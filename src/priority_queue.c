@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static inline int _get_highest_priority(uint16_t mask) {
+static inline int _get_highest_priority(uint32_t mask) {
   return PQ_BITMASK_BITS - __builtin_clz(mask) - 1;
 }
 

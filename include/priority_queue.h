@@ -4,7 +4,7 @@
 #include "task.h"
 #include <pthread.h>
 
-#define PQ_BITMASK_BITS 16
+#define PQ_BITMASK_BITS 32
 
 struct priority_queue_t {
   struct task_t   *heads[NUM_PRIORITIES];   /* FIFO with head and tail */

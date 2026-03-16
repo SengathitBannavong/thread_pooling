@@ -2,11 +2,19 @@
 
 Thread-safe priority task queue and task model for building a thread pool in C (POSIX threads).
 
+## Academic Context
+
+This repository is Project 2 for my major coursework.
+The objective is to design and implement a thread pool system + task scheduler in C as a core component for knowing concurent programing work.
+
 ## Current Status
 
-- `task` module: compiles and basic test target works.
-- `priority_queue` module: implemented but still work-in-progress (build warnings/errors remain).
-- [Unity test framework](https://github.com/ThrowTheSwitch/Unity) is cloned in `Unity/` but not integrated into the Makefile yet.
+- `task` module: implemented and tested.
+- `priority_queue` module: implemented and covered by Unity tests.
+- Unity test framework is integrated in `makefile`.
+- Current test result:
+	- `make test` -> PASS (3/3)
+	- `make test-tsan` -> PASS (3/3)
 
 ## Project Structure
 
@@ -34,11 +42,30 @@ Thread-safe priority task queue and task model for building a thread pool in C (
 
 ## Build And Run
 
-### 1) Build the current test target
+### 1) Run unit tests
 
 ```bash
 make test
 ```
+
+### 2) Run tests with ThreadSanitizer
+
+```bash
+make test-tsan
+```
+
+### 3) Clean binaries
+
+```bash
+make clean
+```
+
+## Makefile Targets
+
+- `make` or `make all`: build and run default tests
+- `make test`: build and run Unity tests
+- `make test-tsan`: build and run Unity tests with ThreadSanitizer
+- `make clean`: remove generated test binaries from `bin/`
 
 ## Module Summary
 
@@ -60,11 +87,14 @@ make test
 
 ## Known Issues (Current)
 
+- No failing tests at the moment.
+- Potential future improvement: add more stress/concurrency test cases with 1 producer and multiple consumer threads.
 
 ## Next Improvements
 
-- Integrate Unity into Makefile test targets.
-- Impiment Thread Pool core
+- Implement thread pool core (worker lifecycle, queue integration, shutdown flow).
+- Add stress tests for blocking `pq_pop` with multiple workers.
+- Add CI workflow to run `make test` and `make test-tsan` automatically.
 
 ## License
 
