@@ -1,2 +1,5 @@
 # excute target
 bin/
+
+# log unit test and debug
+log/

@@ -1,9 +1,15 @@
 #include "priority_queue.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 static inline int _get_highest_priority(uint32_t mask) {
   return PQ_BITMASK_BITS - __builtin_clz(mask) - 1;
+}
+
+static inline bool _shutdown_requested(const atomic_bool *shutdown_flag) {
+  return shutdown_flag != NULL &&
+         atomic_load_explicit(shutdown_flag, memory_order_acquire);
 }
 
 int pq_init(struct priority_queue_t *pq) {
@@ -74,12 +80,21 @@ void pq_push(struct priority_queue_t *pq, struct task_t *task) {
 }
 
 struct task_t *pq_pop(struct priority_queue_t *pq) {
+  return pq_pop_until_shutdown(pq, NULL);
+}
+
+struct task_t *pq_pop_until_shutdown(struct priority_queue_t *pq,
+                                     const atomic_bool *shutdown_flag) {
   if(pq == NULL) return NULL;
 
   pthread_mutex_lock(&pq->mutex);
 
   // wait for task
   while(pq->ready_mask == 0) {
+    if(_shutdown_requested(shutdown_flag)) {
+      pthread_mutex_unlock(&pq->mutex);
+      return NULL;
+    }
     pthread_cond_wait(&pq->not_empty, &pq->mutex); // go with unlock mutex and comeback with lock mutex
   }
 
@@ -100,6 +115,14 @@ struct task_t *pq_pop(struct priority_queue_t *pq) {
 
   pthread_mutex_unlock(&pq->mutex);
   return task;
+}
+
+void pq_wake_all(struct priority_queue_t *pq) {
+  if(pq == NULL) return;
+
+  pthread_mutex_lock(&pq->mutex);
+  pthread_cond_broadcast(&pq->not_empty);
+  pthread_mutex_unlock(&pq->mutex);
 }
 
 struct task_t *pq_pop_nonblock(struct priority_queue_t *pq) {
