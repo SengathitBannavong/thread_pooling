@@ -1,0 +1,2592 @@
+thread #0 is on level #1
+thread #0 is waiting
+thread #0 is done waiting with check_k=1 and victim[1]=1 
+thread #0 is on level #2
+thread #1 is on level #1
+thread #1 is waiting
+thread #0 is waiting
+thread #1 is done waiting with check_k=1 and victim[1]=2 
+thread #2 is on level #1
+thread #1 is on level #2
+thread #1 is waiting
+thread #2 is waiting
+thread #0 is done waiting with check_k=1 and victim[2]=1 
+thread #0 is on level #3
+thread #0 is waiting
+thread #3 is on level #1
+thread #2 is done waiting with check_k=1 and victim[1]=3 
+thread #3 is waiting
+thread #2 is on level #2
+thread #1 is done waiting with check_k=1 and victim[2]=2 
+thread #1 is on level #3
+thread #0 is done waiting with check_k=1 and victim[3]=1 
+thread #1 is waiting
+thread #0 is on level #4
+thread #0 is waiting
+thread #2 is waiting
+thread #3 is done waiting with check_k=1 and victim[1]=4 
+thread #3 is on level #2
+thread #4 is on level #1
+thread #4 is waiting
+thread #3 is waiting
+thread #2 is done waiting with check_k=1 and victim[2]=3 
+thread #2 is on level #3
+thread #2 is waiting
+thread #1 is done waiting with check_k=1 and victim[3]=2 
+thread #1 is on level #4
+thread #0 is done waiting with check_k=1 and victim[4]=1 
+thread #0 is on level #5
+thread #0 is waiting
+thread #1 is waiting
+thread #4 is done waiting with check_k=1 and victim[1]=5 
+thread #4 is on level #2
+thread #5 is on level #1
+thread #4 is waiting
+thread #3 is done waiting with check_k=1 and victim[2]=4 
+thread #3 is on level #3
+thread #2 is done waiting with check_k=1 and victim[3]=3 
+thread #2 is on level #4
+thread #2 is waiting
+thread #1 is done waiting with check_k=1 and victim[4]=2 
+thread #5 is waiting
+thread #1 is on level #5
+thread #1 is waiting
+thread #0 is done waiting with check_k=1 and victim[5]=1 
+thread #0 is on level #6
+thread #0 is waiting
+thread #3 is waiting
+thread #5 is done waiting with check_k=1 and victim[1]=6 
+thread #5 is on level #2
+thread #6 is on level #1
+thread #5 is waiting
+thread #6 is waiting
+thread #4 is done waiting with check_k=1 and victim[2]=5 
+thread #4 is on level #3
+thread #4 is waiting
+thread #3 is done waiting with check_k=1 and victim[3]=4 
+thread #3 is on level #4
+thread #2 is done waiting with check_k=1 and victim[4]=3 
+thread #3 is waiting
+thread #2 is on level #5
+thread #2 is waiting
+thread #1 is done waiting with check_k=1 and victim[5]=2 
+thread #1 is on level #6
+thread #1 is waiting
+thread #0 is done waiting with check_k=1 and victim[6]=1 
+thread #0 is on level #7
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #1 is done waiting with check_k=0 and victim[6]=1 
+thread #1 is on level #7
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #1 is waiting
+thread #2 is done waiting with check_k=0 and victim[5]=2 
+thread #2 is on level #6
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #2 is on level #7
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking
+thread #2 is on level #1
+thread #3 is done waiting with check_k=0 and victim[4]=3 
+thread #0 is waiting
+thread #0 is done waiting with check_k=1 and victim[1]=2 
+thread #0 is on level #2
+thread #5 is done waiting with check_k=1 and victim[2]=0 
+thread #3 is on level #5
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[5]=3 
+thread #3 is on level #6
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #3 is on level #7
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #3 on critical section
+thread #1 is done waiting with check_k=1 and victim[1]=2 
+thread #1 is on level #2
+thread #6 is done waiting with check_k=1 and victim[1]=0 
+thread #4 is done waiting with check_k=1 and victim[3]=5 
+thread #7 is on level #1
+thread #7 is waiting
+thread #4 is on level #4
+thread #4 is waiting
+thread #6 is on level #2
+thread #6 is waiting
+thread #2 is waiting
+thread #2 is done waiting with check_k=1 and victim[1]=7 
+thread #2 is on level #2
+thread #6 is done waiting with check_k=1 and victim[2]=2 
+thread #2 is waiting
+thread #1 is waiting
+thread #6 is on level #3
+thread #6 is waiting
+thread #5 is on level #3
+thread #5 is waiting
+thread #5 is done waiting with check_k=1 and victim[3]=6 
+thread #5 is on level #4
+thread #4 is done waiting with check_k=1 and victim[4]=5 
+thread #5 is waiting
+thread #4 is on level #5
+thread #4 is waiting
+thread #3 done critical section
+thread #3 is unlocking
+thread #3 is on level #1
+thread #7 is done waiting with check_k=1 and victim[1]=3 
+thread #4 is done waiting with check_k=0 and victim[5]=4 
+thread #1 is done waiting with check_k=1 and victim[2]=2 
+thread #4 is on level #6
+thread #1 is on level #3
+thread #4 is waiting
+thread #6 is done waiting with check_k=1 and victim[3]=1 
+thread #1 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #5 is done waiting with check_k=1 and victim[4]=6 
+thread #0 is waiting
+thread #6 is on level #4
+thread #4 is on level #7
+thread #3 is waiting
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #5 is on level #5
+thread #6 is waiting
+thread #4 is unlocking
+thread #5 is waiting
+thread #4 is on level #1
+thread #3 is done waiting with check_k=1 and victim[1]=4 
+thread #4 is waiting
+thread #7 is on level #2
+thread #7 is waiting
+thread #0 is done waiting with check_k=1 and victim[2]=7 
+thread #0 is on level #3
+thread #1 is done waiting with check_k=1 and victim[3]=0 
+thread #0 is waiting
+thread #6 is done waiting with check_k=1 and victim[4]=1 
+thread #6 is on level #5
+thread #1 is on level #4
+thread #6 is waiting
+thread #1 is waiting
+thread #2 is done waiting with check_k=1 and victim[2]=7 
+thread #2 is on level #3
+thread #2 is waiting
+thread #0 is done waiting with check_k=1 and victim[3]=2 
+thread #0 is on level #4
+thread #0 is waiting
+thread #1 is done waiting with check_k=1 and victim[4]=0 
+thread #1 is on level #5
+thread #6 is done waiting with check_k=1 and victim[5]=1 
+thread #1 is waiting
+thread #3 is on level #2
+thread #6 is on level #6
+thread #3 is waiting
+thread #6 is waiting
+thread #7 is done waiting with check_k=1 and victim[2]=3 
+thread #7 is on level #3
+thread #2 is done waiting with check_k=1 and victim[3]=7 
+thread #7 is waiting
+thread #2 is on level #4
+thread #2 is waiting
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #0 is done waiting with check_k=1 and victim[4]=2 
+thread #6 is on level #7
+thread #0 is on level #5
+thread #0 is waiting
+thread #1 is done waiting with check_k=1 and victim[5]=0 
+thread #5 is done waiting with check_k=0 and victim[5]=5 
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #6 is on level #1
+thread #6 is waiting
+thread #4 is done waiting with check_k=1 and victim[1]=6 
+thread #4 is on level #2
+thread #4 is waiting
+thread #3 is done waiting with check_k=1 and victim[2]=4 
+thread #3 is on level #3
+thread #7 is done waiting with check_k=1 and victim[3]=3 
+thread #3 is waiting
+thread #7 is on level #4
+thread #5 is on level #6
+thread #2 is done waiting with check_k=1 and victim[4]=7 
+thread #7 is waiting
+thread #5 is waiting
+thread #2 is on level #5
+thread #2 is waiting
+thread #0 is done waiting with check_k=1 and victim[5]=2 
+thread #0 is on level #6
+thread #5 is done waiting with check_k=1 and victim[6]=0 
+thread #0 is waiting
+thread #5 is on level #7
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking
+thread #5 is on level #1
+thread #5 is waiting
+thread #6 is done waiting with check_k=1 and victim[1]=5 
+thread #6 is on level #2
+thread #4 is done waiting with check_k=1 and victim[2]=6 
+thread #4 is on level #3
+thread #3 is done waiting with check_k=1 and victim[3]=4 
+thread #3 is on level #4
+thread #7 is done waiting with check_k=1 and victim[4]=3 
+thread #3 is waiting
+thread #7 is on level #5
+thread #2 is done waiting with check_k=1 and victim[5]=7 
+thread #2 is on level #6
+thread #0 is done waiting with check_k=1 and victim[6]=2 
+thread #2 is waiting
+thread #0 is on level #7
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #0 is waiting
+thread #5 is done waiting with check_k=1 and victim[1]=0 
+thread #7 is waiting
+thread #5 is on level #2
+thread #6 is waiting
+thread #5 is waiting
+thread #6 is done waiting with check_k=1 and victim[2]=5 
+thread #6 is on level #3
+thread #6 is waiting
+thread #4 is waiting
+thread #4 is done waiting with check_k=1 and victim[3]=6 
+thread #4 is on level #4
+thread #3 is done waiting with check_k=1 and victim[4]=4 
+thread #4 is waiting
+thread #3 is on level #5
+thread #7 is done waiting with check_k=1 and victim[5]=3 
+thread #3 is waiting
+thread #2 is done waiting with check_k=1 and victim[6]=7 
+thread #2 is on level #7
+thread #7 is on level #6
+thread #2 is waiting
+thread #7 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking
+thread #2 is on level #1
+thread #2 is waiting
+thread #0 is done waiting with check_k=1 and victim[1]=2 
+thread #0 is on level #2
+thread #0 is waiting
+thread #5 is done waiting with check_k=1 and victim[2]=0 
+thread #5 is on level #3
+thread #6 is done waiting with check_k=1 and victim[3]=5 
+thread #5 is waiting
+thread #6 is on level #4
+thread #4 is done waiting with check_k=1 and victim[4]=6 
+thread #6 is waiting
+thread #4 is on level #5
+thread #3 is done waiting with check_k=1 and victim[5]=4 
+thread #3 is on level #6
+thread #3 is waiting
+thread #7 is done waiting with check_k=1 and victim[6]=3 
+thread #7 is on level #7
+thread #7 is waiting
+thread #4 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #7 is on level #1
+thread #2 is done waiting with check_k=1 and victim[1]=7 
+thread #2 is on level #2
+thread #7 is waiting
+thread #1 is on level #6
+thread #1 is waiting
+thread #1 is done waiting with check_k=1 and victim[6]=3 
+thread #1 is on level #7
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #7 is done waiting with check_k=1 and victim[1]=1 
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #1 is waiting
+thread #3 is on level #7
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #0 is done waiting with check_k=1 and victim[2]=2 
+thread #3 on critical section
+thread #0 is on level #3
+thread #3 done critical section
+thread #3 is unlocking
+thread #5 is done waiting with check_k=1 and victim[3]=0 
+thread #3 is on level #1
+thread #4 is done waiting with check_k=0 and victim[5]=4 
+thread #0 is waiting
+thread #3 is waiting
+thread #4 is on level #6
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #4 is on level #1
+thread #6 is done waiting with check_k=0 and victim[4]=6 
+thread #5 is on level #4
+thread #5 is waiting
+thread #6 is on level #5
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[5]=6 
+thread #6 is on level #6
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #6 is on level #7
+thread #6 is waiting
+thread #1 is done waiting with check_k=1 and victim[1]=3 
+thread #4 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #6 is on level #1
+thread #4 is done waiting with check_k=1 and victim[1]=6 
+thread #1 is on level #2
+thread #4 is on level #2
+thread #4 is waiting
+thread #6 is waiting
+thread #7 is on level #2
+thread #3 is done waiting with check_k=1 and victim[1]=4 
+thread #3 is on level #2
+thread #4 is done waiting with check_k=1 and victim[2]=3 
+thread #3 is waiting
+thread #4 is on level #3
+thread #4 is waiting
+thread #0 is done waiting with check_k=1 and victim[3]=4 
+thread #0 is on level #4
+thread #0 is waiting
+thread #1 is waiting
+thread #1 is done waiting with check_k=1 and victim[2]=3 
+thread #1 is on level #3
+thread #4 is done waiting with check_k=1 and victim[3]=1 
+thread #1 is waiting
+thread #4 is on level #4
+thread #4 is waiting
+thread #0 is done waiting with check_k=1 and victim[4]=4 
+thread #7 is waiting
+thread #0 is on level #5
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[5]=0 
+thread #7 is done waiting with check_k=1 and victim[2]=3 
+thread #0 is on level #6
+thread #7 is on level #3
+thread #2 is waiting
+thread #7 is waiting
+thread #2 is done waiting with check_k=1 and victim[2]=3 
+thread #2 is on level #3
+thread #7 is done waiting with check_k=1 and victim[3]=2 
+thread #2 is waiting
+thread #7 is on level #4
+thread #0 is waiting
+thread #7 is waiting
+thread #1 is done waiting with check_k=1 and victim[3]=7 
+thread #1 is on level #4
+thread #7 is done waiting with check_k=1 and victim[4]=1 
+thread #1 is waiting
+thread #7 is on level #5
+thread #7 is waiting
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #0 is on level #7
+thread #0 is waiting
+thread #5 is done waiting with check_k=0 and victim[4]=5 
+thread #4 is done waiting with check_k=1 and victim[4]=7 
+thread #4 is on level #5
+thread #4 is waiting
+thread #7 is done waiting with check_k=1 and victim[5]=4 
+thread #7 is on level #6
+thread #7 is waiting
+thread #4 is done waiting with check_k=1 and victim[5]=5 
+thread #5 is on level #5
+thread #7 is done waiting with check_k=1 and victim[6]=4 
+thread #5 is waiting
+thread #4 is on level #6
+thread #7 is on level #7
+thread #4 is waiting
+thread #7 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #0 is waiting
+thread #6 is done waiting with check_k=1 and victim[1]=0 
+thread #6 is on level #2
+thread #3 is done waiting with check_k=1 and victim[2]=6 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #7 is on level #1
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #3 is on level #3
+thread #2 is done waiting with check_k=1 and victim[3]=3 
+thread #2 is on level #4
+thread #2 is waiting
+thread #1 is done waiting with check_k=1 and victim[4]=2 
+thread #4 is on level #7
+thread #1 is on level #5
+thread #1 is waiting
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #4 is on level #1
+thread #4 is waiting
+thread #6 is waiting
+thread #0 is done waiting with check_k=1 and victim[1]=7 
+thread #5 is done waiting with check_k=1 and victim[5]=1 
+thread #6 is done waiting with check_k=1 and victim[2]=0 
+thread #6 is on level #3
+thread #6 is waiting
+thread #5 is on level #6
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[6]=5 
+thread #5 is on level #7
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking
+thread #5 is on level #1
+thread #4 is done waiting with check_k=1 and victim[1]=5 
+thread #5 is waiting
+thread #0 is on level #2
+thread #0 is waiting
+thread #4 is on level #2
+thread #4 is waiting
+thread #0 is done waiting with check_k=1 and victim[2]=4 
+thread #3 is waiting
+thread #3 is done waiting with check_k=1 and victim[3]=0 
+thread #3 is on level #4
+thread #3 is waiting
+thread #2 is done waiting with check_k=1 and victim[4]=3 
+thread #0 is on level #3
+thread #6 is done waiting with check_k=1 and victim[3]=0 
+thread #6 is on level #4
+thread #3 is done waiting with check_k=1 and victim[4]=6 
+thread #6 is waiting
+thread #3 is on level #5
+thread #2 is on level #5
+thread #3 is waiting
+thread #2 is waiting
+thread #3 is done waiting with check_k=1 and victim[5]=2 
+thread #3 is on level #6
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #3 is on level #7
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #3 on critical section
+thread #3 done critical section
+thread #0 is waiting
+thread #3 is unlocking
+thread #3 is on level #1
+thread #3 is waiting
+thread #5 is done waiting with check_k=1 and victim[1]=3 
+thread #5 is on level #2
+thread #5 is waiting
+thread #4 is done waiting with check_k=1 and victim[2]=5 
+thread #7 is waiting
+thread #0 is done waiting with check_k=1 and victim[3]=4 
+thread #0 is on level #4
+thread #6 is done waiting with check_k=1 and victim[4]=0 
+thread #7 is done waiting with check_k=1 and victim[1]=3 
+thread #2 is done waiting with check_k=1 and victim[5]=6 
+thread #6 is on level #5
+thread #5 is done waiting with check_k=1 and victim[2]=7 
+thread #5 is on level #3
+thread #5 is waiting
+thread #4 is on level #3
+thread #6 is waiting
+thread #4 is waiting
+thread #4 is done waiting with check_k=1 and victim[3]=5 
+thread #1 is done waiting with check_k=0 and victim[5]=1 
+thread #0 is waiting
+thread #0 is done waiting with check_k=1 and victim[4]=4 
+thread #6 is done waiting with check_k=1 and victim[5]=0 
+thread #0 is on level #5
+thread #0 is waiting
+thread #2 is on level #6
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #2 is on level #7
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking
+thread #2 is on level #1
+thread #3 is done waiting with check_k=1 and victim[1]=2 
+thread #2 is waiting
+thread #3 is on level #2
+thread #3 is waiting
+thread #6 is on level #6
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #6 is on level #7
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #6 is on level #1
+thread #1 is on level #6
+thread #6 is waiting
+thread #2 is done waiting with check_k=1 and victim[1]=6 
+thread #2 is on level #2
+thread #3 is done waiting with check_k=1 and victim[2]=2 
+thread #2 is waiting
+thread #1 is waiting
+thread #5 is done waiting with check_k=1 and victim[3]=3 
+thread #1 is done waiting with check_k=0 and victim[6]=1 
+thread #1 is on level #7
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #7 is on level #2
+thread #6 is done waiting with check_k=1 and victim[1]=1 
+thread #0 is done waiting with check_k=0 and victim[5]=0 
+thread #6 is on level #2
+thread #4 is on level #4
+thread #4 is waiting
+thread #4 is done waiting with check_k=1 and victim[4]=5 
+thread #4 is on level #5
+thread #4 is waiting
+thread #0 is on level #6
+thread #7 is waiting
+thread #7 is done waiting with check_k=1 and victim[2]=6 
+thread #2 is done waiting with check_k=1 and victim[2]=6 
+thread #1 is on level #1
+thread #2 is on level #3
+thread #1 is waiting
+thread #7 is on level #3
+thread #2 is waiting
+thread #2 is done waiting with check_k=1 and victim[3]=7 
+thread #7 is waiting
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #0 is on level #7
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #1 is done waiting with check_k=1 and victim[1]=0 
+thread #1 is on level #2
+thread #1 is waiting
+thread #4 is done waiting with check_k=0 and victim[5]=4 
+thread #4 is on level #6
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #4 is on level #1
+thread #4 is waiting
+thread #0 is waiting
+thread #0 is done waiting with check_k=1 and victim[1]=4 
+thread #0 is on level #2
+thread #1 is done waiting with check_k=1 and victim[2]=0 
+thread #0 is waiting
+thread #6 is waiting
+thread #7 is done waiting with check_k=1 and victim[3]=1 
+thread #7 is on level #4
+thread #1 is on level #3
+thread #7 is waiting
+thread #1 is waiting
+thread #2 is on level #4
+thread #2 is waiting
+thread #2 is done waiting with check_k=1 and victim[4]=7 
+thread #2 is on level #5
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[5]=2 
+thread #2 is on level #6
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #2 is on level #7
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking
+thread #2 is on level #1
+thread #2 is waiting
+thread #5 is on level #4
+thread #3 is on level #3
+thread #5 is waiting
+thread #5 is done waiting with check_k=1 and victim[4]=7 
+thread #5 is on level #5
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[5]=5 
+thread #5 is on level #6
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[6]=5 
+thread #5 is on level #7
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking
+thread #5 is on level #1
+thread #2 is done waiting with check_k=1 and victim[1]=5 
+thread #7 is done waiting with check_k=0 and victim[4]=7 
+thread #5 is waiting
+thread #0 is done waiting with check_k=1 and victim[2]=2 
+thread #0 is on level #3
+thread #7 is on level #5
+thread #1 is done waiting with check_k=1 and victim[3]=0 
+thread #3 is waiting
+thread #7 is waiting
+thread #3 is done waiting with check_k=1 and victim[3]=0 
+thread #2 is on level #2
+thread #1 is on level #4
+thread #3 is on level #4
+thread #1 is waiting
+thread #2 is waiting
+thread #3 is waiting
+thread #1 is done waiting with check_k=1 and victim[4]=3 
+thread #1 is on level #5
+thread #7 is done waiting with check_k=1 and victim[5]=1 
+thread #1 is waiting
+thread #7 is on level #6
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[6]=7 
+thread #7 is on level #7
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #7 is on level #1
+thread #5 is done waiting with check_k=1 and victim[1]=7 
+thread #5 is on level #2
+thread #2 is done waiting with check_k=1 and victim[2]=5 
+thread #4 is done waiting with check_k=1 and victim[1]=2 
+thread #5 is waiting
+thread #2 is on level #3
+thread #2 is waiting
+thread #6 is done waiting with check_k=1 and victim[2]=0 
+thread #6 is on level #3
+thread #0 is waiting
+thread #1 is done waiting with check_k=0 and victim[5]=1 
+thread #0 is done waiting with check_k=1 and victim[3]=6 
+thread #0 is on level #4
+thread #1 is on level #6
+thread #0 is waiting
+thread #6 is waiting
+thread #2 is done waiting with check_k=1 and victim[3]=6 
+thread #2 is on level #4
+thread #2 is waiting
+thread #0 is done waiting with check_k=1 and victim[4]=2 
+thread #0 is on level #5
+thread #0 is waiting
+thread #4 is on level #2
+thread #5 is done waiting with check_k=1 and victim[2]=4 
+thread #4 is waiting
+thread #5 is on level #3
+thread #6 is done waiting with check_k=1 and victim[3]=5 
+thread #6 is on level #4
+thread #2 is done waiting with check_k=1 and victim[4]=6 
+thread #6 is waiting
+thread #2 is on level #5
+thread #0 is done waiting with check_k=1 and victim[5]=2 
+thread #0 is on level #6
+thread #0 is waiting
+thread #2 is waiting
+thread #7 is waiting
+thread #5 is waiting
+thread #1 is waiting
+thread #1 is done waiting with check_k=1 and victim[6]=0 
+thread #1 is on level #7
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #1 is waiting
+thread #7 is done waiting with check_k=1 and victim[1]=1 
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #4 is done waiting with check_k=1 and victim[2]=7 
+thread #4 is on level #3
+thread #5 is done waiting with check_k=1 and victim[3]=4 
+thread #5 is on level #4
+thread #6 is done waiting with check_k=1 and victim[4]=5 
+thread #5 is waiting
+thread #6 is on level #5
+thread #3 is done waiting with check_k=1 and victim[4]=0 
+thread #6 is waiting
+thread #3 is on level #5
+thread #3 is waiting
+thread #6 is done waiting with check_k=1 and victim[5]=3 
+thread #6 is on level #6
+thread #6 is waiting
+thread #2 is done waiting with check_k=1 and victim[5]=6 
+thread #2 is on level #6
+thread #6 is done waiting with check_k=1 and victim[6]=2 
+thread #4 is waiting
+thread #6 is on level #7
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #6 is on level #1
+thread #1 is done waiting with check_k=1 and victim[1]=6 
+thread #6 is waiting
+thread #1 is on level #2
+thread #1 is waiting
+thread #0 is on level #7
+thread #0 is waiting
+thread #2 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #6 is done waiting with check_k=1 and victim[1]=0 
+thread #2 is on level #7
+thread #6 is on level #2
+thread #7 is on level #2
+thread #7 is waiting
+thread #7 is done waiting with check_k=1 and victim[2]=6 
+thread #7 is on level #3
+thread #7 is waiting
+thread #4 is done waiting with check_k=1 and victim[3]=7 
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #6 is waiting
+thread #4 is on level #4
+thread #2 on critical section
+thread #0 is waiting
+thread #1 is done waiting with check_k=1 and victim[2]=6 
+thread #1 is on level #3
+thread #1 is waiting
+thread #4 is waiting
+thread #7 is done waiting with check_k=1 and victim[3]=1 
+thread #7 is on level #4
+thread #7 is waiting
+thread #4 is done waiting with check_k=1 and victim[4]=7 
+thread #5 is done waiting with check_k=1 and victim[4]=4 
+thread #3 is done waiting with check_k=1 and victim[5]=4 
+thread #4 is on level #5
+thread #2 done critical section
+thread #5 is on level #5
+thread #2 is unlocking
+thread #5 is waiting
+thread #0 is done waiting with check_k=1 and victim[1]=2 
+thread #2 is on level #1
+thread #2 is waiting
+thread #3 is on level #6
+thread #3 is waiting
+thread #6 is done waiting with check_k=1 and victim[2]=0 
+thread #0 is on level #2
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #6 is on level #3
+thread #0 is waiting
+thread #3 is on level #7
+thread #6 is waiting
+thread #1 is done waiting with check_k=1 and victim[3]=6 
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #1 is on level #4
+thread #3 on critical section
+thread #1 is waiting
+thread #7 is done waiting with check_k=1 and victim[4]=1 
+thread #3 done critical section
+thread #5 is done waiting with check_k=1 and victim[5]=7 
+thread #3 is unlocking
+thread #3 is on level #1
+thread #5 is on level #6
+thread #3 is waiting
+thread #7 is on level #5
+thread #7 is waiting
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[6]=5 
+thread #5 is on level #7
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking
+thread #5 is on level #1
+thread #3 is done waiting with check_k=1 and victim[1]=5 
+thread #4 is waiting
+thread #4 is done waiting with check_k=1 and victim[5]=7 
+thread #4 is on level #6
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #4 is on level #1
+thread #7 is done waiting with check_k=0 and victim[5]=7 
+thread #2 is done waiting with check_k=1 and victim[1]=3 
+thread #7 is on level #6
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[6]=7 
+thread #4 is waiting
+thread #7 is on level #7
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #7 is on level #1
+thread #4 is done waiting with check_k=1 and victim[1]=7 
+thread #7 is waiting
+thread #4 is on level #2
+thread #4 is waiting
+thread #1 is done waiting with check_k=0 and victim[4]=1 
+thread #1 is on level #5
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[5]=1 
+thread #1 is on level #6
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[6]=1 
+thread #1 is on level #7
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #2 is on level #2
+thread #0 is done waiting with check_k=1 and victim[2]=3 
+thread #6 is done waiting with check_k=0 and victim[3]=6 
+thread #4 is done waiting with check_k=1 and victim[2]=2 
+thread #4 is on level #3
+thread #4 is waiting
+thread #6 is on level #4
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[4]=6 
+thread #6 is on level #5
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[5]=6 
+thread #6 is on level #6
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #6 is on level #7
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #7 is done waiting with check_k=1 and victim[1]=1 
+thread #4 is done waiting with check_k=0 and victim[3]=4 
+thread #4 is on level #4
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[4]=4 
+thread #4 is on level #5
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[5]=4 
+thread #7 is on level #2
+thread #7 is waiting
+thread #6 is on level #1
+thread #4 is on level #6
+thread #6 is waiting
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #5 is waiting
+thread #5 is done waiting with check_k=1 and victim[1]=6 
+thread #5 is on level #2
+thread #2 is waiting
+thread #7 is done waiting with check_k=1 and victim[2]=5 
+thread #4 on critical section
+thread #0 is on level #3
+thread #7 is on level #3
+thread #2 is done waiting with check_k=1 and victim[2]=5 
+thread #7 is waiting
+thread #2 is on level #3
+thread #4 done critical section
+thread #2 is waiting
+thread #4 is unlocking
+thread #4 is on level #1
+thread #6 is done waiting with check_k=1 and victim[1]=4 
+thread #4 is waiting
+thread #7 is done waiting with check_k=1 and victim[3]=2 
+thread #7 is on level #4
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[4]=7 
+thread #7 is on level #5
+thread #7 is waiting
+thread #6 is on level #2
+thread #7 is done waiting with check_k=0 and victim[5]=7 
+thread #3 is on level #2
+thread #7 is on level #6
+thread #7 is waiting
+thread #5 is waiting
+thread #0 is waiting
+thread #0 is done waiting with check_k=1 and victim[3]=2 
+thread #0 is on level #4
+thread #0 is waiting
+thread #3 is waiting
+thread #3 is done waiting with check_k=1 and victim[2]=6 
+thread #3 is on level #3
+thread #2 is done waiting with check_k=1 and victim[3]=3 
+thread #2 is on level #4
+thread #3 is waiting
+thread #5 is done waiting with check_k=1 and victim[2]=6 
+thread #5 is on level #3
+thread #3 is done waiting with check_k=1 and victim[3]=5 
+thread #0 is done waiting with check_k=1 and victim[4]=2 
+thread #3 is on level #4
+thread #3 is waiting
+thread #5 is waiting
+thread #0 is on level #5
+thread #0 is waiting
+thread #7 is done waiting with check_k=0 and victim[6]=7 
+thread #2 is waiting
+thread #2 is done waiting with check_k=1 and victim[4]=3 
+thread #2 is on level #5
+thread #2 is waiting
+thread #0 is done waiting with check_k=1 and victim[5]=2 
+thread #0 is on level #6
+thread #0 is waiting
+thread #1 is on level #1
+thread #7 is on level #7
+thread #1 is waiting
+thread #1 is done waiting with check_k=1 and victim[1]=4 
+thread #7 is waiting
+thread #1 is on level #2
+thread #1 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #7 is on level #1
+thread #4 is done waiting with check_k=1 and victim[1]=7 
+thread #7 is waiting
+thread #4 is on level #2
+thread #4 is waiting
+thread #1 is done waiting with check_k=1 and victim[2]=4 
+thread #1 is on level #3
+thread #5 is done waiting with check_k=1 and victim[3]=1 
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #0 is on level #7
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #6 is waiting
+thread #2 is done waiting with check_k=0 and victim[5]=2 
+thread #5 is on level #4
+thread #3 is done waiting with check_k=1 and victim[4]=5 
+thread #3 is on level #5
+thread #5 is waiting
+thread #3 is waiting
+thread #6 is done waiting with check_k=1 and victim[2]=4 
+thread #2 is on level #6
+thread #6 is on level #3
+thread #1 is waiting
+thread #6 is waiting
+thread #7 is done waiting with check_k=1 and victim[1]=0 
+thread #7 is on level #2
+thread #4 is done waiting with check_k=1 and victim[2]=7 
+thread #7 is waiting
+thread #1 is done waiting with check_k=1 and victim[3]=6 
+thread #0 is on level #1
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #0 is waiting
+thread #1 is on level #4
+thread #1 is waiting
+thread #4 is on level #3
+thread #4 is waiting
+thread #2 is on level #7
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking
+thread #2 is on level #1
+thread #0 is done waiting with check_k=1 and victim[1]=2 
+thread #6 is done waiting with check_k=1 and victim[3]=4 
+thread #0 is on level #2
+thread #2 is waiting
+thread #3 is done waiting with check_k=0 and victim[5]=3 
+thread #6 is on level #4
+thread #0 is waiting
+thread #7 is done waiting with check_k=1 and victim[2]=0 
+thread #3 is on level #6
+thread #6 is waiting
+thread #7 is on level #3
+thread #4 is done waiting with check_k=1 and victim[3]=7 
+thread #7 is waiting
+thread #5 is done waiting with check_k=1 and victim[4]=1 
+thread #5 is on level #5
+thread #5 is waiting
+thread #4 is on level #4
+thread #6 is done waiting with check_k=1 and victim[4]=4 
+thread #6 is on level #5
+thread #1 is done waiting with check_k=1 and victim[4]=6 
+thread #6 is waiting
+thread #4 is waiting
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #3 is on level #7
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #3 on critical section
+thread #3 done critical section
+thread #3 is unlocking
+thread #3 is on level #1
+thread #3 is waiting
+thread #2 is done waiting with check_k=1 and victim[1]=3 
+thread #6 is done waiting with check_k=1 and victim[5]=1 
+thread #6 is on level #6
+thread #2 is on level #2
+thread #6 is waiting
+thread #0 is done waiting with check_k=1 and victim[2]=2 
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #0 is on level #3
+thread #2 is waiting
+thread #0 is waiting
+thread #5 is done waiting with check_k=1 and victim[5]=6 
+thread #6 is on level #7
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #6 is on level #1
+thread #3 is done waiting with check_k=1 and victim[1]=6 
+thread #1 is on level #5
+thread #1 is waiting
+thread #6 is waiting
+thread #3 is on level #2
+thread #3 is waiting
+thread #2 is done waiting with check_k=1 and victim[2]=3 
+thread #2 is on level #3
+thread #0 is done waiting with check_k=1 and victim[3]=2 
+thread #2 is waiting
+thread #0 is on level #4
+thread #0 is waiting
+thread #4 is done waiting with check_k=1 and victim[4]=0 
+thread #4 is on level #5
+thread #1 is done waiting with check_k=1 and victim[5]=4 
+thread #4 is waiting
+thread #1 is on level #6
+thread #1 is waiting
+thread #7 is done waiting with check_k=1 and victim[3]=0 
+thread #7 is on level #4
+thread #0 is done waiting with check_k=1 and victim[4]=7 
+thread #7 is waiting
+thread #0 is on level #5
+thread #0 is waiting
+thread #4 is done waiting with check_k=1 and victim[5]=0 
+thread #4 is on level #6
+thread #1 is done waiting with check_k=1 and victim[6]=4 
+thread #4 is waiting
+thread #1 is on level #7
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #1 is waiting
+thread #6 is done waiting with check_k=1 and victim[1]=1 
+thread #6 is on level #2
+thread #3 is done waiting with check_k=1 and victim[2]=6 
+thread #6 is waiting
+thread #3 is on level #3
+thread #5 is on level #6
+thread #5 is waiting
+thread #5 is done waiting with check_k=1 and victim[6]=4 
+thread #5 is on level #7
+thread #3 is waiting
+thread #5 is waiting
+thread #2 is done waiting with check_k=1 and victim[3]=3 
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #2 is on level #4
+thread #7 is done waiting with check_k=1 and victim[4]=2 
+thread #2 is waiting
+thread #7 is on level #5
+thread #0 is done waiting with check_k=1 and victim[5]=7 
+thread #7 is waiting
+thread #0 is on level #6
+thread #4 is done waiting with check_k=1 and victim[6]=0 
+thread #5 done critical section
+thread #5 is unlocking
+thread #5 is on level #1
+thread #5 is waiting
+thread #1 is done waiting with check_k=1 and victim[1]=5 
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #1 is on level #2
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #4 is on level #1
+thread #5 is done waiting with check_k=1 and victim[1]=4 
+thread #4 is waiting
+thread #0 is waiting
+thread #5 is on level #2
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #0 is on level #7
+thread #5 is waiting
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #1 is waiting
+thread #7 is done waiting with check_k=0 and victim[5]=7 
+thread #7 is on level #6
+thread #1 is done waiting with check_k=1 and victim[2]=5 
+thread #6 is done waiting with check_k=1 and victim[2]=1 
+thread #4 is done waiting with check_k=1 and victim[1]=0 
+thread #1 is on level #3
+thread #4 is on level #2
+thread #3 is done waiting with check_k=1 and victim[3]=1 
+thread #3 is on level #4
+thread #0 is waiting
+thread #1 is waiting
+thread #3 is waiting
+thread #2 is done waiting with check_k=1 and victim[4]=3 
+thread #2 is on level #5
+thread #2 is waiting
+thread #6 is on level #3
+thread #4 is waiting
+thread #6 is waiting
+thread #1 is done waiting with check_k=1 and victim[3]=6 
+thread #1 is on level #4
+thread #3 is done waiting with check_k=1 and victim[4]=1 
+thread #1 is waiting
+thread #3 is on level #5
+thread #2 is done waiting with check_k=1 and victim[5]=3 
+thread #3 is waiting
+thread #2 is on level #6
+thread #2 is waiting
+thread #7 is waiting
+thread #7 is done waiting with check_k=1 and victim[6]=2 
+thread #7 is on level #7
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #7 is on level #1
+thread #0 is done waiting with check_k=1 and victim[1]=7 
+thread #7 is waiting
+thread #0 is on level #2
+thread #2 is on level #7
+thread #0 is waiting
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking
+thread #2 is on level #1
+thread #7 is done waiting with check_k=1 and victim[1]=2 
+thread #2 is waiting
+thread #4 is done waiting with check_k=1 and victim[2]=0 
+thread #4 is on level #3
+thread #4 is waiting
+thread #0 is done waiting with check_k=1 and victim[2]=7 
+thread #7 is on level #2
+thread #4 is done waiting with check_k=1 and victim[3]=0 
+thread #3 is done waiting with check_k=0 and victim[5]=3 
+thread #1 is done waiting with check_k=1 and victim[4]=4 
+thread #7 is waiting
+thread #6 is done waiting with check_k=1 and victim[3]=4 
+thread #1 is on level #5
+thread #3 is on level #6
+thread #3 is waiting
+thread #1 is waiting
+thread #0 is on level #3
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #0 is waiting
+thread #3 is on level #7
+thread #3 is waiting
+thread #5 is done waiting with check_k=1 and victim[2]=4 
+thread #4 is on level #4
+thread #5 is on level #3
+thread #4 is waiting
+thread #0 is done waiting with check_k=1 and victim[3]=5 
+thread #5 is waiting
+thread #0 is on level #4
+thread #0 is waiting
+thread #4 is done waiting with check_k=1 and victim[4]=6 
+thread #4 is on level #5
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #3 on critical section
+thread #3 done critical section
+thread #3 is unlocking
+thread #3 is on level #1
+thread #3 is waiting
+thread #2 is done waiting with check_k=1 and victim[1]=3 
+thread #2 is on level #2
+thread #7 is done waiting with check_k=1 and victim[2]=2 
+thread #7 is on level #3
+thread #7 is waiting
+thread #5 is done waiting with check_k=1 and victim[3]=7 
+thread #1 is done waiting with check_k=1 and victim[5]=4 
+thread #2 is waiting
+thread #5 is on level #4
+thread #5 is waiting
+thread #4 is waiting
+thread #1 is on level #6
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[6]=1 
+thread #6 is on level #4
+thread #1 is on level #7
+thread #6 is waiting
+thread #0 is done waiting with check_k=1 and victim[4]=5 
+thread #6 is done waiting with check_k=1 and victim[4]=5 
+thread #0 is on level #5
+thread #0 is waiting
+thread #6 is on level #5
+thread #0 is done waiting with check_k=1 and victim[5]=6 
+thread #0 is on level #6
+thread #0 is waiting
+thread #6 is waiting
+thread #4 is done waiting with check_k=1 and victim[5]=0 
+thread #4 is on level #6
+thread #0 is done waiting with check_k=1 and victim[6]=4 
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #0 is on level #7
+thread #1 is waiting
+thread #0 is waiting
+thread #3 is done waiting with check_k=1 and victim[1]=1 
+thread #4 is waiting
+thread #3 is on level #2
+thread #2 is done waiting with check_k=1 and victim[2]=3 
+thread #3 is waiting
+thread #2 is on level #3
+thread #7 is done waiting with check_k=1 and victim[3]=2 
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #7 is on level #4
+thread #5 is done waiting with check_k=1 and victim[4]=7 
+thread #5 is on level #5
+thread #6 is done waiting with check_k=1 and victim[5]=5 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #7 is waiting
+thread #0 is waiting
+thread #2 is waiting
+thread #6 is on level #6
+thread #6 is waiting
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #1 is done waiting with check_k=1 and victim[1]=0 
+thread #5 is waiting
+thread #1 is on level #2
+thread #3 is done waiting with check_k=1 and victim[2]=1 
+thread #1 is waiting
+thread #3 is on level #3
+thread #3 is waiting
+thread #2 is done waiting with check_k=1 and victim[3]=3 
+thread #2 is on level #4
+thread #7 is done waiting with check_k=1 and victim[4]=2 
+thread #2 is waiting
+thread #7 is on level #5
+thread #7 is waiting
+thread #5 is done waiting with check_k=1 and victim[5]=7 
+thread #5 is on level #6
+thread #5 is waiting
+thread #6 is done waiting with check_k=1 and victim[6]=5 
+thread #6 is on level #7
+thread #6 is waiting
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #4 is on level #1
+thread #4 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #6 is on level #1
+thread #4 is done waiting with check_k=1 and victim[1]=6 
+thread #4 is on level #2
+thread #1 is done waiting with check_k=1 and victim[2]=4 
+thread #0 is done waiting with check_k=1 and victim[1]=4 
+thread #6 is waiting
+thread #0 is on level #2
+thread #0 is waiting
+thread #5 is done waiting with check_k=0 and victim[6]=5 
+thread #5 is on level #7
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking
+thread #5 is on level #1
+thread #6 is done waiting with check_k=1 and victim[1]=5 
+thread #5 is waiting
+thread #6 is on level #2
+thread #7 is done waiting with check_k=0 and victim[5]=7 
+thread #7 is on level #6
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[6]=7 
+thread #7 is on level #7
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #6 is waiting
+thread #2 is done waiting with check_k=0 and victim[4]=2 
+thread #5 is done waiting with check_k=1 and victim[1]=7 
+thread #7 is on level #1
+thread #2 is on level #5
+thread #0 is done waiting with check_k=1 and victim[2]=6 
+thread #5 is on level #2
+thread #7 is waiting
+thread #0 is on level #3
+thread #5 is waiting
+thread #3 is done waiting with check_k=1 and victim[3]=0 
+thread #3 is on level #4
+thread #3 is waiting
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[5]=2 
+thread #0 is waiting
+thread #2 is on level #6
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #2 is on level #7
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #2 on critical section
+thread #2 done critical section
+thread #6 is done waiting with check_k=1 and victim[2]=5 
+thread #0 is done waiting with check_k=1 and victim[3]=1 
+thread #1 is on level #3
+thread #0 is on level #4
+thread #3 is done waiting with check_k=1 and victim[4]=0 
+thread #3 is on level #5
+thread #3 is waiting
+thread #6 is on level #3
+thread #0 is waiting
+thread #6 is waiting
+thread #1 is waiting
+thread #4 is waiting
+thread #1 is done waiting with check_k=1 and victim[3]=6 
+thread #4 is done waiting with check_k=1 and victim[2]=5 
+thread #1 is on level #4
+thread #4 is on level #3
+thread #1 is waiting
+thread #4 is waiting
+thread #0 is done waiting with check_k=1 and victim[4]=1 
+thread #6 is done waiting with check_k=1 and victim[3]=4 
+thread #3 is done waiting with check_k=1 and victim[5]=0 
+thread #3 is on level #6
+thread #3 is waiting
+thread #0 is on level #5
+thread #1 is done waiting with check_k=1 and victim[4]=6 
+thread #1 is on level #5
+thread #0 is waiting
+thread #1 is waiting
+thread #0 is done waiting with check_k=1 and victim[5]=1 
+thread #0 is on level #6
+thread #3 is done waiting with check_k=1 and victim[6]=0 
+thread #3 is on level #7
+thread #3 is waiting
+thread #0 is waiting
+thread #2 is unlocking
+thread #6 is on level #4
+thread #2 is on level #1
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #6 is waiting
+thread #3 on critical section
+thread #2 is waiting
+thread #3 done critical section
+thread #3 is unlocking
+thread #3 is on level #1
+thread #3 is waiting
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #0 is on level #7
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #3 is done waiting with check_k=1 and victim[1]=0 
+thread #3 is on level #2
+thread #5 is done waiting with check_k=1 and victim[2]=3 
+thread #1 is done waiting with check_k=0 and victim[5]=1 
+thread #1 is on level #6
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[6]=1 
+thread #5 is on level #3
+thread #1 is on level #7
+thread #4 is done waiting with check_k=1 and victim[3]=5 
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #3 is waiting
+thread #4 is on level #4
+thread #2 is done waiting with check_k=1 and victim[1]=3 
+thread #4 is waiting
+thread #2 is on level #2
+thread #2 is waiting
+thread #3 is done waiting with check_k=1 and victim[2]=2 
+thread #3 is on level #3
+thread #3 is waiting
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #1 is waiting
+thread #5 is waiting
+thread #5 is done waiting with check_k=1 and victim[3]=3 
+thread #0 is waiting
+thread #4 is done waiting with check_k=1 and victim[4]=5 
+thread #5 is on level #4
+thread #6 is done waiting with check_k=1 and victim[4]=4 
+thread #5 is waiting
+thread #4 is on level #5
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[5]=4 
+thread #4 is on level #6
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #6 is on level #5
+thread #4 is on level #1
+thread #6 is waiting
+thread #1 is done waiting with check_k=1 and victim[1]=4 
+thread #4 is waiting
+thread #6 is done waiting with check_k=0 and victim[5]=6 
+thread #0 is done waiting with check_k=1 and victim[1]=1 
+thread #6 is on level #6
+thread #2 is done waiting with check_k=1 and victim[2]=1 
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #2 is on level #3
+thread #6 is on level #7
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #0 is on level #2
+thread #6 on critical section
+thread #0 is waiting
+thread #2 is waiting
+thread #1 is on level #2
+thread #3 is done waiting with check_k=1 and victim[3]=2 
+thread #1 is waiting
+thread #3 is on level #4
+thread #5 is done waiting with check_k=1 and victim[4]=3 
+thread #1 is done waiting with check_k=1 and victim[2]=0 
+thread #7 is done waiting with check_k=1 and victim[1]=2 
+thread #7 is on level #2
+thread #6 done critical section
+thread #0 is done waiting with check_k=1 and victim[2]=7 
+thread #6 is unlocking
+thread #1 is on level #3
+thread #6 is on level #1
+thread #4 is done waiting with check_k=1 and victim[1]=6 
+thread #1 is waiting
+thread #4 is on level #2
+thread #4 is waiting
+thread #1 is done waiting with check_k=1 and victim[3]=0 
+thread #1 is on level #4
+thread #1 is waiting
+thread #0 is on level #3
+thread #6 is waiting
+thread #0 is waiting
+thread #5 is on level #5
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[5]=5 
+thread #5 is on level #6
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[6]=5 
+thread #5 is on level #7
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking
+thread #5 is on level #1
+thread #6 is done waiting with check_k=1 and victim[1]=5 
+thread #6 is on level #2
+thread #4 is done waiting with check_k=1 and victim[2]=6 
+thread #6 is waiting
+thread #4 is on level #3
+thread #4 is waiting
+thread #0 is done waiting with check_k=1 and victim[3]=4 
+thread #7 is waiting
+thread #0 is on level #4
+thread #3 is waiting
+thread #7 is done waiting with check_k=1 and victim[2]=6 
+thread #0 is waiting
+thread #2 is done waiting with check_k=1 and victim[3]=1 
+thread #2 is on level #4
+thread #2 is waiting
+thread #0 is done waiting with check_k=1 and victim[4]=2 
+thread #0 is on level #5
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[5]=0 
+thread #0 is on level #6
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #0 is on level #7
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #0 is waiting
+thread #1 is done waiting with check_k=1 and victim[4]=0 
+thread #1 is on level #5
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[5]=1 
+thread #1 is on level #6
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[6]=1 
+thread #1 is on level #7
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #0 is done waiting with check_k=1 and victim[1]=1 
+thread #1 is waiting
+thread #0 is on level #2
+thread #6 is done waiting with check_k=1 and victim[2]=0 
+thread #6 is on level #3
+thread #6 is waiting
+thread #5 is waiting
+thread #5 is done waiting with check_k=1 and victim[1]=1 
+thread #5 is on level #2
+thread #5 is waiting
+thread #0 is waiting
+thread #0 is done waiting with check_k=1 and victim[2]=5 
+thread #0 is on level #3
+thread #0 is waiting
+thread #6 is done waiting with check_k=1 and victim[3]=0 
+thread #6 is on level #4
+thread #6 is waiting
+thread #2 is done waiting with check_k=1 and victim[4]=6 
+thread #2 is on level #5
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[5]=2 
+thread #2 is on level #6
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #2 is on level #7
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking
+thread #2 is on level #1
+thread #2 is waiting
+thread #1 is done waiting with check_k=1 and victim[1]=2 
+thread #1 is on level #2
+thread #5 is done waiting with check_k=1 and victim[2]=1 
+thread #1 is waiting
+thread #5 is on level #3
+thread #7 is on level #3
+thread #4 is done waiting with check_k=1 and victim[3]=7 
+thread #7 is waiting
+thread #7 is done waiting with check_k=1 and victim[3]=5 
+thread #7 is on level #4
+thread #7 is waiting
+thread #6 is done waiting with check_k=1 and victim[4]=7 
+thread #6 is on level #5
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[5]=6 
+thread #6 is on level #6
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #6 is on level #7
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #6 is on level #1
+thread #6 is waiting
+thread #2 is done waiting with check_k=1 and victim[1]=6 
+thread #2 is on level #2
+thread #2 is waiting
+thread #1 is done waiting with check_k=1 and victim[2]=2 
+thread #0 is done waiting with check_k=1 and victim[3]=5 
+thread #1 is on level #3
+thread #0 is on level #4
+thread #1 is waiting
+thread #0 is waiting
+thread #7 is done waiting with check_k=1 and victim[4]=0 
+thread #7 is on level #5
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[5]=7 
+thread #7 is on level #6
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[6]=7 
+thread #7 is on level #7
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #7 is on level #1
+thread #7 is waiting
+thread #6 is done waiting with check_k=1 and victim[1]=7 
+thread #6 is on level #2
+thread #6 is waiting
+thread #2 is done waiting with check_k=1 and victim[2]=6 
+thread #2 is on level #3
+thread #2 is waiting
+thread #1 is done waiting with check_k=1 and victim[3]=2 
+thread #1 is on level #4
+thread #0 is done waiting with check_k=1 and victim[4]=1 
+thread #0 is on level #5
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[5]=0 
+thread #0 is on level #6
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #0 is on level #7
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #7 is done waiting with check_k=1 and victim[1]=0 
+thread #1 is waiting
+thread #7 is on level #2
+thread #6 is done waiting with check_k=1 and victim[2]=7 
+thread #6 is on level #3
+thread #7 is waiting
+thread #0 is waiting
+thread #6 is waiting
+thread #2 is done waiting with check_k=1 and victim[3]=6 
+thread #2 is on level #4
+thread #2 is waiting
+thread #4 is on level #4
+thread #4 is waiting
+thread #4 is done waiting with check_k=1 and victim[4]=2 
+thread #4 is on level #5
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[5]=4 
+thread #4 is on level #6
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #3 is done waiting with check_k=1 and victim[4]=0 
+thread #1 is done waiting with check_k=1 and victim[4]=2 
+thread #1 is on level #5
+thread #1 is waiting
+thread #3 is on level #5
+thread #1 is done waiting with check_k=1 and victim[5]=3 
+thread #3 is waiting
+thread #1 is on level #6
+thread #1 is waiting
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #1 is done waiting with check_k=0 and victim[6]=1 
+thread #0 is done waiting with check_k=1 and victim[1]=4 
+thread #0 is on level #2
+thread #5 is waiting
+thread #0 is waiting
+thread #1 is on level #7
+thread #4 is on level #1
+thread #1 is waiting
+thread #4 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #4 is done waiting with check_k=1 and victim[1]=1 
+thread #1 is waiting
+thread #3 is done waiting with check_k=0 and victim[5]=3 
+thread #5 is done waiting with check_k=1 and victim[3]=6 
+thread #4 is on level #2
+thread #7 is done waiting with check_k=1 and victim[2]=0 
+thread #4 is waiting
+thread #5 is on level #4
+thread #5 is waiting
+thread #3 is on level #6
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #6 is done waiting with check_k=1 and victim[3]=7 
+thread #6 is on level #4
+thread #7 is on level #3
+thread #0 is done waiting with check_k=1 and victim[2]=4 
+thread #7 is waiting
+thread #2 is done waiting with check_k=1 and victim[4]=5 
+thread #2 is on level #5
+thread #2 is waiting
+thread #6 is waiting
+thread #0 is on level #3
+thread #7 is done waiting with check_k=1 and victim[3]=0 
+thread #7 is on level #4
+thread #7 is waiting
+thread #6 is done waiting with check_k=1 and victim[4]=7 
+thread #0 is waiting
+thread #3 is on level #7
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #2 is done waiting with check_k=1 and victim[5]=6 
+thread #2 is on level #6
+thread #2 is waiting
+thread #6 is on level #5
+thread #3 on critical section
+thread #3 done critical section
+thread #6 is waiting
+thread #3 is unlocking
+thread #3 is on level #1
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #1 is done waiting with check_k=1 and victim[1]=3 
+thread #2 is on level #7
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #1 is on level #2
+thread #5 is done waiting with check_k=1 and victim[4]=6 
+thread #4 is done waiting with check_k=1 and victim[2]=1 
+thread #5 is on level #5
+thread #6 is done waiting with check_k=1 and victim[5]=5 
+thread #5 is waiting
+thread #2 on critical section
+thread #6 is on level #6
+thread #2 done critical section
+thread #2 is unlocking
+thread #2 is on level #1
+thread #2 is waiting
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #6 is on level #7
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #6 is on level #1
+thread #5 is done waiting with check_k=0 and victim[5]=5 
+thread #2 is done waiting with check_k=1 and victim[1]=6 
+thread #3 is waiting
+thread #6 is waiting
+thread #3 is done waiting with check_k=1 and victim[1]=6 
+thread #3 is on level #2
+thread #3 is waiting
+thread #2 is on level #2
+thread #3 is done waiting with check_k=1 and victim[2]=2 
+thread #3 is on level #3
+thread #2 is waiting
+thread #3 is waiting
+thread #5 is on level #6
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[6]=5 
+thread #5 is on level #7
+thread #5 is waiting
+thread #4 is on level #3
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #4 is waiting
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking
+thread #4 is done waiting with check_k=1 and victim[3]=3 
+thread #7 is done waiting with check_k=0 and victim[4]=7 
+thread #1 is waiting
+thread #1 is done waiting with check_k=1 and victim[2]=2 
+thread #1 is on level #3
+thread #1 is waiting
+thread #3 is done waiting with check_k=1 and victim[3]=1 
+thread #4 is on level #4
+thread #4 is waiting
+thread #3 is on level #4
+thread #7 is on level #5
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[5]=7 
+thread #7 is on level #6
+thread #5 is on level #1
+thread #6 is done waiting with check_k=1 and victim[1]=5 
+thread #5 is waiting
+thread #0 is done waiting with check_k=1 and victim[3]=4 
+thread #0 is on level #4
+thread #3 is waiting
+thread #6 is on level #2
+thread #6 is waiting
+thread #3 is done waiting with check_k=1 and victim[4]=0 
+thread #3 is on level #5
+thread #0 is waiting
+thread #3 is waiting
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[6]=7 
+thread #4 is done waiting with check_k=1 and victim[4]=3 
+thread #7 is on level #7
+thread #4 is on level #5
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #2 is done waiting with check_k=1 and victim[2]=6 
+thread #3 is done waiting with check_k=1 and victim[5]=4 
+thread #1 is done waiting with check_k=1 and victim[3]=2 
+thread #1 is on level #4
+thread #0 is done waiting with check_k=1 and victim[4]=1 
+thread #3 is on level #6
+thread #3 is waiting
+thread #0 is on level #5
+thread #0 is waiting
+thread #2 is on level #3
+thread #1 is waiting
+thread #2 is waiting
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #7 is on level #1
+thread #5 is done waiting with check_k=1 and victim[1]=7 
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #5 is on level #2
+thread #6 is done waiting with check_k=1 and victim[2]=5 
+thread #5 is waiting
+thread #6 is on level #3
+thread #2 is done waiting with check_k=1 and victim[3]=6 
+thread #6 is waiting
+thread #2 is on level #4
+thread #3 is on level #7
+thread #1 is done waiting with check_k=1 and victim[4]=2 
+thread #2 is waiting
+thread #3 is waiting
+thread #0 is done waiting with check_k=1 and victim[5]=1 
+thread #1 is on level #5
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #7 is waiting
+thread #1 is waiting
+thread #3 on critical section
+thread #3 done critical section
+thread #3 is unlocking
+thread #3 is on level #1
+thread #3 is waiting
+thread #7 is done waiting with check_k=1 and victim[1]=3 
+thread #7 is on level #2
+thread #0 is on level #6
+thread #4 is waiting
+thread #0 is waiting
+thread #4 is done waiting with check_k=1 and victim[5]=1 
+thread #4 is on level #6
+thread #0 is done waiting with check_k=1 and victim[6]=4 
+thread #4 is waiting
+thread #7 is waiting
+thread #0 is on level #7
+thread #5 is done waiting with check_k=1 and victim[2]=7 
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #5 is on level #3
+thread #0 on critical section
+thread #6 is done waiting with check_k=1 and victim[3]=5 
+thread #5 is waiting
+thread #6 is on level #4
+thread #6 is waiting
+thread #2 is done waiting with check_k=1 and victim[4]=6 
+thread #1 is done waiting with check_k=1 and victim[5]=2 
+thread #1 is on level #6
+thread #2 is on level #5
+thread #1 is waiting
+thread #2 is waiting
+thread #4 is done waiting with check_k=1 and victim[6]=1 
+thread #4 is on level #7
+thread #4 is waiting
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #3 is done waiting with check_k=1 and victim[1]=0 
+thread #0 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #7 is done waiting with check_k=1 and victim[2]=3 
+thread #7 is on level #3
+thread #5 is done waiting with check_k=1 and victim[3]=7 
+thread #5 is on level #4
+thread #3 is on level #2
+thread #5 is waiting
+thread #3 is waiting
+thread #6 is done waiting with check_k=1 and victim[4]=5 
+thread #6 is on level #5
+thread #2 is done waiting with check_k=1 and victim[5]=6 
+thread #2 is on level #6
+thread #1 is done waiting with check_k=1 and victim[6]=2 
+thread #1 is on level #7
+thread #1 is waiting
+thread #2 is waiting
+thread #6 is waiting
+thread #7 is waiting
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #4 is on level #1
+thread #4 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #1 is waiting
+thread #4 is done waiting with check_k=1 and victim[1]=1 
+thread #2 is on level #7
+thread #4 is on level #2
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #3 is done waiting with check_k=1 and victim[2]=4 
+thread #0 is done waiting with check_k=1 and victim[1]=4 
+thread #4 is waiting
+thread #0 is on level #2
+thread #4 is done waiting with check_k=1 and victim[2]=0 
+thread #0 is waiting
+thread #7 is done waiting with check_k=1 and victim[3]=4 
+thread #4 is on level #3
+thread #3 is on level #3
+thread #4 is waiting
+thread #4 is done waiting with check_k=1 and victim[3]=3 
+thread #7 is on level #4
+thread #4 is on level #4
+thread #4 is waiting
+thread #7 is waiting
+thread #7 is done waiting with check_k=1 and victim[4]=4 
+thread #7 is on level #5
+thread #7 is waiting
+thread #6 is done waiting with check_k=1 and victim[5]=7 
+thread #3 is waiting
+thread #6 is on level #6
+thread #6 is waiting
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking
+thread #5 is done waiting with check_k=1 and victim[4]=7 
+thread #1 is done waiting with check_k=1 and victim[1]=2 
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #1 is on level #2
+thread #6 is on level #7
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #6 is on level #1
+thread #7 is done waiting with check_k=0 and victim[5]=7 
+thread #1 is waiting
+thread #6 is waiting
+thread #7 is on level #6
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[6]=7 
+thread #7 is on level #7
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #7 on critical section
+thread #7 done critical section
+thread #0 is done waiting with check_k=1 and victim[2]=1 
+thread #7 is unlocking
+thread #0 is on level #3
+thread #7 is on level #1
+thread #6 is done waiting with check_k=1 and victim[1]=7 
+thread #7 is waiting
+thread #6 is on level #2
+thread #1 is done waiting with check_k=1 and victim[2]=6 
+thread #3 is done waiting with check_k=1 and victim[3]=0 
+thread #1 is on level #3
+thread #1 is waiting
+thread #3 is on level #4
+thread #4 is done waiting with check_k=1 and victim[4]=3 
+thread #6 is waiting
+thread #0 is waiting
+thread #0 is done waiting with check_k=1 and victim[3]=1 
+thread #0 is on level #4
+thread #0 is waiting
+thread #4 is on level #5
+thread #5 is on level #5
+thread #4 is waiting
+thread #4 is done waiting with check_k=1 and victim[5]=5 
+thread #5 is waiting
+thread #3 is waiting
+thread #4 is on level #6
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #4 is on level #1
+thread #7 is done waiting with check_k=1 and victim[1]=4 
+thread #5 is done waiting with check_k=0 and victim[5]=5 
+thread #7 is on level #2
+thread #7 is waiting
+thread #5 is on level #6
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[6]=5 
+thread #5 is on level #7
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking
+thread #5 is on level #1
+thread #5 is waiting
+thread #3 is done waiting with check_k=1 and victim[4]=0 
+thread #3 is on level #5
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[5]=3 
+thread #3 is on level #6
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #3 is on level #7
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #3 on critical section
+thread #3 done critical section
+thread #3 is unlocking
+thread #3 is on level #1
+thread #3 is waiting
+thread #0 is done waiting with check_k=0 and victim[4]=0 
+thread #6 is done waiting with check_k=1 and victim[2]=7 
+thread #0 is on level #5
+thread #1 is done waiting with check_k=1 and victim[3]=6 
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[5]=0 
+thread #6 is on level #3
+thread #4 is waiting
+thread #4 is done waiting with check_k=1 and victim[1]=3 
+thread #0 is on level #6
+thread #0 is waiting
+thread #7 is done waiting with check_k=1 and victim[2]=4 
+thread #5 is done waiting with check_k=1 and victim[1]=3 
+thread #6 is waiting
+thread #5 is on level #2
+thread #5 is waiting
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #6 is done waiting with check_k=1 and victim[3]=7 
+thread #0 is on level #7
+thread #1 is on level #4
+thread #4 is on level #2
+thread #1 is waiting
+thread #0 is waiting
+thread #4 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #4 is done waiting with check_k=1 and victim[2]=5 
+thread #6 is on level #4
+thread #4 is on level #3
+thread #4 is waiting
+thread #1 is done waiting with check_k=1 and victim[4]=6 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #3 is done waiting with check_k=1 and victim[1]=0 
+thread #7 is on level #3
+thread #3 is on level #2
+thread #5 is done waiting with check_k=1 and victim[2]=3 
+thread #3 is waiting
+thread #5 is on level #3
+thread #4 is done waiting with check_k=1 and victim[3]=5 
+thread #5 is waiting
+thread #1 is on level #5
+thread #4 is on level #4
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[5]=1 
+thread #4 is waiting
+thread #7 is waiting
+thread #7 is done waiting with check_k=1 and victim[3]=5 
+thread #7 is on level #4
+thread #7 is waiting
+thread #2 is on level #1
+thread #6 is waiting
+thread #0 is waiting
+thread #6 is done waiting with check_k=1 and victim[4]=7 
+thread #6 is on level #5
+thread #6 is waiting
+thread #1 is on level #6
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[6]=1 
+thread #1 is on level #7
+thread #2 is waiting
+thread #1 is waiting
+thread #2 is done waiting with check_k=1 and victim[1]=0 
+thread #2 is on level #2
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #2 is waiting
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #6 is done waiting with check_k=0 and victim[5]=6 
+thread #1 is waiting
+thread #0 is done waiting with check_k=1 and victim[1]=1 
+thread #6 is on level #6
+thread #2 is done waiting with check_k=1 and victim[2]=0 
+thread #0 is on level #2
+thread #6 is waiting
+thread #5 is done waiting with check_k=1 and victim[3]=2 
+thread #5 is on level #4
+thread #7 is done waiting with check_k=1 and victim[4]=5 
+thread #7 is on level #5
+thread #7 is waiting
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #6 is on level #7
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #6 is on level #1
+thread #7 is done waiting with check_k=0 and victim[5]=7 
+thread #1 is done waiting with check_k=1 and victim[1]=6 
+thread #5 is waiting
+thread #1 is on level #2
+thread #7 is on level #6
+thread #0 is waiting
+thread #0 is done waiting with check_k=1 and victim[2]=1 
+thread #0 is on level #3
+thread #0 is waiting
+thread #1 is waiting
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[6]=7 
+thread #7 is on level #7
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #7 is on level #1
+thread #7 is waiting
+thread #4 is done waiting with check_k=1 and victim[4]=7 
+thread #4 is on level #5
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[5]=4 
+thread #4 is on level #6
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #4 is on level #1
+thread #5 is done waiting with check_k=0 and victim[4]=5 
+thread #7 is done waiting with check_k=1 and victim[1]=4 
+thread #4 is waiting
+thread #7 is on level #2
+thread #1 is done waiting with check_k=1 and victim[2]=7 
+thread #7 is waiting
+thread #1 is on level #3
+thread #1 is waiting
+thread #5 is on level #5
+thread #6 is waiting
+thread #6 is done waiting with check_k=1 and victim[1]=4 
+thread #6 is on level #2
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[5]=5 
+thread #2 is on level #3
+thread #6 is waiting
+thread #3 is done waiting with check_k=1 and victim[2]=2 
+thread #0 is done waiting with check_k=1 and victim[3]=1 
+thread #0 is on level #4
+thread #0 is waiting
+thread #1 is done waiting with check_k=1 and victim[3]=3 
+thread #1 is on level #4
+thread #0 is done waiting with check_k=1 and victim[4]=1 
+thread #2 is waiting
+thread #1 is waiting
+thread #2 is done waiting with check_k=1 and victim[3]=3 
+thread #2 is on level #4
+thread #1 is done waiting with check_k=1 and victim[4]=2 
+thread #2 is waiting
+thread #1 is on level #5
+thread #1 is waiting
+thread #0 is on level #5
+thread #1 is done waiting with check_k=1 and victim[5]=0 
+thread #0 is waiting
+thread #1 is on level #6
+thread #1 is waiting
+thread #3 is on level #3
+thread #3 is waiting
+thread #5 is on level #6
+thread #7 is done waiting with check_k=1 and victim[2]=6 
+thread #7 is on level #3
+thread #7 is waiting
+thread #3 is done waiting with check_k=1 and victim[3]=7 
+thread #3 is on level #4
+thread #5 is waiting
+thread #5 is done waiting with check_k=1 and victim[6]=1 
+thread #5 is on level #7
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking
+thread #5 is on level #1
+thread #1 is done waiting with check_k=0 and victim[6]=1 
+thread #3 is waiting
+thread #5 is waiting
+thread #2 is done waiting with check_k=1 and victim[4]=3 
+thread #1 is on level #7
+thread #1 is waiting
+thread #2 is on level #5
+thread #2 is waiting
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #1 is on level #1
+thread #4 is done waiting with check_k=1 and victim[1]=5 
+thread #1 is waiting
+thread #0 is done waiting with check_k=1 and victim[5]=2 
+thread #0 is on level #6
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #0 is on level #7
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 is on level #1
+thread #2 is done waiting with check_k=0 and victim[5]=2 
+thread #5 is done waiting with check_k=1 and victim[1]=1 
+thread #2 is on level #6
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #2 is on level #7
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking
+thread #2 is on level #1
+thread #3 is done waiting with check_k=0 and victim[4]=3 
+thread #3 is on level #5
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[5]=3 
+thread #3 is on level #6
+thread #3 is waiting
+thread #4 is on level #2
+thread #4 is waiting
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #5 is on level #2
+thread #3 is on level #7
+thread #6 is done waiting with check_k=1 and victim[2]=4 
+thread #5 is waiting
+thread #2 is waiting
+thread #4 is done waiting with check_k=1 and victim[2]=5 
+thread #1 is done waiting with check_k=1 and victim[1]=0 
+thread #4 is on level #3
+thread #4 is waiting
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #1 is on level #2
+thread #6 is on level #3
+thread #6 is waiting
+thread #6 is done waiting with check_k=1 and victim[3]=4 
+thread #1 is waiting
+thread #3 on critical section
+thread #6 is on level #4
+thread #6 is waiting
+thread #3 done critical section
+thread #3 is unlocking
+thread #3 is on level #1
+thread #6 is done waiting with check_k=0 and victim[4]=6 
+thread #7 is done waiting with check_k=1 and victim[3]=6 
+thread #2 is done waiting with check_k=1 and victim[1]=3 
+thread #0 is waiting
+thread #6 is on level #5
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[5]=6 
+thread #6 is on level #6
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #6 is on level #7
+thread #0 is done waiting with check_k=1 and victim[1]=3 
+thread #3 is waiting
+thread #6 is waiting
+thread #0 is on level #2
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #5 is done waiting with check_k=1 and victim[2]=1 
+thread #5 is on level #3
+thread #5 is waiting
+thread #6 on critical section
+thread #4 is done waiting with check_k=1 and victim[3]=5 
+thread #1 is done waiting with check_k=1 and victim[2]=0 
+thread #4 is on level #4
+thread #4 is waiting
+thread #1 is on level #3
+thread #5 is done waiting with check_k=1 and victim[3]=1 
+thread #5 is on level #4
+thread #4 is done waiting with check_k=1 and victim[4]=5 
+thread #1 is waiting
+thread #0 is waiting
+thread #2 is on level #2
+thread #0 is done waiting with check_k=1 and victim[2]=2 
+thread #2 is waiting
+thread #0 is on level #3
+thread #6 done critical section
+thread #0 is waiting
+thread #1 is done waiting with check_k=1 and victim[3]=0 
+thread #1 is on level #4
+thread #7 is on level #4
+thread #7 is waiting
+thread #1 is waiting
+thread #7 is done waiting with check_k=1 and victim[4]=1 
+thread #7 is on level #5
+thread #7 is waiting
+thread #6 is unlocking
+thread #6 is on level #1
+thread #7 is done waiting with check_k=0 and victim[5]=7 
+thread #6 is waiting
+thread #7 is on level #6
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[6]=7 
+thread #3 is done waiting with check_k=1 and victim[1]=6 
+thread #7 is on level #7
+thread #3 is on level #2
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #3 is waiting
+thread #2 is done waiting with check_k=1 and victim[2]=3 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #7 is on level #1
+thread #7 is waiting
+thread #6 is done waiting with check_k=1 and victim[1]=7 
+thread #6 is on level #2
+thread #3 is done waiting with check_k=1 and victim[2]=6 
+thread #6 is waiting
+thread #2 is on level #3
+thread #3 is on level #3
+thread #0 is done waiting with check_k=1 and victim[3]=3 
+thread #2 is waiting
+thread #1 is done waiting with check_k=1 and victim[4]=0 
+thread #4 is on level #5
+thread #3 is waiting
+thread #2 is done waiting with check_k=1 and victim[3]=3 
+thread #2 is on level #4
+thread #2 is waiting
+thread #4 is waiting
+thread #4 is done waiting with check_k=1 and victim[5]=1 
+thread #4 is on level #6
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #4 is on level #1
+thread #4 is waiting
+thread #7 is done waiting with check_k=1 and victim[1]=4 
+thread #5 is waiting
+thread #5 is done waiting with check_k=1 and victim[4]=2 
+thread #5 is on level #5
+thread #5 is waiting
+thread #7 is on level #2
+thread #6 is done waiting with check_k=1 and victim[2]=7 
+thread #7 is waiting
+thread #3 is done waiting with check_k=1 and victim[3]=6 
+thread #6 is on level #3
+thread #2 is done waiting with check_k=1 and victim[4]=3 
+thread #6 is waiting
+thread #3 is on level #4
+thread #2 is on level #5
+thread #3 is waiting
+thread #2 is waiting
+thread #5 is done waiting with check_k=1 and victim[5]=2 
+thread #5 is on level #6
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[6]=5 
+thread #5 is on level #7
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking
+thread #5 is on level #1
+thread #4 is done waiting with check_k=1 and victim[1]=5 
+thread #5 is waiting
+thread #4 is on level #2
+thread #4 is waiting
+thread #7 is done waiting with check_k=1 and victim[2]=4 
+thread #7 is on level #3
+thread #7 is waiting
+thread #0 is on level #4
+thread #0 is waiting
+thread #0 is done waiting with check_k=1 and victim[4]=3 
+thread #0 is on level #5
+thread #0 is waiting
+thread #2 is done waiting with check_k=1 and victim[5]=0 
+thread #2 is on level #6
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[6]=2 
+thread #2 is on level #7
+thread #2 is waiting
+thread #2 is done waiting with check_k=0 and victim[7]=2 
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking
+thread #1 is on level #5
+thread #6 is done waiting with check_k=1 and victim[3]=7 
+thread #1 is waiting
+thread #6 is on level #4
+thread #6 is waiting
+thread #1 is done waiting with check_k=1 and victim[5]=0 
+thread #1 is on level #6
+thread #1 is waiting
+thread #1 is done waiting with check_k=0 and victim[6]=1 
+thread #3 is done waiting with check_k=1 and victim[4]=6 
+thread #1 is on level #7
+thread #0 is done waiting with check_k=1 and victim[5]=3 
+thread #1 is waiting
+thread #0 is on level #6
+thread #3 is on level #5
+thread #1 is done waiting with check_k=0 and victim[7]=1 
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #0 is waiting
+thread #3 is waiting
+thread #0 is done waiting with check_k=0 and victim[6]=0 
+thread #0 is on level #7
+thread #0 is waiting
+thread #0 is done waiting with check_k=0 and victim[7]=0 
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #3 is done waiting with check_k=0 and victim[5]=3 
+thread #3 is on level #6
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[6]=3 
+thread #3 is on level #7
+thread #3 is waiting
+thread #3 is done waiting with check_k=0 and victim[7]=3 
+thread #3 on critical section
+thread #3 done critical section
+thread #3 is unlocking
+thread #6 is done waiting with check_k=0 and victim[4]=6 
+thread #6 is on level #5
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[5]=6 
+thread #6 is on level #6
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[6]=6 
+thread #6 is on level #7
+thread #6 is waiting
+thread #6 is done waiting with check_k=0 and victim[7]=6 
+thread #6 on critical section
+thread #6 done critical section
+thread #6 is unlocking
+thread #7 is done waiting with check_k=0 and victim[3]=7 
+thread #7 is on level #4
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[4]=7 
+thread #7 is on level #5
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[5]=7 
+thread #7 is on level #6
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[6]=7 
+thread #7 is on level #7
+thread #7 is waiting
+thread #7 is done waiting with check_k=0 and victim[7]=7 
+thread #7 on critical section
+thread #7 done critical section
+thread #7 is unlocking
+thread #4 is done waiting with check_k=0 and victim[2]=4 
+thread #4 is on level #3
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[3]=4 
+thread #4 is on level #4
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[4]=4 
+thread #4 is on level #5
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[5]=4 
+thread #4 is on level #6
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[6]=4 
+thread #4 is on level #7
+thread #4 is waiting
+thread #4 is done waiting with check_k=0 and victim[7]=4 
+thread #4 on critical section
+thread #4 done critical section
+thread #4 is unlocking
+thread #5 is done waiting with check_k=0 and victim[1]=5 
+thread #5 is on level #2
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[2]=5 
+thread #5 is on level #3
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[3]=5 
+thread #5 is on level #4
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[4]=5 
+thread #5 is on level #5
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[5]=5 
+thread #5 is on level #6
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[6]=5 
+thread #5 is on level #7
+thread #5 is waiting
+thread #5 is done waiting with check_k=0 and victim[7]=5 
+thread #5 on critical section
+thread #5 done critical section
+thread #5 is unlocking

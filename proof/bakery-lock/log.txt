@@ -1,0 +1,90 @@
+thread #0 label #1 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #2 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #3 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #4 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #5 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #6 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #7 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #8 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #9 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #10 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #11 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #12 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #13 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #14 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #15 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #0 label #16 is waiting
+thread #0 is done waiting
+thread #0 on critical section
+thread #0 done critical section
+thread #0 is unlocking
+thread #1 label #17 is waiting
+thread #1 is done waiting
+thread #1 on critical section
+thread #1 done critical section
+thread #1 is unlocking
+thread #2 label #18 is waiting
+thread #2 is done waiting
+thread #2 on critical section
+thread #2 done critical section
+thread #2 is unlocking

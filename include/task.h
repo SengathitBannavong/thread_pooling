@@ -24,11 +24,11 @@ struct task_t {
   void                *arg;               /* pointer to argument */
   enum task_priority  priority;
   struct timespec     submit_time;
-  struct task_t         *next;
+  struct task_t       *next;
 };
 
 struct task_t   *task_create(void (*func)(void *arg), void *arg,
-           enum task_priority priority);
+                             enum task_priority priority);
 void            task_destroy(struct task_t *task);
 const char      *task_priority_str(enum task_priority priority);
 
