@@ -11,8 +11,7 @@ TEST_TIMEOUT_SEC ?= 20
 
 CORE_SRCS = $(SRC_F)task.c \
 	$(SRC_F)priority_queue.c \
-	$(SRC_F)thread_pool.c \
-	$(SRC_F)check_core.c
+	$(SRC_F)thread_pool.c
 
 TEST_SRCS = $(wildcard $(TEST_F)test_*.c)
 TEST_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%,$(TEST_SRCS))

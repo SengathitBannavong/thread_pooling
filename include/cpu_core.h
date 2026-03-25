@@ -5,21 +5,26 @@
 #include <pthread.h>
 #include <unistd.h>
 
-int     get_num_core();
-int     get_num_thread(); 
+static inline int get_num_core(void)
+{
+        int cores = sysconf(_SC_NPROCESSORS_ONLN);
 
-int get_num_core() {
-  int cores = sysconf(_SC_NPROCESSORS_ONLN);
-  return cores;
+        return cores;
 }
 
-int get_num_thread() {
-  FILE* f = fopen("/proc/sys/kernel/threads-max", "r");
-  int max_threads;
-  fscanf(f, "%d", &max_threads);
-  fclose(f);
+static inline int get_num_thread(void)
+{
+        FILE *f = fopen("/proc/sys/kernel/threads-max", "r");
+        int max_threads;
 
-  return max_threads;
+        if (!f) {
+                return -1;
+        }
+
+        fscanf(f, "%d", &max_threads);
+        fclose(f);
+
+        return max_threads;
 }
 
 #endif
