@@ -1,18 +1,18 @@
 #include "unity.h"
 #include "threadpool.h"
 
-static struct thread_pool_t pool;
+static thread_pool_t *pool;
 
 void setUp(void)
 {
         int workers = (int)sysconf(_SC_NPROCESSORS_ONLN);
         if (workers <= 0) workers = 2;
-        thread_pool_init(&pool, workers);
+        pool = thread_pool_init(workers);
 }
 
 void tearDown(void)
 {
-        thread_pool_destroy(&pool);
+        thread_pool_destroy(pool);
 }
 
 /* atomic counter — tasks increment this on execute */
@@ -39,31 +39,23 @@ static void sleep_ms(void *arg)
         nanosleep(&ts, NULL);
 }
 
-void test_pool_init_returns_zero(void)
+void test_pool_init_returns_valid_pointer(void)
 {
         /* pool already inited in setUp — test a second fresh one */
-        struct thread_pool_t p2;
-        int ret = thread_pool_init(&p2, 2);
-        TEST_ASSERT_EQUAL_INT(0, ret);
-        thread_pool_destroy(&p2);
+        thread_pool_t *p2 = thread_pool_init(2);
+        TEST_ASSERT_NOT_NULL(p2);
+        thread_pool_destroy(p2);
 }
 
-void test_pool_init_null_returns_error(void)
+void test_pool_init_zero_workers_returns_null(void)
 {
-        int ret = thread_pool_init(NULL, 2);
-        TEST_ASSERT_EQUAL_INT(-1, ret);
-}
-
-void test_pool_init_zero_workers_returns_error(void)
-{
-        struct thread_pool_t p2;
-        int ret = thread_pool_init(&p2, 0);
-        TEST_ASSERT_EQUAL_INT(-1, ret);
+        thread_pool_t *p2 = thread_pool_init(0);
+        TEST_ASSERT_NULL(p2);
 }
 
 void test_submit_returns_valid_id(void)
 {
-        int64_t id = thread_pool_submit(&pool, increment_counter, NULL,
+        int64_t id = thread_pool_submit(pool, increment_counter, NULL,
                                         PRIORITY_LOW);
         TEST_ASSERT_GREATER_OR_EQUAL_INT64(0, id);
 }
@@ -77,15 +69,15 @@ void test_submit_null_pool_returns_error(void)
 
 void test_submit_null_func_returns_error(void)
 {
-        int64_t id = thread_pool_submit(&pool, NULL, NULL, PRIORITY_LOW);
+        int64_t id = thread_pool_submit(pool, NULL, NULL, PRIORITY_LOW);
         TEST_ASSERT_EQUAL_INT64(-1, id);
 }
 
 void test_submit_ids_are_unique(void)
 {
-        int64_t a = thread_pool_submit(&pool, increment_counter, NULL, PRIORITY_LOW);
-        int64_t b = thread_pool_submit(&pool, increment_counter, NULL, PRIORITY_LOW);
-        int64_t c = thread_pool_submit(&pool, increment_counter, NULL, PRIORITY_LOW);
+        int64_t a = thread_pool_submit(pool, increment_counter, NULL, PRIORITY_LOW);
+        int64_t b = thread_pool_submit(pool, increment_counter, NULL, PRIORITY_LOW);
+        int64_t c = thread_pool_submit(pool, increment_counter, NULL, PRIORITY_LOW);
 
         TEST_ASSERT_NOT_EQUAL(a, b);
         TEST_ASSERT_NOT_EQUAL(b, c);
@@ -95,16 +87,16 @@ void test_submit_ids_are_unique(void)
 void test_single_task_executes(void)
 {
         atomic_store(&g_counter, 0);
-        thread_pool_submit(&pool, increment_counter, NULL, PRIORITY_LOW);
+        thread_pool_submit(pool, increment_counter, NULL, PRIORITY_LOW);
 
         /* destroy waits for all tasks to finish */
-        thread_pool_destroy(&pool);
+        thread_pool_destroy(pool);
         TEST_ASSERT_EQUAL_INT(1, atomic_load(&g_counter));
 
         /* re-init for tearDown */
         int workers = (int)sysconf(_SC_NPROCESSORS_ONLN);
         if (workers <= 0) workers = 2;
-        thread_pool_init(&pool, workers);
+        pool = thread_pool_init(workers);
 }
 
 void test_many_tasks_all_execute(void)
@@ -113,29 +105,29 @@ void test_many_tasks_all_execute(void)
         const int N = 100;
 
         for (int i = 0; i < N; i++) {
-                thread_pool_submit(&pool, increment_counter, NULL, PRIORITY_MEDIUM);
+                thread_pool_submit(pool, increment_counter, NULL, PRIORITY_MEDIUM);
         }
 
-        thread_pool_destroy(&pool);
+        thread_pool_destroy(pool);
         TEST_ASSERT_EQUAL_INT(N, atomic_load(&g_counter));
 
         int workers = (int)sysconf(_SC_NPROCESSORS_ONLN);
         if (workers <= 0) workers = 2;
-        thread_pool_init(&pool, workers);
+        pool = thread_pool_init(workers);
 }
 
 void test_task_receives_correct_arg(void)
 {
         atomic_store(&g_counter, 0);
         int val = 7;
-        thread_pool_submit(&pool, add_value, &val, PRIORITY_HIGH);
+        thread_pool_submit(pool, add_value, &val, PRIORITY_HIGH);
 
-        thread_pool_destroy(&pool);
+        thread_pool_destroy(pool);
         TEST_ASSERT_EQUAL_INT(7, atomic_load(&g_counter));
 
         int workers = (int)sysconf(_SC_NPROCESSORS_ONLN);
         if (workers <= 0) workers = 2;
-        thread_pool_init(&pool, workers);
+        pool = thread_pool_init(workers);
 }
 
 /*
@@ -161,29 +153,28 @@ static void log_priority(void *arg)
 void test_priority_order_high_before_low(void)
 {
         /* single-worker pool for deterministic ordering */
-        struct thread_pool_t p1;
-        thread_pool_init(&p1, 1);
+        thread_pool_t *p1 = thread_pool_init(1);
 
         atomic_store(&g_order_idx, 0);
 
         /* submit a blocking task first to hold the single worker,
         * giving us time to fill the queue */
         int delay = 50; /* ms */
-        thread_pool_submit(&p1, sleep_ms, &delay, PRIORITY_LOW);
+        thread_pool_submit(p1, sleep_ms, &delay, PRIORITY_LOW);
 
         /* now flood the queue while worker is sleeping */
         static int lo = PRIORITY_LOW, md = PRIORITY_MEDIUM, hi = PRIORITY_HIGH;
-        thread_pool_submit(&p1, log_priority, &lo, PRIORITY_LOW);
-        thread_pool_submit(&p1, log_priority, &lo, PRIORITY_LOW);
-        thread_pool_submit(&p1, log_priority, &lo, PRIORITY_LOW);
-        thread_pool_submit(&p1, log_priority, &md, PRIORITY_MEDIUM);
-        thread_pool_submit(&p1, log_priority, &md, PRIORITY_MEDIUM);
-        thread_pool_submit(&p1, log_priority, &md, PRIORITY_MEDIUM);
-        thread_pool_submit(&p1, log_priority, &hi, PRIORITY_HIGH);
-        thread_pool_submit(&p1, log_priority, &hi, PRIORITY_HIGH);
-        thread_pool_submit(&p1, log_priority, &hi, PRIORITY_HIGH);
+        thread_pool_submit(p1, log_priority, &lo, PRIORITY_LOW);
+        thread_pool_submit(p1, log_priority, &lo, PRIORITY_LOW);
+        thread_pool_submit(p1, log_priority, &lo, PRIORITY_LOW);
+        thread_pool_submit(p1, log_priority, &md, PRIORITY_MEDIUM);
+        thread_pool_submit(p1, log_priority, &md, PRIORITY_MEDIUM);
+        thread_pool_submit(p1, log_priority, &md, PRIORITY_MEDIUM);
+        thread_pool_submit(p1, log_priority, &hi, PRIORITY_HIGH);
+        thread_pool_submit(p1, log_priority, &hi, PRIORITY_HIGH);
+        thread_pool_submit(p1, log_priority, &hi, PRIORITY_HIGH);
 
-        thread_pool_destroy(&p1);
+        thread_pool_destroy(p1);
 
         /* first 3 should be HIGH, next 3 MED, last 3 LOW */
         for (int i = 0; i < 3; i++)
@@ -196,15 +187,15 @@ void test_priority_order_high_before_low(void)
 
 void test_submit_after_destroy_returns_error(void)
 {
-        thread_pool_destroy(&pool);
-        int64_t id = thread_pool_submit(&pool, increment_counter, NULL,
+        thread_pool_destroy(pool);
+        int64_t id = thread_pool_submit(pool, increment_counter, NULL,
                                         PRIORITY_LOW);
         TEST_ASSERT_EQUAL_INT64(-1, id);
 
         /* re-init for tearDown */
         int workers = (int)sysconf(_SC_NPROCESSORS_ONLN);
         if (workers <= 0) workers = 2;
-        thread_pool_init(&pool, workers);
+        pool = thread_pool_init(workers);
 }
 
 void test_destroy_waits_for_running_tasks(void)
@@ -213,19 +204,19 @@ void test_destroy_waits_for_running_tasks(void)
         int delay = 30; /* ms — short but non-zero */
 
         for (int i = 0; i < 4; i++) {
-                thread_pool_submit(&pool, sleep_ms, &delay, PRIORITY_LOW);
+                thread_pool_submit(pool, sleep_ms, &delay, PRIORITY_LOW);
         }
         /* submit a counter task after the sleepers */
-        thread_pool_submit(&pool, increment_counter, NULL, PRIORITY_LOW);
+        thread_pool_submit(pool, increment_counter, NULL, PRIORITY_LOW);
 
-        thread_pool_destroy(&pool);
+        thread_pool_destroy(pool);
 
         /* counter must be 1 — destroy must have waited */
         TEST_ASSERT_EQUAL_INT(1, atomic_load(&g_counter));
 
         int workers = (int)sysconf(_SC_NPROCESSORS_ONLN);
         if (workers <= 0) workers = 2;
-        thread_pool_init(&pool, workers);
+        pool = thread_pool_init(workers);
 }
 
 
@@ -234,9 +225,8 @@ int main(void)
         UNITY_BEGIN();
 
         /* init */
-        RUN_TEST(test_pool_init_returns_zero);
-        RUN_TEST(test_pool_init_null_returns_error);
-        RUN_TEST(test_pool_init_zero_workers_returns_error);
+        RUN_TEST(test_pool_init_returns_valid_pointer);
+        RUN_TEST(test_pool_init_zero_workers_returns_null);
 
         /* submit */
         RUN_TEST(test_submit_returns_valid_id);

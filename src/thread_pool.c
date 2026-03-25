@@ -3,10 +3,20 @@
 #include <errno.h>
 #include "thread_pool.h"
 
+struct thread_pool {
+        pthread_t *workers; /* array[num_workers] of thread ids */
+        uint32_t num_workers; /* total workers thread */
+        struct priority_queue_t pq; /* shared priority queue */
+        atomic_int active_tasks; /* tasks currently executing */
+        atomic_bool shutdown; /* set true to begin shutdown */
+        pthread_mutex_t drain_mutex; /* guards drain_cond */
+        pthread_cond_t drain_cond; /* signalled when active_tasks == 0 */
+};
+
 /* --- worker schedule --- */
 static void *worker_func(void *arg)
 {
-        struct thread_pool_t *pool = (struct thread_pool_t *)arg;
+        thread_pool_t *pool = (thread_pool_t *)arg;
 
         for (;;) {
                 struct task_t *task = pq_pop_until_shutdown(&pool->pq, &pool->shutdown);
@@ -33,29 +43,38 @@ static void *worker_func(void *arg)
         return NULL;
 }
 
-int thread_pool_init(struct thread_pool_t *pool, int num_workers)
+thread_pool_t *thread_pool_init(int num_workers)
 {
-        if (!pool || num_workers <= 0) {
+        if (num_workers <= 0) {
                 errno = EINVAL;
-                return -1;
+                return NULL;
+        }
+
+        thread_pool_t *pool = malloc(sizeof(struct thread_pool));
+        if (!pool) {
+                return NULL;
         }
 
         pool->num_workers = num_workers;
         atomic_store_explicit(&pool->active_tasks, 0, memory_order_relaxed);
         atomic_store_explicit(&pool->shutdown, false, memory_order_relaxed);
 
-        if (pq_init(&pool->pq) != 0) 
-                return -1;
+        if (pq_init(&pool->pq) != 0) {
+                free(pool);
+                return NULL;
+        }
         
         if (pthread_mutex_init(&pool->drain_mutex, NULL) != 0) {
                 pq_destroy(&pool->pq);
-                return -1;
+                free(pool);
+                return NULL;
         }
 
         if (pthread_cond_init(&pool->drain_cond, NULL) != 0) {
                 pthread_mutex_destroy(&pool->drain_mutex);
                 pq_destroy(&pool->pq);
-                return -1;
+                free(pool);
+                return NULL;
         }
 
         /* worker allocate */
@@ -64,7 +83,8 @@ int thread_pool_init(struct thread_pool_t *pool, int num_workers)
                 pthread_cond_destroy(&pool->drain_cond);
                 pthread_mutex_destroy(&pool->drain_mutex);
                 pq_destroy(&pool->pq);
-                return -1;
+                free(pool);
+                return NULL;
         }
 
         /* spawn workers */
@@ -81,13 +101,14 @@ int thread_pool_init(struct thread_pool_t *pool, int num_workers)
                         free(pool->workers);
                         pthread_cond_destroy(&pool->drain_cond);
                         pthread_mutex_destroy(&pool->drain_mutex);
-                        return -1;
+                        free(pool);
+                        return NULL;
                 }
         }
-        return 0;
+        return pool;
 }
 
-int64_t thread_pool_submit(struct thread_pool_t *pool, void (*task_fun_t)(void *arg),
+int64_t thread_pool_submit(thread_pool_t *pool, void (*task_fun_t)(void *arg),
                 void *arg, enum task_priority priority)
 {
         if (!pool || !task_fun_t) 
@@ -107,7 +128,7 @@ int64_t thread_pool_submit(struct thread_pool_t *pool, void (*task_fun_t)(void *
         return id;
 }
 
-void thread_pool_destroy(struct thread_pool_t *pool)
+void thread_pool_destroy(thread_pool_t *pool)
 {
         if (!pool) 
                 return;
@@ -131,4 +152,5 @@ void thread_pool_destroy(struct thread_pool_t *pool)
 
         pthread_cond_destroy(&pool->drain_cond);
         pthread_mutex_destroy(&pool->drain_mutex);
+        free(pool);
 }
