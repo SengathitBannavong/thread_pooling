@@ -12,7 +12,7 @@ void setUp(void)
 
 void tearDown(void)
 {
-        thread_pool_destroy(pool);
+        thread_pool_destroy(&pool);
 }
 
 /* atomic counter — tasks increment this on execute */
@@ -44,7 +44,7 @@ void test_pool_init_returns_valid_pointer(void)
         /* pool already inited in setUp — test a second fresh one */
         thread_pool_t *p2 = thread_pool_init(2);
         TEST_ASSERT_NOT_NULL(p2);
-        thread_pool_destroy(p2);
+        thread_pool_destroy(&p2);
 }
 
 void test_pool_init_zero_workers_returns_null(void)
@@ -90,7 +90,7 @@ void test_single_task_executes(void)
         thread_pool_submit(pool, increment_counter, NULL, PRIORITY_LOW);
 
         /* destroy waits for all tasks to finish */
-        thread_pool_destroy(pool);
+        thread_pool_destroy(&pool);
         TEST_ASSERT_EQUAL_INT(1, atomic_load(&g_counter));
 
         /* re-init for tearDown */
@@ -108,7 +108,7 @@ void test_many_tasks_all_execute(void)
                 thread_pool_submit(pool, increment_counter, NULL, PRIORITY_MEDIUM);
         }
 
-        thread_pool_destroy(pool);
+        thread_pool_destroy(&pool);
         TEST_ASSERT_EQUAL_INT(N, atomic_load(&g_counter));
 
         int workers = (int)sysconf(_SC_NPROCESSORS_ONLN);
@@ -122,7 +122,7 @@ void test_task_receives_correct_arg(void)
         int val = 7;
         thread_pool_submit(pool, add_value, &val, PRIORITY_HIGH);
 
-        thread_pool_destroy(pool);
+        thread_pool_destroy(&pool);
         TEST_ASSERT_EQUAL_INT(7, atomic_load(&g_counter));
 
         int workers = (int)sysconf(_SC_NPROCESSORS_ONLN);
@@ -174,7 +174,7 @@ void test_priority_order_high_before_low(void)
         thread_pool_submit(p1, log_priority, &hi, PRIORITY_HIGH);
         thread_pool_submit(p1, log_priority, &hi, PRIORITY_HIGH);
 
-        thread_pool_destroy(p1);
+        thread_pool_destroy(&p1);
 
         /* first 3 should be HIGH, next 3 MED, last 3 LOW */
         for (int i = 0; i < 3; i++)
@@ -187,7 +187,7 @@ void test_priority_order_high_before_low(void)
 
 void test_submit_after_destroy_returns_error(void)
 {
-        thread_pool_destroy(pool);
+        thread_pool_destroy(&pool);
         int64_t id = thread_pool_submit(pool, increment_counter, NULL,
                                         PRIORITY_LOW);
         TEST_ASSERT_EQUAL_INT64(-1, id);
@@ -209,7 +209,7 @@ void test_destroy_waits_for_running_tasks(void)
         /* submit a counter task after the sleepers */
         thread_pool_submit(pool, increment_counter, NULL, PRIORITY_LOW);
 
-        thread_pool_destroy(pool);
+        thread_pool_destroy(&pool);
 
         /* counter must be 1 — destroy must have waited */
         TEST_ASSERT_EQUAL_INT(1, atomic_load(&g_counter));

@@ -1,138 +1,112 @@
-# Thread Pooling Project (C)
+# C Thread Pooling Project
 
-Thread-safe priority task queue, task model, and worker pool in C (POSIX threads).
+A robust, thread-safe priority task queue and worker pool implementation in C using POSIX threads (pthreads).
 
-## Academic Context
+## Overview
 
-This repository is Project 2 for my major coursework.
-The objective is to design and implement a thread pool system + task scheduler in C as a core component for knowing concurent programing work.
+This project implements a multi-threaded task execution system where tasks are submitted to a centralized priority queue and executed by a pool of worker threads. It is designed to demonstrate concurrent programming principles, synchronization primitives (mutexes, condition variables), and graceful shutdown mechanisms.
 
-## Current Status
+## Key Features
 
-- `task` module: implemented and tested.
-- `priority_queue` module: implemented and tested.
-- `thread_pool` module: implemented with graceful shutdown support.
-- Unity test framework is integrated in `makefile`.
-- Tests are split into independent test binaries under `test/`.
+- **Priority-Based Scheduling:** Tasks are executed based on their assigned priority (Low, Medium, High).
+- **Thread-Safe Priority Queue:** Implements a blocking queue with support for both blocking and non-blocking operations.
+- **Graceful Shutdown:** Ensures all pending tasks are completed before the thread pool is destroyed.
+- **Unit Tested:** Comprehensive test suite using the Unity framework.
+- **ThreadSanitizer Support:** Makefile includes targets for memory and race condition detection.
 
 ## Project Structure
 
 ```text
 .
-├── include/
-│   ├── cpu_core.h
-│   ├── defs.h
-│   ├── priority_queue.h
-│   ├── task.h
-│   ├── thread_pool.h
-│   └── threadpool.h
-├── src/
-│   ├── check_core.c
-│   ├── priority_queue.c
-│   ├── task.c
-│   └── thread_pool.c
-├── test/
+├── include/              # Header files
+│   ├── cpu_core.h        # CPU core count utility
+│   ├── priority_queue.h  # Priority queue interface
+│   ├── task.h            # Task model and priority definitions
+│   ├── thread_pool.h     # Thread pool core interface
+│   └── threadpool.h      # Convenience wrapper header
+├── src/                  # Source files
+│   ├── priority_queue.c  # Queue implementation with mutex/cond
+│   ├── task.c            # Task allocation and management
+│   └── thread_pool.c     # Worker thread management and lifecycle
+├── test/                 # Unit tests
 │   ├── test_priority_queue.c
 │   ├── test_task.c
+│   ├── test_starvation.c
+│   ├── test_deadlock.c
 │   └── test_thread_pool.c
-├── bin/
-├── log/
-├── makefile
-└── Unity/
+├── bin/                  # Compiled binaries (generated)
+├── log/                  # Test execution logs (generated)
+├── makefile              # Build system
+└── Unity/                # Unity Test Framework (submodule)
 ```
 
 ## Requirements
 
-- Linux
-- GCC
-- POSIX threads (`pthread`)
-- `make`
+- **OS:** Linux-based system
+- **Compiler:** GCC (supporting C11)
+- **Libraries:** POSIX threads (`pthread`)
+- **Tools:** `make`
 
-## Build And Run
+## Quick Start
 
-### 1) Build all tests
+### Build and Run Tests
 
-```bash
-make build-tests
+1. **Compile all tests:**
+   ```bash
+   make build-tests
+   ```
+
+2. **Run the test suite:**
+   ```bash
+   make test
+   ```
+
+3. **Run with ThreadSanitizer (TSAN):**
+   ```bash
+   make test-tsan
+   ```
+
+### Usage Example
+
+```c
+#include "threadpool.h"
+#include <stdio.h>
+#include <unistd.h>
+
+void sample_task(void *arg) {
+    int id = *(int *)arg;
+    printf("Task %d is executing...\n", id);
+    sleep(1);
+}
+
+int main() {
+    // Initialize pool with 4 worker threads
+    thread_pool_t *pool = thread_pool_init(4);
+
+    int task_ids[5];
+    for (int i = 0; i < 5; i++) {
+        task_ids[i] = i;
+        // Submit tasks with Medium priority
+        thread_pool_submit(pool, sample_task, &task_ids[i], TASK_PRIORITY_MEDIUM);
+    }
+
+    // Wait for tasks to finish and cleanup
+    thread_pool_destroy(pool);
+    return 0;
+}
 ```
 
-### 2) Run all tests (with per-test logs)
+## Testing and Validation
 
-```bash
-make test
-```
+Tests are compiled into independent binaries and execution logs are stored in the `log/` directory. The test runner provides a summary of pass/fail/timeout status for each module.
 
-### 3) Run all tests with ThreadSanitizer (with per-test logs)
+## Future Roadmap
 
-```bash
-make test-tsan
-```
+[ ] **Aging Scheduler:** Implement a mechanism to prevent task starvation by increasing priority over time.
 
-### 4) Set custom timeout per test binary (default 20s)
+[ ] **Benchmarks:** Add performance evaluation metrics for throughput and latency.
 
-```bash
-make test TEST_TIMEOUT_SEC=60
-```
-
-### 5) Clean binaries and logs
-
-```bash
-make clean
-```
-
-## Makefile Targets
-
-- `make` or `make all`: alias to `make test`
-- `make build-tests`: compile all test binaries from `test/test_*.c`
-- `make run-tests`: run all normal test binaries and write logs to `log/*.log`
-- `make test`: alias to `make run-tests`
-- `make build-tests-tsan`: compile all TSAN test binaries
-- `make run-tests-tsan`: run all TSAN test binaries and write logs to `log/*.log`
-- `make test-tsan`: alias to `make run-tests-tsan`
-- `make clean`: remove generated binaries and `log/`
-
-## Module Summary
-
-### task (`include/task.h`, `src/task.c`)
-
-- `task_create(...)`: allocate and initialize task object
-- `task_destroy(...)`: free task object
-- `task_priority_str(...)`: return priority label string
-
-### priority_queue (`include/priority_queue.h`, `src/priority_queue.c`)
-
-- `pq_init(...)`: initialize queue, mutex, and condition variable
-- `pq_destroy(...)`: release remaining tasks and synchronization objects
-- `pq_push(...)`: enqueue task by priority
-- `pq_pop(...)`: blocking pop (waits while queue is empty)
-- `pq_pop_until_shutdown(...)`: blocking pop with shutdown-aware exit
-- `pq_wake_all(...)`: broadcast wake-up for all waiting workers
-- `pq_pop_nonblock(...)`: non-blocking pop
-- `pq_size(...)`: thread-safe queue size snapshot
-- `pq_is_empty(...)`: thread-safe empty check
-
-### thread_pool (`include/thread_pool.h`, `src/thread_pool.c`)
-
-- `thread_pool_init(...)`: initialize queue/resources and create worker threads
-- `thread_pool_submit(...)`: submit a task to the shared priority queue
-- `thread_pool_destroy(...)`: graceful shutdown (drain pending work, stop workers, cleanup)
-
-## Test Logs
-
-- Each test binary writes output to `log/<binary_name>.log`
-- Runner prints per-binary status: `PASS`, `FAIL`, or `TIMEOUT`
-- A summary line is printed at the end: total/fail/pass
-
-## Known Issues (Current)
-
-- No failing tests at the moment.
-- Potential future improvement: add more stress/concurrency test cases with 1 producer and multiple consumer threads.
-
-## Next Improvements
-
-- Add another task schedule (Aging task scheduler)
-- Evaluation brenchmark
-- Try build appication layer on top of this
+[ ] **Application Layer:** Develop a sample application (e.g., an image processor or web server) utilizing the pool.
 
 ## License
 

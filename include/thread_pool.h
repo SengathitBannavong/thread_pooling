@@ -29,6 +29,6 @@ int64_t thread_pool_submit(thread_pool_t *pool, void (*task_fun_t)(void *arg), v
  *
  * poll must not be NULL
  */
-void thread_pool_destroy(thread_pool_t *pool);
+void thread_pool_destroy(thread_pool_t **ori_pool);
 
 #endif
