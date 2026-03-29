@@ -30,7 +30,7 @@ int main() {
         
         // Inject mixed work
         int heavy_n = 100;
-        int tiny_n = 100;
+        int tiny_n = 10000;
         for(int i = 0; i < heavy_n; i++) {
                 thread_pool_submit(pool, heavy_work, NULL, PRIORITY_MEDIUM);
                 for(int j = 0; j < tiny_n; j++) {

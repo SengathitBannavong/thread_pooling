@@ -45,7 +45,7 @@ int main()
                 }
                 
                 while(atomic_load_explicit(&count_task, memory_order_acquire)) {
-                        // busy wait for tasks to finish
+                        sched_yield();
                 }
                 BENCH_STOP();
                 BENCH_WRITE(fp, "burst", tasks_per_cycle, i+1);

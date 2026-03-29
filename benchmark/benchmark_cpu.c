@@ -59,7 +59,7 @@ int on_demand_bench(int n, int run)
         return 0;
 }
 
-int sequential_bench(int n, int run) 
+int sequential_bench(int n, int run, int last_run) 
 {
         printf("[INFO] start sequential_bench\n");
         BENCH_START();
@@ -68,6 +68,8 @@ int sequential_bench(int n, int run)
         }
         BENCH_STOP();
         BENCH_WRITE(fp, "sequential", n, run);
+        // run only one time for base line
+        BENCH_WRITE(fp, "sequential", n, last_run);
         return 0;
 }
 
@@ -89,14 +91,16 @@ int main(int argc,char *argv[]) {
         printf("[INFO] check your device have %d core of cpu\n", get_num_core());
         for(int i = 1; i <= spin; i++) {
                 printf("[INFO] start spin #%d\n", i);
-                // if(sequential_bench(n, i))
-                // break;
-                
+                // one time run
+                if(i == 1) {
+                        if(sequential_bench(n, i, spin))
+                	        break;
+                }             
                 if(on_demand_bench(n, i))
-                break;
+                        break;
                 
                 if(thread_pool_bench(n, i))
-                break;
+                        break;
         }
 
         BENCH_CSV_CLOSE(fp);

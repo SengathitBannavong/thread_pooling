@@ -63,8 +63,13 @@ benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STAB
 
 run-benchmarks: benchmarks
 	mkdir -p benchmark/res
+	./$(BENCH_CPU) 100 5
 	./$(BENCH_CPU) 1000 5
+	./$(BENCH_CPU) 10000 5
+	./$(BENCH_CPU) 100000 3
+	./$(BENCH_IO) 100 5
 	./$(BENCH_IO) 1000 5
+	./$(BENCH_IO) 10000 5
 	./$(BENCH_SCALE)
 	./$(BENCH_HETERO)
 	./$(BENCH_STABLE)
