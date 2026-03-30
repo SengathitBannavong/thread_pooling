@@ -13,3 +13,19 @@ benchmark/save/
 
 # unit test src floder
 Unity/
+
+# language server floder
+.idea/
+.caches/
+.cache/
+.clangd
+compile_commands.json
+
+# Zed
+.zed/
+
+# GDB
+.gdb_history
+
+# Commit Message
+commit.txt
