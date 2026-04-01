@@ -9,9 +9,7 @@ LOG_F = log/
 TSAN_FLAGS = -fsanitize=thread -fno-omit-frame-pointer
 TEST_TIMEOUT_SEC ?= 20
 
-CORE_SRCS = $(SRC_F)task.c \
-	$(SRC_F)priority_queue.c \
-	$(SRC_F)thread_pool.c
+CORE_SRCS = $(wildcard $(SRC_F)*.c)
 
 TEST_SRCS = $(wildcard $(TEST_F)test_*.c)
 TEST_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%,$(TEST_SRCS))
@@ -136,4 +134,3 @@ clean-photo:
 clean:
 	rm -f $(TEST_BINS) $(TSAN_BINS) $(BENCH_CPU) $(BENCH_IO) $(BENCH_PRIO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE)
 	rm -rf $(LOG_F)
-	rm -rf benchmark/res

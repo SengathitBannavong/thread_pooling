@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include "priority_queue.h"
+#include "worker.h"
 
 typedef struct thread_pool thread_pool_t;
 
@@ -39,7 +40,7 @@ void thread_pool_destroy(thread_pool_t **ori_pool);
  *
  * if have set flag pause this wait function will overwrite
  * pause -> resume for worker done all task correctly
- * 
+ *
  * pool must not be NULL
  */
 void thread_pool_wait(thread_pool_t *ori_pool);
@@ -59,5 +60,10 @@ void thread_pool_pause(thread_pool_t *ori_pool);
  * wake up all worker on thread pool for pop task
  */
 void thread_pool_resume(thread_pool_t *ori_pool);
+
+/**
+ * get capacity of workers are busy
+ */
+uint16_t thread_pool_num_working(thread_pool_t *ori_pool);
 
 #endif

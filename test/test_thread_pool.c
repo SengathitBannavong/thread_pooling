@@ -317,6 +317,33 @@ void test_waiting_for_running_all_task_without_shutdown(void)
         TEST_ASSERT_EQUAL_INT((int)n_task, atomic_load(&g_counter));
 }
 
+void test_check_worker_waiting_capacity(void) {
+        const int num_worker = 2;
+        thread_pool_t *p = thread_pool_init(num_worker);
+        TEST_ASSERT_NOT_NULL(p);
+
+        const int task_ms = 1000; // 1s for makesure worker are not done fast than checking
+        const int N = 5;
+
+        for (int i = 0; i < N; i++) {
+                thread_pool_submit(p, slow_count_task, (void *)&task_ms, PRIORITY_LOW);
+        }
+
+        /* waiting a little for all worker are  */
+        struct timespec t1 = {0, 80 * 1000000L}; /* 80ms */
+        nanosleep(&t1, NULL);
+
+        int busy_worker = thread_pool_num_working(p);
+        TEST_ASSERT_EQUAL_INT(busy_worker, num_worker);
+
+        thread_pool_wait(p);
+
+        busy_worker = thread_pool_num_working(p);
+        TEST_ASSERT_EQUAL_INT(busy_worker, 0);
+
+        thread_pool_destroy(&p);
+}
+
 void test_submit_after_destroy_returns_error(void)
 {
         thread_pool_destroy(&pool);
@@ -377,6 +404,9 @@ int main(void)
         /* pause + resume */
         RUN_TEST(test_pause_resume_thread_pool_1_workers);
         RUN_TEST(test_pause_midflight_with_many_workers);
+
+        /* capacity of worker */
+        RUN_TEST(test_check_worker_waiting_capacity);
 
         /* waiting */
         RUN_TEST(test_waiting_for_running_all_task_without_shutdown);
