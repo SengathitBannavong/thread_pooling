@@ -1,11 +1,18 @@
+#include "cpu_core.h"
+#include "task.h"
+#include "thread_pool.h"
 #include "unity.h"
 #include "threadpool.h"
+#include "unity_internals.h"
+#include <stdatomic.h>
+#include <stdio.h>
+#include <time.h>
 
 static thread_pool_t *pool;
 
 void setUp(void)
 {
-        int workers = (int)sysconf(_SC_NPROCESSORS_ONLN);
+        int workers = get_num_core();
         if (workers <= 0) workers = 2;
         pool = thread_pool_init(workers);
 }
@@ -159,7 +166,7 @@ void test_priority_order_high_before_low(void)
 
         /* submit a blocking task first to hold the single worker,
         * giving us time to fill the queue */
-        int delay = 50; /* ms */
+        int delay = 100; /* ms */
         thread_pool_submit(p1, sleep_ms, &delay, PRIORITY_LOW);
 
         /* now flood the queue while worker is sleeping */
@@ -183,6 +190,131 @@ void test_priority_order_high_before_low(void)
                 TEST_ASSERT_EQUAL_INT(PRIORITY_MEDIUM, g_order_log[i]);
         for (int i = 6; i < 9; i++)
                 TEST_ASSERT_EQUAL_INT(PRIORITY_LOW, g_order_log[i]);
+}
+
+static atomic_int g_started;
+static atomic_int g_finished;
+static atomic_int g_gate_open;
+
+static void gated_task(void *arg)
+{
+        (void)arg;
+        atomic_fetch_add_explicit(&g_started, 1, memory_order_relaxed);
+
+        while (atomic_load_explicit(&g_gate_open, memory_order_acquire) == 0) {
+                struct timespec ts = {0, 1000000L}; /* 1ms */
+                nanosleep(&ts, NULL);
+        }
+
+        atomic_fetch_add_explicit(&g_finished, 1, memory_order_relaxed);
+}
+
+static void count_task(void *arg)
+{
+        (void)arg;
+        atomic_fetch_add_explicit(&g_finished, 1, memory_order_relaxed);
+}
+
+
+void test_pause_resume_thread_pool_1_workers(void) {
+        thread_pool_t *p1 = thread_pool_init(1);
+        TEST_ASSERT_NOT_NULL(p1);
+
+        atomic_store(&g_started, 0);
+        atomic_store(&g_finished, 0);
+        atomic_store(&g_gate_open, 0);
+
+        /* Occupy the only worker */
+        thread_pool_submit(p1, gated_task, NULL, PRIORITY_LOW);
+
+        /* Give worker a moment to start */
+        while(atomic_load(&g_started) == 0)
+                sched_yield();
+        TEST_ASSERT_EQUAL_INT(1, atomic_load(&g_started));
+
+        thread_pool_pause(p1);
+
+        const int N = 50;
+        for (int i = 0; i < N; i++) {
+                thread_pool_submit(p1, count_task, NULL, PRIORITY_LOW);
+        }
+
+        /* Only gated task might still be running, but not finished (gate closed) */
+        TEST_ASSERT_EQUAL_INT(0, atomic_load(&g_finished));
+        TEST_ASSERT_EQUAL_INT(0, atomic_load(&g_gate_open));
+
+        /* Let running task finish, then resume queue processing */
+        atomic_store(&g_gate_open, 1);
+        thread_pool_resume(p1);
+
+        thread_pool_wait(p1);
+
+        /* 1 gated_task + N count_task completed */
+        TEST_ASSERT_EQUAL_INT(1 + N, atomic_load(&g_finished));
+
+        thread_pool_destroy(&p1);
+}
+
+static atomic_int g_done;
+
+static void slow_count_task(void *arg)
+{
+        int ms = *(int *)arg;
+        struct timespec ts;
+        ts.tv_sec = ms / 1000;
+        ts.tv_nsec = (long)(ms % 1000) * 1000000L;
+        nanosleep(&ts, NULL);
+        atomic_fetch_add_explicit(&g_done, 1, memory_order_relaxed);
+}
+
+void test_pause_midflight_with_many_workers(void)
+{
+        int workers = 4; /* simular 4 workers */
+        thread_pool_t *p = thread_pool_init(workers);
+        TEST_ASSERT_NOT_NULL(p);
+
+        atomic_store(&g_done, 0);
+
+        const int task_ms = 30;
+        const int N = 100;
+
+        for (int i = 0; i < N; i++) {
+                thread_pool_submit(p, slow_count_task, (void *)&task_ms, PRIORITY_LOW);
+        }
+
+        /* let workers start processing */
+        struct timespec t0 = {0, 10 * 1000000L}; /* 10ms */
+        nanosleep(&t0, NULL);
+
+        thread_pool_pause(p);
+
+        int before = atomic_load_explicit(&g_done, memory_order_relaxed);
+        /* long enough that all in-flight workers can finish one task */
+        struct timespec t1 = {0, 80 * 1000000L}; /* 80ms */
+        nanosleep(&t1, NULL);
+        int after = atomic_load_explicit(&g_done, memory_order_relaxed);
+        /* only tasks already running at pause time may complete */
+        TEST_ASSERT_TRUE((after - before) <= workers);
+        thread_pool_resume(p);
+        thread_pool_wait(p);
+
+        TEST_ASSERT_EQUAL_INT(N, atomic_load_explicit(&g_done, memory_order_relaxed));
+        thread_pool_destroy(&p);
+}
+
+void test_waiting_for_running_all_task_without_shutdown(void)
+{
+        size_t n_task = 2000;
+        int delay_ms = 1;
+        atomic_store(&g_counter, 0);
+
+        for (size_t i = 0; i < n_task; i++) {
+                thread_pool_submit(pool, sleep_ms, &delay_ms, PRIORITY_LOW);
+                thread_pool_submit(pool, increment_counter, NULL, PRIORITY_LOW);
+        }
+
+        thread_pool_wait(pool);
+        TEST_ASSERT_EQUAL_INT((int)n_task, atomic_load(&g_counter));
 }
 
 void test_submit_after_destroy_returns_error(void)
@@ -241,6 +373,13 @@ int main(void)
 
         /* priority ordering */
         RUN_TEST(test_priority_order_high_before_low);
+
+        /* pause + resume */
+        RUN_TEST(test_pause_resume_thread_pool_1_workers);
+        RUN_TEST(test_pause_midflight_with_many_workers);
+
+        /* waiting */
+        RUN_TEST(test_waiting_for_running_all_task_without_shutdown);
 
         /* shutdown */
         RUN_TEST(test_submit_after_destroy_returns_error);
