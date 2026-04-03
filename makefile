@@ -8,14 +8,17 @@ LOG_F = log/
 
 TSAN_FLAGS = -fsanitize=thread -fno-omit-frame-pointer
 TEST_TIMEOUT_SEC ?= 20
+NCURSES_FLAGS = -lncursesw
 
-CORE_SRCS = $(wildcard $(SRC_F)*.c)
+# Core sources (exclude monitor.c by default)
+CORE_SRCS = $(filter-out $(SRC_F)monitor.c, $(wildcard $(SRC_F)*.c))
+MONITOR_SRC = $(SRC_F)monitor.c
 
-TEST_SRCS = $(wildcard $(TEST_F)test_*.c)
+TEST_SRCS = $(filter-out $(TEST_F)test_monitor.c, $(wildcard $(TEST_F)test_*.c))
 TEST_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%,$(TEST_SRCS))
 TSAN_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%_tsan,$(TEST_SRCS))
 
-.PHONY: all build-tests run-tests test build-tests-tsan run-tests-tsan test-tsan benchmarks clean
+.PHONY: all build-tests run-tests test build-tests-tsan run-tests-tsan test-tsan benchmarks monitor clean
 
 all: test benchmarks
 
@@ -59,6 +62,19 @@ $(BENCH_STABLE): $(BENCH_F)benchmark_stability.c $(BENCH_SRCS) $(CORE_SRCS) | $(
 
 benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE)
 
+# Monitor target
+MONITOR_BIN = $(TARGET_F)test_monitor
+MONITOR_TSAN_BIN = $(TARGET_F)test_monitor_tsan
+
+$(MONITOR_BIN): $(TEST_F)test_monitor.c $(MONITOR_SRC) $(CORE_SRCS) | $(TARGET_F)
+	$(CC) $(CFLAGS) $^ -o $@ $(NCURSES_FLAGS)
+
+$(MONITOR_TSAN_BIN): $(TEST_F)test_monitor.c $(MONITOR_SRC) $(CORE_SRCS) | $(TARGET_F)
+	$(CC) $(CFLAGS) $(TSAN_FLAGS) $^ -o $@ $(NCURSES_FLAGS)
+
+monitor: $(MONITOR_BIN)
+	./$(MONITOR_BIN)
+
 run-benchmarks: benchmarks
 	mkdir -p benchmark/res
 	./$(BENCH_CPU) 100 5
@@ -78,9 +94,9 @@ plot-all: run-benchmarks
 		$(PYTHON_BENCH) benchmark/plot/plot.py $$f; \
 	done
 
-build-tests: $(TEST_BINS)
+build-tests: $(TEST_BINS) $(MONITOR_BIN)
 
-build-tests-tsan: $(TSAN_BINS)
+build-tests-tsan: $(TSAN_BINS) $(MONITOR_TSAN_BIN)
 
 run-tests: build-tests | $(LOG_F)
 	@fails=0; total=0; \
@@ -132,5 +148,5 @@ clean-photo:
 	rm -r benchmark/plot/*.png
 
 clean:
-	rm -f $(TEST_BINS) $(TSAN_BINS) $(BENCH_CPU) $(BENCH_IO) $(BENCH_PRIO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE)
+	rm -f $(TEST_BINS) $(TSAN_BINS) $(BENCH_CPU) $(BENCH_IO) $(BENCH_PRIO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE) $(MONITOR_BIN)
 	rm -rf $(LOG_F)
