@@ -10,26 +10,39 @@ TSAN_FLAGS = -fsanitize=thread -fno-omit-frame-pointer
 TEST_TIMEOUT_SEC ?= 20
 NCURSES_FLAGS = -lncursesw
 
-# Core sources (exclude monitor.c by default)
-CORE_SRCS = $(filter-out $(SRC_F)monitor.c, $(wildcard $(SRC_F)*.c))
-MONITOR_SRC = $(SRC_F)monitor.c
+# Core sources (all files in src/)
+CORE_SRCS = $(wildcard $(SRC_F)*.c)
 
-TEST_SRCS = $(filter-out $(TEST_F)test_monitor.c, $(wildcard $(TEST_F)test_*.c))
-TEST_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%,$(TEST_SRCS))
-TSAN_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%_tsan,$(TEST_SRCS))
+# Test sources
+# Note: we still exclude manual tests from automatic run-tests to avoid blocking
+TEST_SRCS = $(wildcard $(TEST_F)test_*.c)
+# But for the standard TEST_BINS used in 'make test', we might want to exclude manual ones
+# to prevent automated tests from hanging on interactive UI.
+AUTO_TEST_SRCS = $(filter-out %_manual.c, $(TEST_SRCS))
 
-.PHONY: all build-tests run-tests test build-tests-tsan run-tests-tsan test-tsan benchmarks monitor clean
+TEST_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%,$(AUTO_TEST_SRCS))
+TSAN_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%_tsan,$(AUTO_TEST_SRCS))
+
+# All test bins (including manual)
+ALL_TEST_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%,$(TEST_SRCS))
+ALL_TSAN_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%_tsan,$(TEST_SRCS))
+
+MONITOR_BIN = $(TARGET_F)test_monitor_manual
+VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --suppressions=ncurses.supp
+
+.PHONY: all build-tests build-tests-all build-all-tests-tsan run-tests test build-tests-tsan run-tests-tsan test-tsan benchmarks run-benchmarks plot-all monitor valgrind-monitor clean
 
 all: test benchmarks
 
 $(TARGET_F) $(LOG_F):
 	mkdir -p $@
 
+# Standard pattern rule for all tests
 $(TARGET_F)%: $(TEST_F)%.c $(CORE_SRCS) $(UNITY) | $(TARGET_F)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(NCURSES_FLAGS)
 
 $(TARGET_F)%_tsan: $(TEST_F)%.c $(CORE_SRCS) $(UNITY) | $(TARGET_F)
-	$(CC) $(CFLAGS) $(TSAN_FLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(TSAN_FLAGS) $^ -o $@ $(NCURSES_FLAGS)
 
 # Benchmark targets
 BENCH_F = benchmark/
@@ -46,34 +59,29 @@ CONDA_ENV = bench_env
 PYTHON_BENCH = conda run --no-capture-output -n $(CONDA_ENV) python3
 
 $(BENCH_CPU): $(BENCH_F)benchmark_cpu.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@
+	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_IO): $(BENCH_F)benchmark_io.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@
+	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_SCALE): $(BENCH_F)benchmark_scaling.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@
+	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_HETERO): $(BENCH_F)benchmark_heterogeneous.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@
+	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_STABLE): $(BENCH_F)benchmark_stability.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@
+	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
 benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE)
 
-# Monitor target
-MONITOR_BIN = $(TARGET_F)test_monitor
-MONITOR_TSAN_BIN = $(TARGET_F)test_monitor_tsan
+build-tests: $(TEST_BINS)
 
-$(MONITOR_BIN): $(TEST_F)test_monitor.c $(MONITOR_SRC) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) $^ -o $@ $(NCURSES_FLAGS)
+build-tests-all: $(ALL_TEST_BINS)
 
-$(MONITOR_TSAN_BIN): $(TEST_F)test_monitor.c $(MONITOR_SRC) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) $(TSAN_FLAGS) $^ -o $@ $(NCURSES_FLAGS)
+build-tests-tsan: $(TSAN_BINS)
 
-monitor: $(MONITOR_BIN)
-	./$(MONITOR_BIN)
+build-tests-all-tsan: $(ALL_TSAN_BINS)
 
 run-benchmarks: benchmarks
 	mkdir -p benchmark/res
@@ -93,10 +101,6 @@ plot-all: run-benchmarks
 		echo "Plotting $$f..."; \
 		$(PYTHON_BENCH) benchmark/plot/plot.py $$f; \
 	done
-
-build-tests: $(TEST_BINS) $(MONITOR_BIN)
-
-build-tests-tsan: $(TSAN_BINS) $(MONITOR_TSAN_BIN)
 
 run-tests: build-tests | $(LOG_F)
 	@fails=0; total=0; \
@@ -144,9 +148,16 @@ test: run-tests
 
 test-tsan: run-tests-tsan
 
+monitor: $(MONITOR_BIN)
+	./$(MONITOR_BIN)
+
+valgrind-monitor: $(MONITOR_BIN)
+	valgrind $(VALGRIND_FLAGS) ./$(MONITOR_BIN)
+
 clean-photo:
 	rm -r benchmark/plot/*.png
 
 clean:
-	rm -f $(TEST_BINS) $(TSAN_BINS) $(BENCH_CPU) $(BENCH_IO) $(BENCH_PRIO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE) $(MONITOR_BIN)
+	rm -f $(ALL_TEST_BINS) $(ALL_TSAN_BINS) $(MONITOR_BIN) \
+	      $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE)
 	rm -rf $(LOG_F)

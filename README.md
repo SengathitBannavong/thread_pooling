@@ -102,9 +102,9 @@ Tests are compiled into independent binaries and execution logs are stored in th
 
 ## Future Roadmap
 
-[ ] **Ncurses Dashboard:** Implement a real-time dashboard to monitor task queue status and worker activity.
+[x] **Ncurses Dashboard:** Implement a real-time dashboard to monitor task queue status and worker activity.
 
-[ ] **Pause/Resume:** Add functionality to pause and resume the thread pool for maintenance or debugging.
+[x] **Pause/Resume:** Add functionality to pause and resume the thread pool for maintenance or debugging.
 
 [ ] **Aging Scheduler:** Implement a mechanism to prevent task starvation by increasing priority over time.
 
