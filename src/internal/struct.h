@@ -1,6 +1,8 @@
 #ifndef _THREAD_POOL_STRUCT_H
 #define _THREAD_POOL_STRUCT_H
 
+#include <bits/pthreadtypes.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdatomic.h>
 #include <pthread.h>
@@ -8,26 +10,28 @@
 #include "worker.h"
 
 
+struct monitor_t {
+        pthread_t               tid;
+        bool                    tid_valid;      /* true → thread exists, safe to join  */
+        atomic_bool             running;        /* true → thread loop active (attached) */
+        atomic_bool             ever_init;
+        thread_pool_t*          pool;           /* pointer back to own pool */
+};
+
 struct thread_pool {
         struct worker_t         *workers;
-        /* total workers thread */
         uint32_t                num_workers;
-        /* shared priority queue */
-        struct priority_queue_t pq;
-        /* tasks currently executing */
+        struct priority_queue_t pq;             /* shared priority queue */
         atomic_int              total_task_in_system;
-        /* set true to begin shutdown */
-        atomic_bool             shutdown;
-        /* guards drain_cond */
-        pthread_mutex_t         drain_mutex;
-        /* signalled when total_task_in_system == 0 */
-        pthread_cond_t          drain_cond;
-        /* ensure no one will destroy pool before submit */
-        atomic_uint             in_flight_submits;
-        /* set true to begin paused and only resume is set to false */
-        atomic_bool             paused;
-        /* signalled when resume is call */
-        pthread_cond_t          pause_cond;
+        atomic_bool             shutdown;       /* set true to begin shutdown */
+        pthread_mutex_t         drain_mutex;    /* guards drain_cond */
+        pthread_cond_t          drain_cond;     /* signalled when total_task_in_system == 0 */
+        atomic_uint             in_flight_submits; /* ensure no one will destroy pool before submit */
+        atomic_bool             paused;         /* set true to begin paused and only resume is set to false */
+        pthread_mutex_t         pause_mutex;
+        pthread_cond_t          pause_cond;     /* signalled when resume is call */
+        time_t                  start_time;
+        struct monitor_t        monitor;
 };
 
 #endif

@@ -66,4 +66,42 @@ void thread_pool_resume(thread_pool_t *ori_pool);
  */
 uint16_t thread_pool_num_working(thread_pool_t *ori_pool);
 
+/**
+ * Start the ncurses real-time thread pool monitor in a background thread.
+ * The monitor redraws every 100 ms. Safe to call only once; use
+ * thread_pool_monitor_reattach() to resume after a detach.
+ *
+ * Keys:
+ *   p / P  – pause the pool
+ *   r / R  – resume the pool
+ *   q / Q  – detach (same as h)
+ *
+ * pool must not be NULL.
+ */
+void thread_pool_monitor_start(thread_pool_t *pool);
+
+/**
+ * Detach the monitor: stop the thread and restore the terminal.
+ * The monitor context (history, pool pointer) is kept alive in the pool so
+ * that thread_pool_monitor_reattach() can resume later.
+ *
+ * return 0 on success, -1 if monitor is not currently attached.
+ */
+int thread_pool_monitor_detach(thread_pool_t *pool);
+
+/**
+ * Reattach the monitor after a detach or [q] key press.
+ * Spawns a new monitor thread; ncurses re-enters via refresh() (no re-alloc).
+ * Colors and layout settings from the previous session are still active.
+ *
+ * return 0 on success, -1 if already attached or monitor_start() was never
+ *         called.
+ */
+int thread_pool_monitor_reattach(thread_pool_t *pool);
+
+/**
+ * return true if the monitor thread is currently running (attached).
+ */
+bool thread_pool_monitor_attached(thread_pool_t *pool);
+
 #endif
