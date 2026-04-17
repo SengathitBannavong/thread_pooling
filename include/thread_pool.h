@@ -104,4 +104,16 @@ int thread_pool_monitor_reattach(thread_pool_t *pool);
  */
 bool thread_pool_monitor_attached(thread_pool_t *pool);
 
+/**
+ * return true if not error spawn thread
+ */
+bool thread_pool_enable_aging(thread_pool_t *pool, const long interval_time_ms, const long promote_time_ms);
+
+/**
+ * return true if not error join thread
+ *
+ * warning: this api will wake up all pause
+ */
+bool thread_pool_disable_aging(thread_pool_t *pool);
+
 #endif

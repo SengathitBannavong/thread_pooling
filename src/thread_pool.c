@@ -1,5 +1,7 @@
+#define _POSIX_C_SOURCE 200809L
 #include <pthread.h>
 #include <stdatomic.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -9,7 +11,6 @@
 #include "priority_queue.h"
 #include "worker.h"
 #include "internal/struct.h"
-
 
 /* --- worker schedule --- */
 static void *worker_func(void *arg)
@@ -52,6 +53,67 @@ static void *worker_func(void *arg)
         return NULL;
 }
 
+static inline void timespec_add_ms(struct timespec *ts, long ms)
+{
+        if (ms <= 0)
+                return;
+
+        ts->tv_sec += ms / 1000;
+        ts->tv_nsec += (ms % 1000) * 1000000L;
+
+        if (ts->tv_nsec >= 1000000000L) {
+                ts->tv_sec += ts->tv_nsec / 1000000000L;
+                ts->tv_nsec %= 1000000000L;
+        }
+}
+
+static void *aging_worker(void *arg)
+{
+        thread_pool_t *pool = (thread_pool_t *)arg;
+        const long interval_ms = pool->aging_interval_ms;
+
+        pthread_mutex_lock(&pool->aging_mutex);
+        while (1) {
+                if (atomic_load_explicit(&pool->paused, memory_order_acquire)) {
+                        pthread_mutex_unlock(&pool->aging_mutex);
+                        pthread_mutex_lock(&pool->pause_mutex);
+
+                        while (atomic_load_explicit(&pool->paused, memory_order_acquire)) {
+
+                                if(atomic_load_explicit(&pool->shutdown, memory_order_acquire)) {
+                                        break;
+                                }
+
+                                if(!atomic_load_explicit(&pool->aging_enable, memory_order_acquire)) {
+                                        break;
+                                }
+
+                                pthread_cond_wait(&pool->pause_cond, &pool->pause_mutex);
+                        }
+                        pthread_mutex_unlock(&pool->pause_mutex);
+                        pthread_mutex_lock(&pool->aging_mutex);
+                }
+
+                if (atomic_load_explicit(&pool->shutdown, memory_order_acquire))
+                        break;
+
+                if (!atomic_load_explicit(&pool->aging_enable, memory_order_acquire))
+                        break;
+
+                /* Compute absolute wake time */
+                struct timespec ts;
+                clock_gettime(CLOCK_MONOTONIC, &ts);
+                timespec_add_ms(&ts, interval_ms);
+
+                pthread_cond_timedwait(&pool->aging_cond, &pool->aging_mutex, &ts);
+
+                pq_aging(&pool->pq, &pool->shutdown, pool->aging_promote_ms);
+        }
+        pthread_mutex_unlock(&pool->aging_mutex);
+
+        return NULL;
+}
+
 thread_pool_t *thread_pool_init(int num_workers)
 {
         if (num_workers <= 0) {
@@ -65,6 +127,9 @@ thread_pool_t *thread_pool_init(int num_workers)
         }
 
         pool->num_workers = num_workers;
+        atomic_store_explicit(&pool->aging_enable, false, memory_order_relaxed);
+        pool->aging_interval_ms = 0;
+        pool->aging_promote_ms = 0;
         atomic_store_explicit(&pool->in_flight_submits, 0, memory_order_relaxed);
         atomic_store_explicit(&pool->total_task_in_system, 0, memory_order_relaxed);
         atomic_store_explicit(&pool->shutdown, false, memory_order_relaxed);
@@ -79,8 +144,26 @@ thread_pool_t *thread_pool_init(int num_workers)
         if (pthread_cond_init(&pool->drain_cond, NULL) != 0)
                 goto err_drain_mutex;
 
-        if (pthread_mutex_init(&pool->pause_mutex, NULL) != 0)
+        if (pthread_mutex_init(&pool->aging_mutex, NULL) != 0)
                 goto err_drain_cond;
+
+        pthread_condattr_t aging_cond_attr;
+        if (pthread_condattr_init(&aging_cond_attr) != 0)
+                goto err_aging_mutex;
+
+        if (pthread_condattr_setclock(&aging_cond_attr, CLOCK_MONOTONIC) != 0) {
+                pthread_condattr_destroy(&aging_cond_attr);
+                goto err_aging_mutex;
+        }
+
+        if (pthread_cond_init(&pool->aging_cond, &aging_cond_attr) != 0) {
+                pthread_condattr_destroy(&aging_cond_attr);
+                goto err_aging_mutex;
+        }
+        pthread_condattr_destroy(&aging_cond_attr);
+
+        if (pthread_mutex_init(&pool->pause_mutex, NULL) != 0)
+                goto err_aging_cond;
 
         if (pthread_cond_init(&pool->pause_cond, NULL) != 0)
                 goto err_pause_mutex;
@@ -108,6 +191,7 @@ thread_pool_t *thread_pool_init(int num_workers)
                         goto err_workers;
                 }
         }
+
         pool->start_time = time(NULL);
 
         /* monitor init */
@@ -121,6 +205,8 @@ thread_pool_t *thread_pool_init(int num_workers)
 err_workers:        free(pool->workers);
 err_pause_cond:     pthread_cond_destroy(&pool->pause_cond);
 err_pause_mutex:    pthread_mutex_destroy(&pool->pause_mutex);
+err_aging_cond:     pthread_cond_destroy(&pool->aging_cond);
+err_aging_mutex:    pthread_mutex_destroy(&pool->aging_mutex);
 err_drain_cond:     pthread_cond_destroy(&pool->drain_cond);
 err_drain_mutex:    pthread_mutex_destroy(&pool->drain_mutex);
 err_pq:             pq_destroy(&pool->pq);
@@ -135,7 +221,7 @@ int64_t thread_pool_submit(thread_pool_t *pool, void (*task_fun_t)(void *arg),
                 return -1;
 
         // fast return if shutdown
-        if (atomic_load_explicit(&pool->shutdown, memory_order_acquire)) 
+        if (atomic_load_explicit(&pool->shutdown, memory_order_acquire))
                 return -1;
 
         atomic_fetch_add_explicit(&pool->in_flight_submits, 1, memory_order_release);
@@ -163,7 +249,8 @@ void thread_pool_pause(thread_pool_t *ori_pool)
         pq_wake_all(&ori_pool->pq);
 }
 
-static void thread_pool_wake_pause(thread_pool_t *ori_pool) {
+static void thread_pool_wake_pause(thread_pool_t *ori_pool)
+{
         pthread_mutex_lock(&ori_pool->pause_mutex);
         pthread_cond_broadcast(&ori_pool->pause_cond);
         pthread_mutex_unlock(&ori_pool->pause_mutex);
@@ -231,12 +318,15 @@ void thread_pool_destroy(thread_pool_t **ori_pool)
         atomic_store_explicit(&pool->shutdown, true, memory_order_release);
         atomic_store_explicit(&pool->paused, false, memory_order_release);
 
-        // ensure no thread in middle submits task 
+        // ensure no thread in middle submits task
         while(atomic_load_explicit(&pool->in_flight_submits, memory_order_acquire) > 0); // block
 
         /* ensure workers blocked in pq_pop_until_shutdown wake up and exit */
         pq_wake_all(&pool->pq);
         thread_pool_wake_pause(pool);
+        // wake up aging and join
+        thread_pool_disable_aging(pool);
+
         pthread_mutex_lock(&pool->drain_mutex);
 
         while (atomic_load_explicit(&pool->total_task_in_system, memory_order_acquire) > 0)
@@ -255,9 +345,52 @@ void thread_pool_destroy(thread_pool_t **ori_pool)
 
         pthread_cond_destroy(&pool->drain_cond);
         pthread_cond_destroy(&pool->pause_cond);
+        pthread_cond_destroy(&pool->aging_cond);
         pthread_mutex_destroy(&pool->drain_mutex);
         pthread_mutex_destroy(&pool->pause_mutex);
-
+        pthread_mutex_destroy(&pool->aging_mutex);
         free(pool);
         *ori_pool = NULL;
+}
+
+
+bool thread_pool_enable_aging(thread_pool_t *pool, const long interval_time_ms, const long promote_time_ms)
+{
+        if (!pool || interval_time_ms <= 0 || promote_time_ms <= 0)
+                return false;
+
+        pthread_mutex_lock(&pool->aging_mutex);
+        if (atomic_load_explicit(&pool->aging_enable, memory_order_acquire)) {
+                pthread_mutex_unlock(&pool->aging_mutex);
+                return true;
+        }
+        pool->aging_interval_ms = interval_time_ms;
+        pool->aging_promote_ms = promote_time_ms;
+        atomic_store_explicit(&pool->aging_enable, true, memory_order_release);
+        pthread_mutex_unlock(&pool->aging_mutex);
+
+        if (pthread_create(&pool->aging_tid, NULL, aging_worker, pool) != 0) {
+                atomic_store_explicit(&pool->aging_enable, false, memory_order_release);
+                return false;
+        }
+
+        return true;
+}
+
+bool thread_pool_disable_aging(thread_pool_t *pool)
+{
+        if (!pool)
+                return false;
+
+        if (!atomic_load_explicit(&pool->aging_enable, memory_order_acquire))
+                return true;
+
+        atomic_store_explicit(&pool->aging_enable, false, memory_order_release);
+        pthread_mutex_lock(&pool->aging_mutex);
+        pthread_cond_signal(&pool->aging_cond);
+        pthread_mutex_unlock(&pool->aging_mutex);
+        thread_pool_wake_pause(pool);
+        pthread_join(pool->aging_tid, NULL);
+
+        return true;
 }

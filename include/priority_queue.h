@@ -54,6 +54,11 @@ void pq_wake_all(struct priority_queue_t *pq);
  */
 struct task_t *pq_pop_nonblock(struct priority_queue_t *pq);
 
+/**
+ * run scan old task to upscale priority
+ */
+void pq_aging(struct priority_queue_t *pq, const atomic_bool *shutdown_flag, const long promote_time_ms);
+
 int pq_size(struct priority_queue_t *pq);
 int pq_is_empty(struct priority_queue_t *pq);
 

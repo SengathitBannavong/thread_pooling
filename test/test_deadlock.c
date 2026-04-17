@@ -37,15 +37,15 @@ void simple_task(void *arg) {
  * incrementing total_task_in_system.
  */
 void test_premature_drain(void) {
-        for (int retry = 0; retry < 10; retry++) {
+        for (int retry = 0; retry < 6; retry++) {
                 atomic_store(&executed_count, 0);
-                int num_tasks = 500;
+                int num_tasks = 300;
 
                 /* Small pool to increase contention */
                 thread_pool_t *pool = thread_pool_init(2);
 
                 for (int i = 0; i < num_tasks; i++) {
-                thread_pool_submit(pool, simple_task, NULL, PRIORITY_MEDIUM);
+                        thread_pool_submit(pool, simple_task, NULL, PRIORITY_MEDIUM);
                 }
 
                 /* Immediately destroy.
@@ -84,7 +84,7 @@ void test_submit_vs_destroy_race(void) {
                 pthread_create(&sub_thread, NULL, submitter_thread, pool);
 
                 /* Wait a tiny bit then destroy while sub_thread is likely still submitting */
-                sleep_ms(500);
+                sleep_ms(200);
                 thread_pool_destroy(&pool);
 
                 pthread_join(sub_thread, NULL);

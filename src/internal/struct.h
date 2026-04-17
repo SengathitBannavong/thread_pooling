@@ -30,6 +30,12 @@ struct thread_pool {
         atomic_bool             paused;         /* set true to begin paused and only resume is set to false */
         pthread_mutex_t         pause_mutex;
         pthread_cond_t          pause_cond;     /* signalled when resume is call */
+        pthread_t               aging_tid;
+        pthread_mutex_t         aging_mutex;
+        pthread_cond_t          aging_cond;
+        atomic_bool             aging_enable;
+        long                    aging_interval_ms;
+        long                    aging_promote_ms;
         time_t                  start_time;
         struct monitor_t        monitor;
 };

@@ -161,15 +161,18 @@ void test_priority_order_high_before_low(void)
 {
         /* single-worker pool for deterministic ordering */
         thread_pool_t *p1 = thread_pool_init(1);
+        TEST_ASSERT_NOT_NULL(p1);
 
         atomic_store(&g_order_idx, 0);
 
-        /* submit a blocking task first to hold the single worker,
-        * giving us time to fill the queue */
+        /* Pause worker so queue can be filled before execution begins */
+        thread_pool_pause(p1);
+
+        /* Keep single worker occupied briefly so queue is fully populated */
         int delay = 100; /* ms */
         thread_pool_submit(p1, sleep_ms, &delay, PRIORITY_LOW);
 
-        /* now flood the queue while worker is sleeping */
+        /* flood queue while paused */
         static int lo = PRIORITY_LOW, md = PRIORITY_MEDIUM, hi = PRIORITY_HIGH;
         thread_pool_submit(p1, log_priority, &lo, PRIORITY_LOW);
         thread_pool_submit(p1, log_priority, &lo, PRIORITY_LOW);
@@ -181,6 +184,7 @@ void test_priority_order_high_before_low(void)
         thread_pool_submit(p1, log_priority, &hi, PRIORITY_HIGH);
         thread_pool_submit(p1, log_priority, &hi, PRIORITY_HIGH);
 
+        thread_pool_resume(p1);
         thread_pool_destroy(&p1);
 
         /* first 3 should be HIGH, next 3 MED, last 3 LOW */
@@ -378,6 +382,18 @@ void test_destroy_waits_for_running_tasks(void)
         pool = thread_pool_init(workers);
 }
 
+void test_aging_enable_disable_runtime(void)
+{
+        thread_pool_t *p = thread_pool_init(1);
+        TEST_ASSERT_NOT_NULL(p);
+
+        TEST_ASSERT_TRUE(thread_pool_enable_aging(p, 50L, 100L));
+        TEST_ASSERT_TRUE(thread_pool_disable_aging(p));
+        TEST_ASSERT_TRUE(thread_pool_disable_aging(p)); /* idempotent no-op */
+
+        thread_pool_destroy(&p);
+}
+
 
 int main(void)
 {
@@ -414,6 +430,7 @@ int main(void)
         /* shutdown */
         RUN_TEST(test_submit_after_destroy_returns_error);
         RUN_TEST(test_destroy_waits_for_running_tasks);
+        RUN_TEST(test_aging_enable_disable_runtime);
 
         return UNITY_END();
 }
