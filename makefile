@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -std=c11 -Wall -Wextra -Iinclude -IUnity/src -g -pthread
+OPFLAGS = -std=c11 -Wall -Wextra -Iinclude -IUnity/src -O3 -march=native -ffast-math -pthread
 TARGET_F = bin/
 SRC_F = src/
 UNITY = Unity/src/unity.c
@@ -53,27 +54,35 @@ BENCH_HETERO = $(TARGET_F)benchmark_heterogeneous
 BENCH_STABLE = $(TARGET_F)benchmark_stability
 
 BENCH_SRCS = $(BENCH_F)work.c
+BENCH_QUEUE = $(TARGET_F)benchmark_queue_ops
+BENCH_AGING = $(TARGET_F)benchmark_aging
 
 # Conda python for plotting
 CONDA_ENV = bench_env
 PYTHON_BENCH = conda run --no-capture-output -n $(CONDA_ENV) python3
 
 $(BENCH_CPU): $(BENCH_F)benchmark_cpu.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_IO): $(BENCH_F)benchmark_io.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_SCALE): $(BENCH_F)benchmark_scaling.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_HETERO): $(BENCH_F)benchmark_heterogeneous.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_STABLE): $(BENCH_F)benchmark_stability.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(CFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
-benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE)
+$(BENCH_QUEUE): $(BENCH_F)benchmark_queue_ops.c $(CORE_SRCS) | $(TARGET_F)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+
+$(BENCH_AGING): $(BENCH_F)benchmark_aging.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+
+benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE) $(BENCH_QUEUE) $(BENCH_AGING)
 
 build-tests: $(TEST_BINS)
 
@@ -95,11 +104,13 @@ run-benchmarks: benchmarks
 	./$(BENCH_SCALE)
 	./$(BENCH_HETERO)
 	./$(BENCH_STABLE)
+	./$(BENCH_QUEUE) 10000 3
+	./$(BENCH_AGING)
 
 plot-all: run-benchmarks
 	@for f in benchmark/res/*.txt; do \
 		echo "Plotting $$f..."; \
-		$(PYTHON_BENCH) benchmark/plot/plot.py $$f; \
+		$(PYTHON_BENCH) plot.py $$f; \
 	done
 
 run-tests: build-tests | $(LOG_F)
@@ -159,5 +170,5 @@ clean-photo:
 
 clean:
 	rm -f $(ALL_TEST_BINS) $(ALL_TSAN_BINS) $(MONITOR_BIN) \
-	      $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE)
+	      $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE) $(BENCH_QUEUE) $(BENCH_AGING)
 	rm -rf $(LOG_F)
