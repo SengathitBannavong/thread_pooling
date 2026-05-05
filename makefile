@@ -82,7 +82,7 @@ $(BENCH_QUEUE): $(BENCH_F)benchmark_queue_ops.c $(CORE_SRCS) | $(TARGET_F)
 $(BENCH_AGING): $(BENCH_F)benchmark_aging.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
 	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
 
-benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE) $(BENCH_QUEUE) $(BENCH_AGING)
+benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_QUEUE) $(BENCH_AGING)
 
 build-tests: $(TEST_BINS)
 
@@ -94,16 +94,9 @@ build-tests-all-tsan: $(ALL_TSAN_BINS)
 
 run-benchmarks: benchmarks
 	mkdir -p benchmark/res
-	./$(BENCH_CPU) 100 5
-	./$(BENCH_CPU) 1000 5
-	./$(BENCH_CPU) 10000 5
 	./$(BENCH_CPU) 100000 3
-	./$(BENCH_IO) 100 5
-	./$(BENCH_IO) 1000 5
-	./$(BENCH_IO) 10000 5
+	./$(BENCH_IO) 100000 3
 	./$(BENCH_SCALE)
-	./$(BENCH_HETERO)
-	./$(BENCH_STABLE)
 	./$(BENCH_QUEUE) 10000 3
 	./$(BENCH_AGING)
 

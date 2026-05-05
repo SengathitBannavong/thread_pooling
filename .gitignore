@@ -11,9 +11,6 @@ context/
 # file save log of brenchmark test
 benchmark/save/
 
-# unit test src floder
-Unity/
-
 # language server floder
 .idea/
 .caches/

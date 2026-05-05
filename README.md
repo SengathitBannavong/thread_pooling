@@ -44,8 +44,29 @@ This project implements a multi-threaded task execution system where tasks are s
 
 - **OS:** Linux-based system
 - **Compiler:** GCC (supporting C11)
-- **Libraries:** POSIX threads (`pthread`)
-- **Tools:** `make`
+- **Libraries:** POSIX threads (`pthread`), `ncurses` (for the monitor)
+- **Tools:** `make`, `git`
+
+## Installation
+
+### 1. Install System Dependencies
+
+On **Fedora / RHEL / CentOS**:
+```bash
+sudo dnf install ncurses-devel libtsan
+```
+
+On **Ubuntu / Debian**:
+```bash
+sudo apt-get install libncurses5-dev libncursesw5-dev libtsan0
+```
+
+### 2. Initialize Submodules
+
+This project uses the Unity Test Framework as a git submodule. To fetch it, run:
+```bash
+git submodule update --init --recursive
+```
 
 ## Quick Start
 
