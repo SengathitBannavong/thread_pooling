@@ -11,6 +11,15 @@ TSAN_FLAGS = -fsanitize=thread -fno-omit-frame-pointer
 TEST_TIMEOUT_SEC ?= 20
 NCURSES_FLAGS = -lncursesw
 
+BASELINE_F = src/baseline/
+BASELINE_SRCS = $(wildcard $(BASELINE_F)*.c)
+BASELINE_BIN = $(TARGET_F)baseline
+
+BASELINE_TEST_SRC = $(TEST_F)baseline/test_baseline.c
+BASELINE_POOL_SRC = $(SRC_F)baseline/baseline.c
+BASELINE_TEST_BIN = $(TARGET_F)test_baseline
+
+
 # Core sources (all files in src/)
 CORE_SRCS = $(wildcard $(SRC_F)*.c)
 
@@ -25,8 +34,8 @@ TEST_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%,$(AUTO_TEST_SRCS))
 TSAN_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%_tsan,$(AUTO_TEST_SRCS))
 
 # All test bins (including manual)
-ALL_TEST_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%,$(TEST_SRCS))
-ALL_TSAN_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%_tsan,$(TEST_SRCS))
+ALL_TEST_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%,$(TEST_SRCS),$(BASELINE_BIN))
+ALL_TSAN_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%_tsan,$(TEST_SRCS),$(BASELINE_BIN)_tsan)
 
 MONITOR_BIN = $(TARGET_F)test_monitor_manual
 VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --suppressions=ncurses.supp
@@ -44,6 +53,18 @@ $(TARGET_F)%: $(TEST_F)%.c $(CORE_SRCS) $(UNITY) | $(TARGET_F)
 
 $(TARGET_F)%_tsan: $(TEST_F)%.c $(CORE_SRCS) $(UNITY) | $(TARGET_F)
 	$(CC) $(CFLAGS) $(TSAN_FLAGS) $^ -o $@ $(NCURSES_FLAGS)
+
+$(BASELINE_BIN): $(BASELINE_SRCS) | $(TARGET_F)
+	$(CC) $(CFLAGS) $^ -o $@ $(NCURSES_FLAGS)
+
+$(BASELINE_BIN)_tsan: $(BASELINE_SRCS) | $(TARGET_F)
+	$(CC) $(CFLAGS) $(TSAN_FLAGS) $^ -o $@ $(NCURSES_FLAGS)
+
+$(BASELINE_TEST_BIN): $(BASELINE_TEST_SRC) $(BASELINE_POOL_SRC) $(UNITY) | $(TARGET_F)
+	$(CC) $(CFLAGS) -Iinclude/baseline $^ -o $@
+
+$(BASELINE_TEST_BIN)_tsan: $(BASELINE_TEST_SRC) $(BASELINE_POOL_SRC) $(UNITY) | $(TARGET_F)
+	$(CC) $(CFLAGS) $(TSAN_FLAGS) -Iinclude/baseline $^ -o $@
 
 # Benchmark targets
 BENCH_F = benchmark/
@@ -84,11 +105,11 @@ $(BENCH_AGING): $(BENCH_F)benchmark_aging.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGE
 
 benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_QUEUE) $(BENCH_AGING)
 
-build-tests: $(TEST_BINS)
+build-tests: $(TEST_BINS) $(BASELINE_TEST_BIN)
 
 build-tests-all: $(ALL_TEST_BINS)
 
-build-tests-tsan: $(TSAN_BINS)
+build-tests-tsan: $(TSAN_BINS) $(BASELINE_TEST_BIN)_tsan
 
 build-tests-all-tsan: $(ALL_TSAN_BINS)
 
@@ -108,7 +129,7 @@ plot-all: run-benchmarks
 
 run-tests: build-tests | $(LOG_F)
 	@fails=0; total=0; \
-	for t in $(TEST_BINS); do \
+	for t in $(TEST_BINS) $(BASELINE_TEST_BIN); do \
 		name=$$(basename $$t); \
 		total=$$((total+1)); \
 		echo "[RUN] $$name"; \
@@ -129,7 +150,7 @@ run-tests: build-tests | $(LOG_F)
 
 run-tests-tsan: build-tests-tsan | $(LOG_F)
 	@fails=0; total=0; \
-	for t in $(TSAN_BINS); do \
+	for t in $(TSAN_BINS) $(BASELINE_TEST_BIN)_tsan; do \
 		name=$$(basename $$t); \
 		total=$$((total+1)); \
 		echo "[RUN] $$name"; \
@@ -162,6 +183,6 @@ clean-photo:
 	rm -r benchmark/plot/*.png
 
 clean:
-	rm -f $(ALL_TEST_BINS) $(ALL_TSAN_BINS) $(MONITOR_BIN) \
+	rm -f $(ALL_TEST_BINS) $(ALL_TSAN_BINS) $(MONITOR_BIN) $(BASELINE_TEST_BIN) $(BASELINE_TEST_BIN)_tsan \
 	      $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE) $(BENCH_QUEUE) $(BENCH_AGING)
 	rm -rf $(LOG_F)
