@@ -126,7 +126,7 @@ static void *worker_func(void *arg)
 }
 
 
-baseline_pool_t* baseline_pool_init(uint32_t num_workers)
+baseline_pool_t* baseline_pool_init(int32_t num_workers)
 {
 
         if (num_workers <= 0)
@@ -158,7 +158,7 @@ baseline_pool_t* baseline_pool_init(uint32_t num_workers)
         if(pthread_cond_init(&pool->queue.q_cond, NULL) != 0)
                 goto error_mutex_q;
 
-        for(uint32_t i = 0 ; i < num_workers; i++) {
+        for(uint32_t i = 0 ; i < pool->num_workers; i++) {
                 if(pthread_create(&pool->worker_thread[i], NULL, worker_func, (void *)pool)) {
                         atomic_store_explicit(&pool->shutdown, true, memory_order_relaxed);
                         q_wake_all(&pool->queue);

@@ -8,7 +8,7 @@
 
 typedef struct baseline_pool_t baseline_pool_t;
 
-baseline_pool_t* baseline_pool_init(uint32_t num_workers);
+baseline_pool_t* baseline_pool_init(int32_t num_workers);
 
 int64_t baseline_pool_submit(baseline_pool_t *pool, void (*task_fun_t)(void *arg), void *arg);
 
