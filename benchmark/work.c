@@ -11,7 +11,7 @@ int fibonaccy(int n)
 {
         if(n < 2)
                 return n;
-        
+
         return fibonaccy(n-2) + fibonaccy(n-1);
 }
 
@@ -19,29 +19,23 @@ int fibonaccy(int n)
 
 /* ---------- I/O Bound ---------- */
 
-int read_file() 
+int read_file()
 {
-        int fd = open("benchmark/in/io_test.dat", O_RDONLY | O_DIRECT);
+        int fd = open("benchmark/in/io_test.dat", O_RDONLY);
         if (fd == -1) {
-                perror("Error opening file with O_DIRECT (check if filesystem supports it)");
-                return 1;
-        }
-        
-        void *buf;
-        size_t size = 65536;
-        if (posix_memalign(&buf, 4096, size) != 0) {
-                perror("posix_memalign");
-                close(fd);
+                perror("open benchmark/in/io_test.dat");
                 return 1;
         }
 
-        // With O_DIRECT, offset and size must be aligned to block size (usually 512 or 4096)
-        ssize_t rb = pread(fd, buf, size, 0);
-        if (rb == -1) {
-                perror("pread (O_DIRECT)");
-        }
+        /* Drop the page-cache entry before reading so every call goes to disk,
+         * giving realistic I/O latency without needing O_DIRECT. */
+        posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
 
-        free(buf);
+        char buf[65536];
+        ssize_t rb = pread(fd, buf, sizeof(buf), 0);
+        if (rb == -1)
+                perror("pread");
+
         close(fd);
         return rb == -1 ? 1 : 0;
 }

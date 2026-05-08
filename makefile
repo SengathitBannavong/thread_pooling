@@ -19,6 +19,8 @@ BASELINE_TEST_SRC = $(TEST_F)baseline/test_baseline.c
 BASELINE_POOL_SRC = $(SRC_F)baseline/baseline.c
 BASELINE_TEST_BIN = $(TARGET_F)test_baseline
 
+SMOKE_TEST_SRC = $(TEST_F)test_baseline_smoke.c
+SMOKE_TEST_BIN = $(TARGET_F)test_baseline_smoke
 
 # Core sources (all files in src/)
 CORE_SRCS = $(wildcard $(SRC_F)*.c)
@@ -40,7 +42,7 @@ ALL_TSAN_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%_tsan,$(TEST_SRCS),$(BASELIN
 MONITOR_BIN = $(TARGET_F)test_monitor_manual
 VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --suppressions=ncurses.supp
 
-.PHONY: all build-tests build-tests-all build-all-tests-tsan run-tests test build-tests-tsan run-tests-tsan test-tsan benchmarks run-benchmarks plot-all monitor valgrind-monitor clean
+.PHONY: all build-tests build-tests-all build-all-tests-tsan run-tests test build-tests-tsan run-tests-tsan test-tsan benchmarks benchmarks_base run-benchmarks run-benchmarks-base plot-all monitor valgrind-monitor clean
 
 all: test benchmarks
 
@@ -66,8 +68,15 @@ $(BASELINE_TEST_BIN): $(BASELINE_TEST_SRC) $(BASELINE_POOL_SRC) $(UNITY) | $(TAR
 $(BASELINE_TEST_BIN)_tsan: $(BASELINE_TEST_SRC) $(BASELINE_POOL_SRC) $(UNITY) | $(TARGET_F)
 	$(CC) $(CFLAGS) $(TSAN_FLAGS) -Iinclude/baseline $^ -o $@
 
+$(SMOKE_TEST_BIN): $(SMOKE_TEST_SRC) $(BASELINE_POOL_SRC) $(UNITY) | $(TARGET_F)
+	$(CC) $(CFLAGS) -Iinclude/baseline $^ -o $@
+
+$(SMOKE_TEST_BIN)_tsan: $(SMOKE_TEST_SRC) $(BASELINE_POOL_SRC) $(UNITY) | $(TARGET_F)
+	$(CC) $(CFLAGS) $(TSAN_FLAGS) -Iinclude/baseline $^ -o $@
+
 # Benchmark targets
 BENCH_F = benchmark/
+BENCH_FLAG = -g -fno-omit-frame-pointer
 BENCH_CPU = $(TARGET_F)benchmark_cpu
 BENCH_IO = $(TARGET_F)benchmark_io
 BENCH_SCALE = $(TARGET_F)benchmark_scaling
@@ -83,35 +92,63 @@ CONDA_ENV = bench_env
 PYTHON_BENCH = conda run --no-capture-output -n $(CONDA_ENV) python3
 
 $(BENCH_CPU): $(BENCH_F)benchmark_cpu.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_IO): $(BENCH_F)benchmark_io.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_SCALE): $(BENCH_F)benchmark_scaling.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_HETERO): $(BENCH_F)benchmark_heterogeneous.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_STABLE): $(BENCH_F)benchmark_stability.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_QUEUE): $(BENCH_F)benchmark_queue_ops.c $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) $^ -o $@ $(NCURSES_FLAGS)
 
 $(BENCH_AGING): $(BENCH_F)benchmark_aging.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
-	$(CC) $(OPFLAGS) -I$(BENCH_F) $^ -o $@ $(NCURSES_FLAGS)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) $^ -o $@ $(NCURSES_FLAGS)
+
+# Baseline benchmark targets
+BASE_F = benchmark/base/
+BENCH_BASE_CPU     = $(TARGET_F)benchmark_base_cpu
+BENCH_BASE_IO      = $(TARGET_F)benchmark_base_io
+BENCH_BASE_QUEUE   = $(TARGET_F)benchmark_base_queue_ops
+BENCH_BASE_SCALING = $(TARGET_F)benchmark_base_scaling
+
+$(BENCH_BASE_CPU): $(BASE_F)benchmark_base_cpu.c $(BENCH_SRCS) $(BASELINE_POOL_SRC) | $(TARGET_F)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) -Iinclude/baseline $^ -o $@
+
+$(BENCH_BASE_IO): $(BASE_F)benchmark_base_io.c $(BENCH_SRCS) $(BASELINE_POOL_SRC) | $(TARGET_F)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) -Iinclude/baseline $^ -o $@
+
+$(BENCH_BASE_QUEUE): $(BASE_F)benchmark_base_queue_ops.c $(BASELINE_POOL_SRC) | $(TARGET_F)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) -Iinclude/baseline $^ -o $@
+
+$(BENCH_BASE_SCALING): $(BASE_F)benchmark_base_scaling.c $(BENCH_SRCS) $(BASELINE_POOL_SRC) | $(TARGET_F)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) -Iinclude/baseline $^ -o $@
+
+benchmarks-base: $(BENCH_BASE_CPU) $(BENCH_BASE_IO) $(BENCH_BASE_QUEUE) $(BENCH_BASE_SCALING)
 
 benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_QUEUE) $(BENCH_AGING)
 
-build-tests: $(TEST_BINS) $(BASELINE_TEST_BIN)
+build-tests: $(TEST_BINS) $(BASELINE_TEST_BIN) $(SMOKE_TEST_BIN)
 
 build-tests-all: $(ALL_TEST_BINS)
 
-build-tests-tsan: $(TSAN_BINS) $(BASELINE_TEST_BIN)_tsan
+build-tests-tsan: $(TSAN_BINS) $(BASELINE_TEST_BIN)_tsan $(SMOKE_TEST_BIN)_tsan
 
 build-tests-all-tsan: $(ALL_TSAN_BINS)
+
+run-benchmarks-base: benchmarks_base
+	mkdir -p benchmark/res
+	./$(BENCH_BASE_CPU) 100000 3
+	./$(BENCH_BASE_IO) 100000 3
+	./$(BENCH_BASE_SCALING)
+	./$(BENCH_BASE_QUEUE) 10000 3
 
 run-benchmarks: benchmarks
 	mkdir -p benchmark/res
@@ -129,7 +166,7 @@ plot-all: run-benchmarks
 
 run-tests: build-tests | $(LOG_F)
 	@fails=0; total=0; \
-	for t in $(TEST_BINS) $(BASELINE_TEST_BIN); do \
+	for t in $(TEST_BINS) $(BASELINE_TEST_BIN) ; do \
 		name=$$(basename $$t); \
 		total=$$((total+1)); \
 		echo "[RUN] $$name"; \
@@ -150,7 +187,7 @@ run-tests: build-tests | $(LOG_F)
 
 run-tests-tsan: build-tests-tsan | $(LOG_F)
 	@fails=0; total=0; \
-	for t in $(TSAN_BINS) $(BASELINE_TEST_BIN)_tsan; do \
+	for t in $(TSAN_BINS) $(BASELINE_TEST_BIN)_tsan $(SMOKE_TEST_BIN)_tsan; do \
 		name=$$(basename $$t); \
 		total=$$((total+1)); \
 		echo "[RUN] $$name"; \
@@ -183,6 +220,7 @@ clean-photo:
 	rm -r benchmark/plot/*.png
 
 clean:
-	rm -f $(ALL_TEST_BINS) $(ALL_TSAN_BINS) $(MONITOR_BIN) $(BASELINE_TEST_BIN) $(BASELINE_TEST_BIN)_tsan \
-	      $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE) $(BENCH_QUEUE) $(BENCH_AGING)
+	rm -f $(ALL_TEST_BINS) $(ALL_TSAN_BINS) $(MONITOR_BIN) $(BASELINE_TEST_BIN) $(BASELINE_TEST_BIN)_tsan $(SMOKE_TEST_BIN) $(SMOKE_TEST_BIN)_tsan \
+	      $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE) $(BENCH_QUEUE) $(BENCH_AGING) \
+	      $(BENCH_BASE_CPU) $(BENCH_BASE_IO) $(BENCH_BASE_QUEUE) $(BENCH_BASE_SCALING) \
 	rm -rf $(LOG_F)

@@ -161,8 +161,24 @@ static int queue_ops_bench(FILE *fp, int n_tasks, int n_workers, int run)
 
 int main(int argc, char *argv[])
 {
+        /* perf mode: --workers N --tasks M — no fork, profiles this process */
+        if (argc >= 5 && strcmp(argv[1], "--workers") == 0 &&
+                         strcmp(argv[3], "--tasks")   == 0) {
+                int n_workers = atoi(argv[2]);
+                int n_tasks   = atoi(argv[4]);
+                thread_pool_t *pool = thread_pool_init(n_workers);
+                if (!pool) { fprintf(stderr, "pool init failed\n"); return 1; }
+                double push_us = 0, total_us = 0;
+                bench_concurrent(n_tasks, pool, &push_us, &total_us);
+                thread_pool_destroy(&pool);
+                printf("wall_s=%.6f tasks=%d workers=%d\n",
+                       total_us / 1e6, n_tasks, n_workers);
+                return 0;
+        }
+
         if (argc < 3) {
                 printf("Usage: %s <n_tasks> <n_runs>\n", argv[0]);
+                printf("       %s --workers N --tasks M\n", argv[0]);
                 return 1;
         }
 
