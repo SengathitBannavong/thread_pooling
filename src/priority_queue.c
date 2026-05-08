@@ -80,8 +80,8 @@ void pq_push(struct priority_queue_t *pq, struct task_t *task)
         pq->ready_mask |= (1UL << p);
         pq->size++;
         // wake up worker
-        pthread_cond_signal(&pq->not_empty);
         pthread_mutex_unlock(&pq->mutex);
+        pthread_cond_signal(&pq->not_empty);
 }
 
 static void pq_push_head(struct priority_queue_t *pq, struct task_t *task)
@@ -104,8 +104,8 @@ static void pq_push_head(struct priority_queue_t *pq, struct task_t *task)
         pq->ready_mask |= (1UL << p);
         pq->size++;
         // wake up worker
-        pthread_cond_signal(&pq->not_empty);
         pthread_mutex_unlock(&pq->mutex);
+        pthread_cond_signal(&pq->not_empty);
 }
 
 struct task_t *pq_pop(struct priority_queue_t *pq)
@@ -147,12 +147,12 @@ struct task_t *pq_pop_until_shutdown(struct priority_queue_t *pq, const atomic_b
 
 void pq_wake_all(struct priority_queue_t *pq)
 {
-  if (!pq)
-    return;
+        if (!pq)
+                return;
 
-  pthread_mutex_lock(&pq->mutex);
-  pthread_cond_broadcast(&pq->not_empty);
-  pthread_mutex_unlock(&pq->mutex);
+        pthread_mutex_lock(&pq->mutex);
+        pthread_cond_broadcast(&pq->not_empty);
+        pthread_mutex_unlock(&pq->mutex);
 }
 
 struct task_t *pq_pop_nonblock(struct priority_queue_t *pq)
