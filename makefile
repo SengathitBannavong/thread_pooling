@@ -41,8 +41,9 @@ ALL_TSAN_BINS = $(patsubst $(TEST_F)%.c,$(TARGET_F)%_tsan,$(TEST_SRCS),$(BASELIN
 
 MONITOR_BIN = $(TARGET_F)test_monitor_manual
 VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --suppressions=ncurses.supp
+VALGRIND_TEST_FLAGS = $(VALGRIND_FLAGS) --errors-for-leak-kinds=definite,possible --error-exitcode=99
 
-.PHONY: all build-tests build-tests-all build-all-tests-tsan run-tests test build-tests-tsan run-tests-tsan test-tsan benchmarks benchmarks_base run-benchmarks run-benchmarks-base plot-all monitor valgrind-monitor clean
+.PHONY: all build-tests build-tests-all build-all-tests-tsan run-tests test build-tests-tsan run-tests-tsan test-tsan run-tests-valgrind test-valgrind benchmarks benchmarks_base run-benchmarks run-benchmarks-base plot-all monitor valgrind-monitor clean
 
 all: test benchmarks
 
@@ -209,6 +210,29 @@ run-tests-tsan: build-tests-tsan | $(LOG_F)
 test: run-tests
 
 test-tsan: run-tests-tsan
+
+run-tests-valgrind: build-tests | $(LOG_F)
+	@fails=0; total=0; \
+	for t in $(TEST_BINS) $(BASELINE_TEST_BIN) ; do \
+		name=$$(basename $$t); \
+		total=$$((total+1)); \
+		echo "[VALGRIND] $$name"; \
+		if timeout $(TEST_TIMEOUT_SEC)s valgrind $(VALGRIND_TEST_FLAGS) ./$$t > $(LOG_F)$$name.valgrind.log 2>&1; then \
+			echo "[PASS] $$name (log: $(LOG_F)$$name.valgrind.log)"; \
+		else \
+			code=$$?; \
+			if [ $$code -eq 124 ]; then \
+				echo "[TIMEOUT] $$name after $(TEST_TIMEOUT_SEC)s (log: $(LOG_F)$$name.valgrind.log)"; \
+			else \
+				echo "[FAIL] $$name (log: $(LOG_F)$$name.valgrind.log)"; \
+			fi; \
+			fails=$$((fails+1)); \
+		fi; \
+	done; \
+	echo "[SUMMARY] total=$$total fail=$$fails pass=$$((total-fails))"; \
+	test $$fails -eq 0
+
+test-valgrind: run-tests-valgrind
 
 monitor: $(MONITOR_BIN)
 	./$(MONITOR_BIN)
