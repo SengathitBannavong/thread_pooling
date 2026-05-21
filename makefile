@@ -43,7 +43,7 @@ MONITOR_BIN = $(TARGET_F)test_monitor_manual
 VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --suppressions=ncurses.supp
 VALGRIND_TEST_FLAGS = $(VALGRIND_FLAGS) --errors-for-leak-kinds=definite,possible --error-exitcode=99
 
-.PHONY: all build-tests build-tests-all build-all-tests-tsan run-tests test build-tests-tsan run-tests-tsan test-tsan run-tests-valgrind test-valgrind benchmarks benchmarks_base run-benchmarks run-benchmarks-base plot-all monitor valgrind-monitor clean
+.PHONY: all build-tests build-tests-all build-all-tests-tsan run-tests test build-tests-tsan run-tests-tsan test-tsan run-tests-valgrind test-valgrind benchmarks benchmarks_base run-benchmarks run-benchmarks-base perf-report plot-all monitor valgrind-monitor clean
 
 all: test benchmarks
 
@@ -136,6 +136,9 @@ benchmarks-base: $(BENCH_BASE_CPU) $(BENCH_BASE_IO) $(BENCH_BASE_QUEUE) $(BENCH_
 
 benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_QUEUE) $(BENCH_AGING)
 
+perf-report: benchmarks benchmarks-base
+	bash perf_run.sh
+
 build-tests: $(TEST_BINS) $(BASELINE_TEST_BIN) $(SMOKE_TEST_BIN)
 
 build-tests-all: $(ALL_TEST_BINS)
@@ -148,14 +151,14 @@ run-benchmarks-base: benchmarks_base
 	mkdir -p benchmark/res
 	./$(BENCH_BASE_CPU) 100000 3
 	./$(BENCH_BASE_IO) 100000 3
-	./$(BENCH_BASE_SCALING)
+	./$(BENCH_BASE_SCALING) 3
 	./$(BENCH_BASE_QUEUE) 10000 3
 
 run-benchmarks: benchmarks
 	mkdir -p benchmark/res
 	./$(BENCH_CPU) 100000 3
 	./$(BENCH_IO) 100000 3
-	./$(BENCH_SCALE)
+	./$(BENCH_SCALE) 3
 	./$(BENCH_QUEUE) 10000 3
 	./$(BENCH_AGING)
 

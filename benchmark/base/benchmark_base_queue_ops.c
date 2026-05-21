@@ -103,8 +103,8 @@ static void run_queue_ops(void *_arg, bench_result_t *_unused)
         bench_concurrent(a->n_tasks, pool,
                          &qr.conc_push_us, &qr.conc_total_us);
 
-        // bench_isolated(a->n_tasks, pool,
-        //                &qr.iso_push_us, &qr.iso_pop_us, &qr.mem_peak_kb);
+        bench_isolated(a->n_tasks, pool,
+                       &qr.iso_push_us, &qr.iso_pop_us, &qr.mem_peak_kb);
 
         qr.mem_run_kb = _bench_get_rss_kb();
         baseline_pool_shutdown(&pool);

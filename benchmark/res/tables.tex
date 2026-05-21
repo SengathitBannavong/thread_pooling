@@ -1,0 +1,75 @@
+\begin{table}[htbp]
+\centering
+\caption{Real-workload throughput comparison (mean $\pm$ sample stddev, $n=3$ trials)}
+\label{tab:real_workload}
+\begin{tabular}{lrrrr}
+\toprule
+Benchmark & Mine (t/s) & Baseline (t/s) & Ratio & CV (mine / base) \\
+\midrule
+CPU-bound (fib30, 100K) & 4\,565.6 $\pm$ 2.3 & 4\,531.7 $\pm$ 1.4 & 1.007x & 0.05\% / 0.03\% \\
+IO-bound (64KB read, 100K) & 29\,698.7 $\pm$ 131.2 & 30\,085.2 $\pm$ 1\,180.9 & 0.987x & 0.44\% / 3.93\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Worker scaling throughput (fib25 task, 10K tasks, $n=3$ trials)}
+\label{tab:scaling}
+\begin{tabular}{rrrr}
+\toprule
+Workers & Mine (t/s) & Baseline (t/s) & Ratio \\
+\midrule
+1 & 8\,548.1 $\pm$ 30.1 & 8\,262.2 $\pm$ 24.9 & 1.035x \\
+2 & 17\,211.9 $\pm$ 30.3 & 16\,557.1 $\pm$ 121.5 & 1.040x \\
+4 & 34\,346.9 $\pm$ 78.8 & 33\,138.1 $\pm$ 73.7 & 1.036x \\
+8 & 58\,126.1 $\pm$ 818.8 & 56\,579.1 $\pm$ 150.2 & 1.027x \\
+16 & 66\,912.8 $\pm$ 208.1 & 63\,735.2 $\pm$ 429.4 & 1.050x \\
+32 & 66\,796.1 $\pm$ 283.7 & 63\,829.2 $\pm$ 59.0 & 1.046x \\
+64 & 66\,778.2 $\pm$ 254.2 & 63\,857.2 $\pm$ 172.3 & 1.046x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Concurrent queue operations throughput (10K tasks per trial, $n=3$ trials)}
+\label{tab:queue_ops}
+\begin{tabular}{rrrr}
+\toprule
+Workers & Mine (ops/s) & Baseline (ops/s) & Ratio \\
+\midrule
+1 & 3\,702\,692.2 $\pm$ 232\,164.0 & 5\,533\,950.3 $\pm$ 329\,751.0 & 0.669x \\
+2 & 3\,205\,438.5 $\pm$ 57\,715.6 & 4\,483\,572.0 $\pm$ 112\,952.2 & 0.715x \\
+4 & 1\,242\,745.0 $\pm$ 345\,427.7 & 1\,874\,934.0 $\pm$ 49\,907.6 & 0.663x \\
+8 & 800\,821.2 $\pm$ 36\,634.9 & 773\,287.0 $\pm$ 52\,084.6 & 1.036x \\
+16 & 728\,600.9 $\pm$ 19\,626.3 & 738\,767.7 $\pm$ 5\,122.1 & 0.986x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Coefficient of variation comparison (lower is more predictable)}
+\label{tab:variance}
+\begin{tabular}{lrrr}
+\toprule
+Benchmark & Mine CV (\%) & Base CV (\%) & Stability advantage \\
+\midrule
+CPU-bound & 0.05\% & 0.03\% & 0.64x \\
+IO-bound & 0.44\% & 3.93\% & 8.89x \\
+Scaling 1w & 0.35\% & 0.30\% & 0.86x \\
+Scaling 2w & 0.18\% & 0.73\% & 4.17x \\
+Scaling 4w & 0.23\% & 0.22\% & 0.97x \\
+Scaling 8w & 1.41\% & 0.27\% & 0.19x \\
+Scaling 16w & 0.31\% & 0.67\% & 2.17x \\
+Scaling 32w & 0.42\% & 0.09\% & 0.22x \\
+Scaling 64w & 0.38\% & 0.27\% & 0.71x \\
+Queue 1w & 6.27\% & 5.96\% & 0.95x \\
+Queue 2w & 1.80\% & 2.52\% & 1.40x \\
+Queue 4w & 27.80\% & 2.66\% & 0.10x \\
+Queue 8w & 4.57\% & 6.74\% & 1.47x \\
+Queue 16w & 2.69\% & 0.69\% & 0.26x \\
+\bottomrule
+\end{tabular}
+\end{table}

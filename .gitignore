@@ -11,6 +11,13 @@ context/
 # file save log of brenchmark test
 benchmark/save/
 
+# generated benchmark plots (regenerate with run_plot.sh / plot.py)
+benchmark/plot/
+
+# perf raw capture (large binaries; keep only the text summaries)
+*.perf.data
+benchmark/perf/**/*.perf.data
+
 # language server floder
 .idea/
 .caches/

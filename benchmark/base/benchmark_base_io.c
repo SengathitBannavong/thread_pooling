@@ -2,6 +2,7 @@
 #include "include/bench.h"
 #include "include/work.h"
 #include "baseline/baseline.h"
+#include "cpu_core.h"
 #include <pthread.h>
 #include <stdlib.h>
 
@@ -17,7 +18,7 @@ static void run_baseline(void *_arg, bench_result_t *r)
         io_arg_t *a = _arg;
 
         BENCH_MEM_BASELINE();
-        baseline_pool_t *pool = baseline_pool_init(4);
+        baseline_pool_t *pool = baseline_pool_init(get_num_core());
         if (!pool) return;
         BENCH_MEM_AFTER_INIT();
 

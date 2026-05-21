@@ -17,7 +17,7 @@ static void run_thread_pool(void *_arg, bench_result_t *r)
         io_arg_t *a = _arg;
 
         BENCH_MEM_BASELINE();
-        thread_pool_t *pool = thread_pool_init(4);
+        thread_pool_t *pool = thread_pool_init(get_num_core());
         if (!pool) return;
         BENCH_MEM_AFTER_INIT();
 
