@@ -16,7 +16,10 @@ benchmark/plot/
 
 # perf raw capture (large binaries; keep only the text summaries)
 *.perf.data
+*.perf.data.old
 benchmark/perf/**/*.perf.data
+benchmark/perf/**/*.perf.data.old
+benchmark/perf/**/*.old
 
 # language server floder
 .idea/

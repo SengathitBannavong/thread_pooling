@@ -1,0 +1,120 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 6562
+#
+# Samples: 1M of event 'cpu/cycles/P'
+# Event count (approx.): 2191691396143
+#
+# Children      Self  Command        Shared Object         Symbol                                                  
+# ........  ........  .............  ....................  ........................................................
+#
+    98.73%    98.70%  benchmark_cpu  benchmark_cpu         [.] fibonaccy
+            |          
+            |--24.25%--_start
+            |          __libc_start_main@@GLIBC_2.34
+            |          __libc_start_call_main
+            |          main
+            |          sequential_bench (inlined)
+            |          bench_fork (inlined)
+            |          run_sequential (inlined)
+            |          work_cpu (inlined)
+            |          fibonaccy
+            |          |          
+            |           --21.55%--fibonaccy
+            |                     |          
+            |                      --21.16%--fibonaccy
+            |                                |          
+            |                                 --20.98%--fibonaccy
+            |                                           |          
+            |                                            --20.91%--fibonaccy
+            |                                                      |          
+            |                                                       --20.75%--fibonaccy
+            |                                                                 |          
+            |                                                                  --20.33%--fibonaccy
+            |                                                                            |          
+            |                                                                             --19.56%--fibonaccy
+            |                                                                                       |          
+            |                                                                                        --18.02%--fibonaccy
+            |                                                                                                  |          
+            |                                                                                                   --13.71%--fibonaccy
+            |                                                                                                             |          
+            |                                                                                                              --9.59%--fibonaccy
+            |                                                                                                                        |          
+            |                                                                                                                         --8.82%--fibonaccy
+            |                                                                                                                                   |          
+            |                                                                                                                                    --8.47%--fibonaccy
+            |                                                                                                                                              |          
+            |                                                                                                                                               --8.38%--fibonaccy
+            |                                                                                                                                                         |          
+            |                                                                                                                                                          --8.27%--fibonaccy
+            |                                                                                                                                                                    |          
+            |                                                                                                                                                                     --8.00%--fibonaccy
+            |                                                                                                                                                                               |          
+            |                                                                                                                                                                                --7.44%--fibonaccy
+            |                                                                                                                                                                                          |          
+            |                                                                                                                                                                                           --6.03%--fibonaccy
+            |          
+             --0.80%--fibonaccy
+
+    49.62%     0.00%  benchmark_cpu  benchmark_cpu         [.] main
+            |          
+            |--49.10%--main
+            |          |          
+            |          |--24.29%--sequential_bench (inlined)
+            |          |          bench_fork (inlined)
+            |          |          |          
+            |          |           --24.29%--run_sequential (inlined)
+            |          |                     |          
+            |          |                      --24.29%--work_cpu (inlined)
+            |          |                                fibonaccy
+            |          |                                |          
+            |          |                                 --21.58%--fibonaccy
+            |          |                                           |          
+            |          |                                            --21.19%--fibonaccy
+            |          |                                                      |          
+            |          |                                                       --21.02%--fibonaccy
+            |          |                                                                 |          
+            |          |                                                                  --20.94%--fibonaccy
+            |          |                                                                            |          
+            |          |                                                                             --20.79%--fibonaccy
+            |          |                                                                                       |          
+            |          |                                                                                        --20.37%--fibonaccy
+            |          |                                                                                                  |          
+            |          |                                                                                                   --19.59%--fibonaccy
+            |          |                                                                                                             |          
+            |          |                                                                                                              --18.05%--fibonaccy
+            |          |                                                                                                                        |          
+            |          |                                                                                                                         --13.73%--fibonaccy
+            |          |                                                                                                                                   |          
+            |          |                                                                                                                                    --9.59%--fibonaccy
+            |          |                                                                                                                                              |          
+            |          |                                                                                                                                               --8.82%--fibonaccy
+            |          |                                                                                                                                                         |          
+            |          |                                                                                                                                                          --8.47%--fibonaccy
+            |          |                                                                                                                                                                    |          
+            |          |                                                                                                                                                                     --8.38%--fibonaccy
+            |          |                                                                                                                                                                               |          
+            |          |                                                                                                                                                                                --8.27%--fibonaccy
+            |          |                                                                                                                                                                                          |          
+            |          |                                                                                                                                                                                           --8.00%--fibonaccy
+            |          |                                                                                                                                                                                                     |          
+            |          |                                                                                                                                                                                                      --7.44%--fibonaccy
+            |          |                                                                                                                                                                                                                |          
+            |          |                                                                                                                                                                                                                 --6.03%--fibonaccy
+            |          |          
+            |          |--24.29%--0x40144b
+            |          |          |          
+            |          |           --24.29%--0x40144b
+            |          |                     0x4019a0
+            |          |                     |          
+            |          |                      --21.58%--0x4019a0
+            |          |                                |          
+            |          |                                 --21.19%--0x4019a0
+            |          |                                           |          
+            |          |                                            --21.02%--0x4019a0
+            |          |                                                      |          
+            |          |                                                       --20.94%--0x4019a0
+            |          |                                                                 |          
+            |          |                                                                  --20.79%--0x4019a0
+            |          |                                                                            |          

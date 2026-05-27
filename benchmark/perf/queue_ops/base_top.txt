@@ -1,0 +1,60 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 91
+#
+# Samples: 51K of event 'cpu/cycles/P'
+# Event count (approx.): 187915141929
+#
+# Overhead       Samples  Command          Shared Object             Symbol                                     
+# ........  ............  ...............  ........................  ...........................................
+#
+    13.95%          6588  benchmark_base_  [kernel.kallsyms]         [k] entry_SYSRETQ_unsafe_stack
+            |          
+            |--0.93%--futex_hash
+            |          |          
+            |           --0.56%--futex_wake
+            |                     do_futex
+            |                     __x64_sys_futex
+            |                     do_syscall_64
+            |                     entry_SYSCALL_64_after_hwframe
+            |          
+            |--0.83%--entry_SYSCALL_64
+            |          
+            |--0.65%--entry_SYSCALL_64_after_hwframe
+            |          
+            |--0.57%--futex_wake
+            |          do_futex
+            |          __x64_sys_futex
+            |          do_syscall_64
+            |          entry_SYSCALL_64_after_hwframe
+            |          
+            |--0.55%--do_syscall_64
+            |          entry_SYSCALL_64_after_hwframe
+            |          
+             --0.53%--__futex_hash
+                       futex_hash
+
+    10.62%          4448  benchmark_base_  benchmark_base_queue_ops  [.] gate_noop
+     7.74%          3217  benchmark_base_  [kernel.kallsyms]         [k] native_queued_spin_lock_slowpath
+            |          
+            |--5.42%--native_queued_spin_lock_slowpath
+            |          _raw_spin_lock
+            |          |          
+            |          |--3.87%--raw_spin_rq_lock_nested
+            |          |          |          
+            |          |           --3.85%--___task_rq_lock
+            |          |                     try_to_wake_up
+            |          |                     wake_up_q
+            |          |                     futex_wake
+            |          |                     do_futex
+            |          |                     __x64_sys_futex
+            |          |                     do_syscall_64
+            |          |                     entry_SYSCALL_64_after_hwframe
+            |          |                     |          
+            |          |                      --1.00%--futex_wake (inlined)
+            |          |                                ___pthread_cond_signal (inlined)
+            |          |                                q_push (inlined)
+            |          |                                baseline_pool_submit
+            |          |                                bench_concurrent
+            |          |                                run_queue_ops (inlined)

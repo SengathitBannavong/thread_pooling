@@ -1,0 +1,60 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 49K of event 'cpu/cycles/P'
+# Event count (approx.): 181032568719
+#
+# Overhead       Samples  Command          Shared Object         Symbol                                     
+# ........  ............  ...............  ....................  ...........................................
+#
+    15.87%          7141  benchmark_queue  [kernel.kallsyms]     [k] entry_SYSRETQ_unsafe_stack
+            |          
+            |--1.20%--futex_hash
+            |          |          
+            |          |--0.67%--futex_wake
+            |          |          do_futex
+            |          |          __x64_sys_futex
+            |          |          do_syscall_64
+            |          |          entry_SYSCALL_64_after_hwframe
+            |          |          
+            |           --0.53%--futex_wait_setup
+            |                     __futex_wait
+            |                     futex_wait
+            |                     do_futex
+            |                     __x64_sys_futex
+            |                     do_syscall_64
+            |                     entry_SYSCALL_64_after_hwframe
+            |          
+            |--1.06%--entry_SYSCALL_64
+            |          
+            |--0.71%--__futex_hash
+            |          futex_hash
+            |          
+            |--0.69%--entry_SYSCALL_64_after_hwframe
+            |          
+            |--0.64%--do_syscall_64
+            |          entry_SYSCALL_64_after_hwframe
+            |          
+             --0.62%--futex_wake
+                       |          
+                        --0.62%--do_futex
+                                  __x64_sys_futex
+                                  do_syscall_64
+                                  entry_SYSCALL_64_after_hwframe
+
+     8.60%          3453  benchmark_queue  [kernel.kallsyms]     [k] native_queued_spin_lock_slowpath
+            |          
+            |--6.12%--native_queued_spin_lock_slowpath
+            |          _raw_spin_lock
+            |          |          
+            |          |--4.82%--raw_spin_rq_lock_nested
+            |          |          |          
+            |          |           --4.82%--___task_rq_lock
+            |          |                     try_to_wake_up
+            |          |                     wake_up_q
+            |          |                     futex_wake
+            |          |                     do_futex
+            |          |                     __x64_sys_futex
+            |          |                     do_syscall_64

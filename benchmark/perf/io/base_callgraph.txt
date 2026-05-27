@@ -1,0 +1,120 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 496659
+#
+# Samples: 702K of event 'cpu/cycles/P'
+# Event count (approx.): 112156912378
+#
+# Children      Self  Command          Shared Object         Symbol                                                  
+# ........  ........  ...............  ....................  ........................................................
+#
+    96.08%     0.10%  benchmark_base_  [kernel.kallsyms]     [.] entry_SYSCALL_64_after_hwframe
+            |          
+             --96.01%--entry_SYSCALL_64_after_hwframe
+                       |          
+                        --95.83%--do_syscall_64
+                                  |          
+                                  |--51.45%--__x64_sys_pread64
+                                  |          |          
+                                  |           --51.42%--vfs_read
+                                  |                     |          
+                                  |                      --51.07%--filemap_read
+                                  |                                |          
+                                  |                                |--42.51%--filemap_get_pages
+                                  |                                |          |          
+                                  |                                |          |--31.50%--do_page_cache_ra
+                                  |                                |          |          |          
+                                  |                                |          |           --31.48%--page_cache_ra_unbounded
+                                  |                                |          |                     |          
+                                  |                                |          |                     |--11.94%--read_pages
+                                  |                                |          |                     |          |          
+                                  |                                |          |                     |          |--8.66%--btrfs_readahead
+                                  |                                |          |                     |          |          |          
+                                  |                                |          |                     |          |          |--3.86%--submit_one_bio
+                                  |                                |          |                     |          |          |          |          
+                                  |                                |          |                     |          |          |           --3.84%--btrfs_submit_bbio
+                                  |                                |          |                     |          |          |                     |          
+                                  |                                |          |                     |          |          |                      --3.83%--btrfs_submit_chunk
+                                  |                                |          |                     |          |          |                                |          
+                                  |                                |          |                     |          |          |                                |--2.51%--submit_bio_noacct_nocheck
+                                  |                                |          |                     |          |          |                                |          |          
+                                  |                                |          |                     |          |          |                                |           --2.46%--__submit_bio
+                                  |                                |          |                     |          |          |                                |                     |          
+                                  |                                |          |                     |          |          |                                |                      --2.41%--blk_mq_submit_bio
+                                  |                                |          |                     |          |          |                                |                                |          
+                                  |                                |          |                     |          |          |                                |                                 --1.63%--blk_add_rq_to_plug
+                                  |                                |          |                     |          |          |                                |                                           |          
+                                  |                                |          |                     |          |          |                                |                                            --1.62%--blk_mq_flush_plug_list
+                                  |                                |          |                     |          |          |                                |                                                      |          
+                                  |                                |          |                     |          |          |                                |                                                       --1.62%--blk_mq_dispatch_queue_requests
+                                  |                                |          |                     |          |          |                                |                                                                 |          
+                                  |                                |          |                     |          |          |                                |                                                                  --1.59%--nvme_queue_rqs
+                                  |                                |          |                     |          |          |                                |                                                                            |          
+                                  |                                |          |                     |          |          |                                |                                                                             --1.49%--nvme_prep_rq.part.0
+                                  |                                |          |                     |          |          |                                |                                                                                       |          
+                                  |                                |          |                     |          |          |                                |                                                                                        --1.45%--nvme_map_data
+                                  |                                |          |                     |          |          |                                |                                                                                                  |          
+                                  |                                |          |                     |          |          |                                |                                                                                                   --1.36%--blk_dma_map_iter_start
+                                  |                                |          |                     |          |          |                                |                                                                                                             |          
+                                  |                                |          |                     |          |          |                                |                                                                                                              --0.87%--iommu_map_nosync
+                                  |                                |          |                     |          |          |                                |                                                                                                                        |          
+                                  |                                |          |                     |          |          |                                |                                                                                                                         --0.57%--pt_iommu_amdv1_map_pages
+                                  |                                |          |                     |          |          |                                |          
+                                  |                                |          |                     |          |          |                                 --0.89%--btrfs_lookup_bio_sums
+                                  |                                |          |                     |          |          |                                           |          
+                                  |                                |          |                     |          |          |                                            --0.66%--search_csum_tree
+                                  |                                |          |                     |          |          |          
+                                  |                                |          |                     |          |          |--3.14%--btrfs_do_readpage
+                                  |                                |          |                     |          |          |          |          
+                                  |                                |          |                     |          |          |          |--1.15%--submit_extent_folio
+                                  |                                |          |                     |          |          |          |          |          
+                                  |                                |          |                     |          |          |          |           --0.50%--bio_add_folio
+                                  |                                |          |                     |          |          |          |          
+                                  |                                |          |                     |          |          |           --1.04%--btrfs_get_extent
+                                  |                                |          |                     |          |          |                     |          
+                                  |                                |          |                     |          |          |                      --0.51%--btrfs_lookup_file_extent
+                                  |                                |          |                     |          |          |                                |          
+                                  |                                |          |                     |          |          |                                 --0.51%--btrfs_search_slot
+                                  |                                |          |                     |          |          |          
+                                  |                                |          |                     |          |           --0.75%--xa_load
+                                  |                                |          |                     |          |          
+                                  |                                |          |                     |           --3.16%--blk_finish_plug
+                                  |                                |          |                     |                     |          
+                                  |                                |          |                     |                      --3.15%--__blk_flush_plug
+                                  |                                |          |                     |                                |          
+                                  |                                |          |                     |                                 --3.13%--blk_mq_flush_plug_list
+                                  |                                |          |                     |                                           |          
+                                  |                                |          |                     |                                            --3.04%--blk_mq_dispatch_queue_requests
+                                  |                                |          |                     |                                                      |          
+                                  |                                |          |                     |                                                       --3.00%--nvme_queue_rqs
+                                  |                                |          |                     |                                                                 |          
+                                  |                                |          |                     |                                                                  --2.91%--nvme_prep_rq.part.0
+                                  |                                |          |                     |                                                                            |          
+                                  |                                |          |                     |                                                                             --2.86%--nvme_map_data
+                                  |                                |          |                     |                                                                                       |          
+                                  |                                |          |                     |                                                                                        --2.70%--blk_dma_map_iter_start
+                                  |                                |          |                     |                                                                                                  |          
+                                  |                                |          |                     |                                                                                                   --2.12%--iommu_map_nosync
+                                  |                                |          |                     |                                                                                                             |          
+                                  |                                |          |                     |                                                                                                              --1.69%--pt_iommu_amdv1_map_pages
+                                  |                                |          |                     |                                                                                                                        |          
+                                  |                                |          |                     |                                                                                                                         --1.03%--do_map.isra.0
+                                  |                                |          |                     |                                                                                                                                   |          
+                                  |                                |          |                     |                                                                                                                                    --0.63%--__map_single_page0.isra.0
+                                  |                                |          |                     |          
+                                  |                                |          |                     |--10.46%--filemap_add_folio
+                                  |                                |          |                     |          |          
+                                  |                                |          |                     |          |--3.81%--__filemap_add_folio
+                                  |                                |          |                     |          |          |          
+                                  |                                |          |                     |          |          |--0.79%--xas_store
+                                  |                                |          |                     |          |          |          
+                                  |                                |          |                     |          |          |--0.59%--lruvec_stat_mod_folio
+                                  |                                |          |                     |          |          |          
+                                  |                                |          |                     |          |           --0.54%--_raw_spin_lock_irq
+                                  |                                |          |                     |          |          
+                                  |                                |          |                     |          |--3.20%--__mem_cgroup_charge
+                                  |                                |          |                     |          |          |          
+                                  |                                |          |                     |          |          |--1.96%--charge_memcg
+                                  |                                |          |                     |          |          |          |          
+                                  |                                |          |                     |          |          |           --0.90%--memcg1_commit_charge

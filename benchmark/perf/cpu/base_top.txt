@@ -1,0 +1,60 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 4427
+#
+# Samples: 1M of event 'cpu/cycles/P'
+# Event count (approx.): 2178352732999
+#
+# Overhead       Samples  Command          Shared Object         Symbol                                                  
+# ........  ............  ...............  ....................  ........................................................
+#
+    98.65%        606779  benchmark_base_  benchmark_base_cpu    [.] fibonaccy
+            |          
+             --25.70%--fibonaccy
+                       |          
+                       |--21.61%--fibonaccy
+                       |          |          
+                       |           --21.20%--fibonaccy
+                       |                     |          
+                       |                      --21.03%--fibonaccy
+                       |                                |          
+                       |                                 --20.96%--fibonaccy
+                       |                                           |          
+                       |                                            --20.80%--fibonaccy
+                       |                                                      |          
+                       |                                                       --20.40%--fibonaccy
+                       |                                                                 |          
+                       |                                                                 |--19.56%--fibonaccy
+                       |                                                                 |          |          
+                       |                                                                 |          |--18.07%--fibonaccy
+                       |                                                                 |          |          |          
+                       |                                                                 |          |          |--13.78%--fibonaccy
+                       |                                                                 |          |          |          |          
+                       |                                                                 |          |          |          |--9.63%--fibonaccy
+                       |                                                                 |          |          |          |          |          
+                       |                                                                 |          |          |          |          |--8.83%--fibonaccy
+                       |                                                                 |          |          |          |          |          |          
+                       |                                                                 |          |          |          |          |           --8.43%--fibonaccy
+                       |                                                                 |          |          |          |          |                     |          
+                       |                                                                 |          |          |          |          |                      --8.33%--fibonaccy
+                       |                                                                 |          |          |          |          |                                |          
+                       |                                                                 |          |          |          |          |                                 --8.23%--fibonaccy
+                       |                                                                 |          |          |          |          |                                           |          
+                       |                                                                 |          |          |          |          |                                            --7.99%--fibonaccy
+                       |                                                                 |          |          |          |          |                                                      |          
+                       |                                                                 |          |          |          |          |                                                      |--7.42%--fibonaccy
+                       |                                                                 |          |          |          |          |                                                      |          |          
+                       |                                                                 |          |          |          |          |                                                      |          |--6.11%--fibonaccy
+                       |                                                                 |          |          |          |          |                                                      |          |          work_cpu (inlined)
+                       |                                                                 |          |          |          |          |                                                      |          |          run_sequential (inlined)
+                       |                                                                 |          |          |          |          |                                                      |          |          bench_fork (inlined)
+                       |                                                                 |          |          |          |          |                                                      |          |          sequential_bench (inlined)
+                       |                                                                 |          |          |          |          |                                                      |          |          main
+                       |                                                                 |          |          |          |          |                                                      |          |          __libc_start_call_main
+                       |                                                                 |          |          |          |          |                                                      |          |          __libc_start_main@@GLIBC_2.34
+                       |                                                                 |          |          |          |          |                                                      |          |          _start
+                       |                                                                 |          |          |          |          |                                                      |          |          
+                       |                                                                 |          |          |          |          |                                                      |           --1.31%--work_cpu (inlined)
+                       |                                                                 |          |          |          |          |                                                      |                     run_sequential (inlined)
+                       |                                                                 |          |          |          |          |                                                      |                     bench_fork (inlined)

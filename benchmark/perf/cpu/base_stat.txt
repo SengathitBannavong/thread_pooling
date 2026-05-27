@@ -1,0 +1,17 @@
+# started on Thu May 21 12:36:13 2026
+
+
+ Performance counter stats for './bin/benchmark_base_cpu 100000 1' (5 runs):
+
+ 2,630,560,722,029      cycles                                                                  ( +-  0.01% )
+ 6,377,080,012,637      instructions                                                            ( +-  0.00% )
+       434,466,706      cache-misses                                                            ( +-  0.63% )
+     2,347,739,117      cache-references                                                        ( +-  0.28% )
+           189,010      context-switches                                                        ( +-  1.08% )
+            69,358      cpu-migrations                                                          ( +-  1.03% )
+           208,891      page-faults                                                             ( +-  0.00% )
+   <not supported>      LLC-loads                                                             
+   <not supported>      LLC-load-misses                                                       
+
+     154.038251004 +- 0.090337305 seconds time elapsed  ( +-  0.06% )
+

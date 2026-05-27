@@ -1,0 +1,17 @@
+# started on Thu May 21 12:00:11 2026
+
+
+ Performance counter stats for './bin/benchmark_queue_ops 1000000 3' (5 runs):
+
+   162,193,654,959      cycles                                                                  ( +-  0.43% )
+    78,750,632,202      instructions                                                            ( +-  0.43% )
+       475,609,940      cache-misses                                                            ( +-  0.79% )
+     7,067,344,693      cache-references                                                        ( +-  0.54% )
+         4,471,514      context-switches                                                        ( +-  0.65% )
+           889,711      cpu-migrations                                                          ( +-  2.54% )
+           235,779      page-faults                                                             ( +-  0.01% )
+   <not supported>      LLC-loads                                                             
+   <not supported>      LLC-load-misses                                                       
+
+       9.472542719 +- 0.052108919 seconds time elapsed  ( +-  0.55% )
+

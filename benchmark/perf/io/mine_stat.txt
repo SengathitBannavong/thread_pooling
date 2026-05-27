@@ -1,0 +1,17 @@
+# started on Thu May 21 12:03:31 2026
+
+
+ Performance counter stats for './bin/benchmark_io 100000 1' (5 runs):
+
+   186,969,822,234      cycles                                                                  ( +-  0.28% )
+   104,387,238,658      instructions                                                            ( +-  0.16% )
+     2,852,230,030      cache-misses                                                            ( +-  0.66% )
+    10,320,026,859      cache-references                                                        ( +-  0.35% )
+         1,980,090      context-switches                                                        ( +-  0.50% )
+           486,786      cpu-migrations                                                          ( +-  1.65% )
+         1,809,599      page-faults                                                             ( +-  0.00% )
+   <not supported>      LLC-loads                                                             
+   <not supported>      LLC-load-misses                                                       
+
+      71.424925038 +- 0.178500040 seconds time elapsed  ( +-  0.25% )
+

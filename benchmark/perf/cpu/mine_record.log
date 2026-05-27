@@ -1,0 +1,10 @@
+[ perf record: Woken up 20842 times to write data ]
+Warning:
+Processed 1400509 events and lost 1315 chunks!
+
+Check IO/CPU overload!
+
+[ perf record: Captured and wrote 8304.756 MB benchmark/perf/cpu/mine.perf.data (1055048 samples) ]
+libbpf: Failed to bump RLIMIT_MEMLOCK (err = -EPERM), you might need to do it explicitly!
+libbpf: Error in bpf_object__probe_loading(): -EPERM. Couldn't load trivial BPF program. Make sure your kernel supports BPF (CONFIG_BPF_SYSCALL=y) and/or that RLIMIT_MEMLOCK is set to big enough value.
+libbpf: failed to load BPF skeleton 'augmented_raw_syscalls_bpf': -EPERM

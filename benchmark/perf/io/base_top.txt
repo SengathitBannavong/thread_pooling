@@ -1,0 +1,60 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 496659
+#
+# Samples: 702K of event 'cpu/cycles/P'
+# Event count (approx.): 112156912378
+#
+# Overhead       Samples  Command          Shared Object         Symbol                                                  
+# ........  ............  ...............  ....................  ........................................................
+#
+     7.07%          9351  benchmark_base_  [kernel.kallsyms]     [k] native_queued_spin_lock_slowpath
+            |          
+             --6.49%--native_queued_spin_lock_slowpath
+                       |          
+                       |--5.26%--__raw_spin_lock_irqsave
+                       |          |          
+                       |           --4.59%--folio_wake_bit
+                       |                     |          
+                       |                      --4.59%--mapping_try_invalidate
+                       |                                generic_fadvise
+                       |                                ksys_fadvise64_64
+                       |                                __x64_sys_fadvise64
+                       |                                do_syscall_64
+                       |                                entry_SYSCALL_64_after_hwframe
+                       |          
+                       |--0.62%--_raw_spin_lock
+                       |          
+                        --0.60%--_raw_spin_lock_irq
+
+     4.46%         18773  benchmark_base_  [kernel.kallsyms]     [k] kernel_init_pages
+            |          
+            |--0.60%--__filemap_add_folio
+            |          filemap_add_folio
+            |          page_cache_ra_unbounded
+            |          do_page_cache_ra
+            |          filemap_get_pages
+            |          filemap_read
+            |          vfs_read
+            |          __x64_sys_pread64
+            |          do_syscall_64
+            |          entry_SYSCALL_64_after_hwframe
+            |          |          
+            |           --0.53%--__internal_syscall_cancel
+            |                     __syscall_cancel
+            |                     __libc_pread64 (inlined)
+            |                     read_file
+            |          
+             --0.58%--kernel_init_pages
+                       post_alloc_hook
+                       get_page_from_freelist
+                       |          
+                        --0.56%--__alloc_frozen_pages_noprof
+
+     2.76%         15030  benchmark_base_  [kernel.kallsyms]     [k] srso_alias_safe_ret
+     2.68%         13440  benchmark_base_  [kernel.kallsyms]     [k] _copy_to_iter
+            |          
+             --1.28%--_copy_to_iter
+                       copy_page_to_iter
+                       filemap_read
