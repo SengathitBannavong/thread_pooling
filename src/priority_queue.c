@@ -1,5 +1,6 @@
 #include "priority_queue.h"
 #include "task.h"
+#include <assert.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
@@ -8,6 +9,7 @@
 
 static inline int _get_highest_priority(uint32_t mask)
 {
+        assert(mask != 0);
         return PQ_BITMASK_BITS - __builtin_clz(mask) - 1;
 }
 
@@ -91,21 +93,32 @@ static void pq_push_head(struct priority_queue_t *pq, struct task_t *task)
 
         int p = (int)task->priority;
         pthread_mutex_lock(&pq->mutex);
-        task->next = NULL;
 
+        task->next = pq->heads[p];
+        pq->heads[p] = task;
         if (!pq->tails[p])
-                pq->heads[p] = pq->tails[p] = task;
-        else {
-                task->next = pq->heads[p];
-                pq->heads[p] = task;
-        }
+                pq->tails[p] = task;
 
-        // mask ready task at p priority level
         pq->ready_mask |= (1UL << p);
         pq->size++;
-        // wake up worker
+
         pthread_mutex_unlock(&pq->mutex);
         pthread_cond_signal(&pq->not_empty);
+}
+
+static struct task_t *_pq_pop_locked(struct priority_queue_t *pq, int p)
+{
+        struct task_t *task = pq->heads[p];
+        pq->heads[p] = task->next;
+
+        if (!pq->heads[p]) {
+                pq->tails[p] = NULL;
+                pq->ready_mask &= ~(1UL << p);
+        }
+
+        task->next = NULL;
+        pq->size--;
+        return task;
 }
 
 struct task_t *pq_pop(struct priority_queue_t *pq)
@@ -131,16 +144,7 @@ struct task_t *pq_pop_until_shutdown(struct priority_queue_t *pq, const atomic_b
         }
 
         int p = _get_highest_priority(pq->ready_mask);
-        struct task_t *task = pq->heads[p];
-        pq->heads[p] = task->next;
-
-        if (!pq->heads[p]) {
-                pq->tails[p] = NULL;
-                pq->ready_mask &= ~(1UL << p);
-        }
-
-        task->next = NULL;
-        pq->size--;
+        struct task_t *task = _pq_pop_locked(pq, p);
         pthread_mutex_unlock(&pq->mutex);
         return task;
 }
@@ -169,17 +173,7 @@ struct task_t *pq_pop_nonblock(struct priority_queue_t *pq)
         }
 
         int p = _get_highest_priority(pq->ready_mask);
-        struct task_t *task = pq->heads[p];
-        pq->heads[p] = task->next;
-
-        // task at priority level p is now empty
-        if (!pq->heads[p]) {
-                pq->tails[p] = NULL;
-                pq->ready_mask &= ~(1UL << p);
-        }
-
-        task->next = NULL;
-        pq->size--;
+        struct task_t *task = _pq_pop_locked(pq, p);
         pthread_mutex_unlock(&pq->mutex);
         return task;
 }
@@ -231,17 +225,7 @@ static struct task_t *pq_pop_until_shutdown_without_lock(struct priority_queue_t
         if(!((pq->ready_mask) & (1UL << priority)))
                 return NULL;
 
-        struct task_t *task = pq->heads[priority];
-        pq->heads[priority] = task->next;
-
-        if (!pq->heads[priority]) {
-                pq->tails[priority] = NULL;
-                pq->ready_mask &= ~(1UL << priority);
-        }
-
-        task->next = NULL;
-        pq->size--;
-        return task;
+        return _pq_pop_locked(pq, priority);
 }
 
 void pq_aging(struct priority_queue_t *pq, const atomic_bool *shutdown_flag, const long promote_time_ms)

@@ -220,11 +220,14 @@ int64_t thread_pool_submit(thread_pool_t *pool, void (*task_fun_t)(void *arg),
         if (!pool || !task_fun_t)
                 return -1;
 
-        // fast return if shutdown
-        if (atomic_load_explicit(&pool->shutdown, memory_order_acquire))
-                return -1;
+        atomic_fetch_add_explicit(&pool->in_flight_submits, 1, memory_order_seq_cst);
 
-        atomic_fetch_add_explicit(&pool->in_flight_submits, 1, memory_order_release);
+        // fast return if shutdown
+        if (atomic_load_explicit(&pool->shutdown, memory_order_seq_cst)) {
+                atomic_fetch_add_explicit(&pool->in_flight_submits, -1, memory_order_release);
+                return -1;
+        }
+
 
         struct task_t *task = task_create(task_fun_t, arg, priority);
 
@@ -315,11 +318,11 @@ void thread_pool_destroy(thread_pool_t **ori_pool)
                 return;
 
         thread_pool_t *pool = *ori_pool;
-        atomic_store_explicit(&pool->shutdown, true, memory_order_release);
+        atomic_store_explicit(&pool->shutdown, true, memory_order_seq_cst);
         atomic_store_explicit(&pool->paused, false, memory_order_release);
 
         // ensure no thread in middle submits task
-        while(atomic_load_explicit(&pool->in_flight_submits, memory_order_acquire) > 0); // block
+        while(atomic_load_explicit(&pool->in_flight_submits, memory_order_seq_cst) > 0); // block
 
         /* ensure workers blocked in pq_pop_until_shutdown wake up and exit */
         pq_wake_all(&pool->pq);
