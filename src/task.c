@@ -33,7 +33,8 @@ struct task_t *task_create(void (*func)(void *arg), void *arg,
         new_task->arg         = arg;
         new_task->func        = func;
         new_task->priority    = priority;
-        clock_gettime(CLOCK_MONOTONIC, &new_task->submit_time);
+        new_task->submit_time.tv_sec = 0;
+        new_task->submit_time.tv_nsec = 0;
         new_task->next = NULL;
 
         return new_task;

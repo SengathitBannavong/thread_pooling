@@ -238,6 +238,10 @@ int64_t thread_pool_submit(thread_pool_t *pool, void (*task_fun_t)(void *arg),
 
         int64_t id = (int64_t)task->task_id;
         atomic_fetch_add_explicit(&pool->total_task_in_system, 1, memory_order_relaxed);
+
+        if (atomic_load_explicit(&pool->aging_enable, memory_order_acquire))
+                clock_gettime(CLOCK_MONOTONIC, &task->submit_time);
+
         pq_push(&pool->pq, task);
         atomic_fetch_add_explicit(&pool->in_flight_submits, -1, memory_order_release);
         return id;

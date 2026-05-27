@@ -86,26 +86,6 @@ void pq_push(struct priority_queue_t *pq, struct task_t *task)
         pthread_cond_signal(&pq->not_empty);
 }
 
-static void pq_push_head(struct priority_queue_t *pq, struct task_t *task)
-{
-        if (!pq || !task)
-                return;
-
-        int p = (int)task->priority;
-        pthread_mutex_lock(&pq->mutex);
-
-        task->next = pq->heads[p];
-        pq->heads[p] = task;
-        if (!pq->tails[p])
-                pq->tails[p] = task;
-
-        pq->ready_mask |= (1UL << p);
-        pq->size++;
-
-        pthread_mutex_unlock(&pq->mutex);
-        pthread_cond_signal(&pq->not_empty);
-}
-
 static struct task_t *_pq_pop_locked(struct priority_queue_t *pq, int p)
 {
         struct task_t *task = pq->heads[p];
@@ -213,66 +193,63 @@ static inline bool has_passed_ms(struct timespec *start, struct timespec *end, l
         return total_ns >= target_ms * 1000000L;
 }
 
-static struct task_t *pq_pop_until_shutdown_without_lock(struct priority_queue_t *pq, const atomic_bool *shutdown_flag,int priority)
-{
-        if (!pq)
-                return NULL;
-
-        if (_shutdown_requested(shutdown_flag)) {
-                return NULL;
-        }
-
-        if(!((pq->ready_mask) & (1UL << priority)))
-                return NULL;
-
-        return _pq_pop_locked(pq, priority);
-}
-
-void pq_aging(struct priority_queue_t *pq, const atomic_bool *shutdown_flag, const long promote_time_ms)
+static bool pq_aging_promote_prefix(struct priority_queue_t *pq,
+                enum task_priority src, enum task_priority dst,
+                const atomic_bool *shutdown_flag, const long promote_time_ms)
 {
         struct timespec now;
         clock_gettime(CLOCK_MONOTONIC, &now);
 
-        /* MEDIUM -> HIGH */
-        while (!_shutdown_requested(shutdown_flag)) {
-                pthread_mutex_lock(&pq->mutex);
+        if (_shutdown_requested(shutdown_flag))
+                return false;
 
-                struct task_t *head = pq->heads[PRIORITY_MEDIUM];
-                if (!head || !has_passed_ms(&head->submit_time, &now, promote_time_ms)) {
-                        pthread_mutex_unlock(&pq->mutex);
-                        break;
-                }
+        pthread_mutex_lock(&pq->mutex);
 
-                struct task_t *task = pq_pop_until_shutdown_without_lock(pq, shutdown_flag, PRIORITY_MEDIUM);
+        struct task_t *prefix_head = pq->heads[src];
+        if (!prefix_head || !has_passed_ms(&prefix_head->submit_time, &now, promote_time_ms)) {
                 pthread_mutex_unlock(&pq->mutex);
-
-                if (!task)
-                        break;
-
-                task->priority = PRIORITY_HIGH;
-                task->next = NULL;
-                pq_push_head(pq, task);
+                return false;
         }
 
-        clock_gettime(CLOCK_MONOTONIC, &now);
-        /* LOW -> MEDIUM */
-        while (!_shutdown_requested(shutdown_flag)) {
-                pthread_mutex_lock(&pq->mutex);
-
-                struct task_t *head = pq->heads[PRIORITY_LOW];
-                if (!head || !has_passed_ms(&head->submit_time, &now, promote_time_ms)) {
-                        pthread_mutex_unlock(&pq->mutex);
-                        break;
-                }
-
-                struct task_t *task = pq_pop_until_shutdown_without_lock(pq, shutdown_flag, PRIORITY_LOW);
-                pthread_mutex_unlock(&pq->mutex);
-
-                if (!task)
-                        break;
-
-                task->priority = PRIORITY_MEDIUM;
-                task->next = NULL;
-                pq_push_head(pq, task);
+        struct task_t *prefix_tail = prefix_head;
+        while (prefix_tail->next &&
+                        has_passed_ms(&prefix_tail->next->submit_time, &now, promote_time_ms)) {
+                prefix_tail = prefix_tail->next;
         }
+
+        struct task_t *next_after = prefix_tail->next;
+        pq->heads[src] = next_after;
+        if (!pq->heads[src]) {
+                pq->tails[src] = NULL;
+                pq->ready_mask &= ~(1UL << src);
+        }
+
+        for (struct task_t *node = prefix_head;; node = node->next) {
+                node->priority = dst;
+                if (node == prefix_tail)
+                        break;
+        }
+
+        prefix_tail->next = pq->heads[dst];
+        pq->heads[dst] = prefix_head;
+        if (!pq->tails[dst])
+                pq->tails[dst] = prefix_tail;
+        pq->ready_mask |= (1UL << dst);
+
+        pthread_mutex_unlock(&pq->mutex);
+        pthread_cond_broadcast(&pq->not_empty);
+        return true;
+}
+
+void pq_aging(struct priority_queue_t *pq, const atomic_bool *shutdown_flag, const long promote_time_ms)
+{
+        if (!pq)
+                return;
+
+        pq_aging_promote_prefix(pq, PRIORITY_MEDIUM, PRIORITY_HIGH, shutdown_flag, promote_time_ms);
+
+        if (_shutdown_requested(shutdown_flag))
+                return;
+
+        pq_aging_promote_prefix(pq, PRIORITY_LOW, PRIORITY_MEDIUM, shutdown_flag, promote_time_ms);
 }
