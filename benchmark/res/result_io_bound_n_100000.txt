@@ -1,0 +1,5 @@
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+sequential,100000,1,61493745.55,1626.18,614.9375,88
+sequential,100000,1,61493745.55,1626.18,614.9375,88
+on_demand,100000,1,5294477.51,18887.61,52.9448,29344
+thread_pool,100000,1,4213507.75,23733.19,42.1351,7268
