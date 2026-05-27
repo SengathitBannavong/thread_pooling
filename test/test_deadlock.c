@@ -61,13 +61,6 @@ void test_premature_drain(void) {
         }
 }
 
-/**
- * TEST: Submission vs Destruction Race
- *
- * This test tries to hit the window where submit checks shutdown=false,
- * but destroy starts and frees the queue before the submit actually pushes.
- * This is hard to trigger but multiple threads help.
- */
 /* Regression harness for the shutdown TOCTOU race closed in PR1 (bd88864).
  *
  * Pre-PR1, thread_pool_submit used release/acquire on `shutdown` and

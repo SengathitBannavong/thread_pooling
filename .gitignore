@@ -23,8 +23,11 @@ benchmark/perf/**/*.old
 
 # language server floder
 .idea/
+.local/
 .caches/
 .cache/
+.vscode/
+.claude/
 .clangd
 compile_commands.json
 
