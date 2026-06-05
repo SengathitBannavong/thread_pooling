@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Thread Pool Mandelbrot Demo</title>
+        <link rel="stylesheet" href="/threadpool/style.css" />
+    </head>
+    <body>
+        <main class="shell">
+            <section class="panel">
+                <div>
+                    <h1>Thread Pool Mandelbrot</h1>
+                    <p>
+                        Use the controls to send concurrent CPU-heavy render
+                        requests.
+                    </p>
+                </div>
+                <label class="control">
+                    <span>Heaviness <strong id="weightLabel">5</strong></span>
+                    <input
+                        id="weight"
+                        type="range"
+                        min="1"
+                        max="10"
+                        value="5"
+                    />
+                </label>
+                <label class="control">
+                    <span>Requests <strong>N</strong></span>
+                    <input
+                        id="count"
+                        type="number"
+                        min="1"
+                        max="200"
+                        value="10"
+                    />
+                </label>
+                <div class="actions">
+                    <button id="fireOne" type="button">Fire 1</button>
+                    <button id="fireMany" type="button">Fire N</button>
+                </div>
+                <div class="stats">
+                    <span id="status">idle</span>
+                    <span id="params"></span>
+                </div>
+            </section>
+            <section id="gallery" class="gallery" aria-live="polite"></section>
+        </main>
+        <script src="/threadpool/app.js"></script>
+    </body>
+</html>

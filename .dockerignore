@@ -1,0 +1,26 @@
+# VCS / history (330M+ — never needs to enter the build context)
+.git
+.gitignore
+
+# Build outputs & logs
+bin/
+log/
+*.o
+*.log
+
+# Tests, benchmarks, plots, reports — not needed to build the demo server
+Unity/
+test/
+benchmark/
+context/
+report/
+perf*.sh
+perf*.data
+*.svg
+*.png
+
+# Editor / OS cruft
+.vscode/
+.idea/
+*.swp
+.DS_Store

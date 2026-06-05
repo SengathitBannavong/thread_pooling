@@ -43,7 +43,7 @@ MONITOR_BIN = $(TARGET_F)test_monitor_manual
 VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --suppressions=ncurses.supp
 VALGRIND_TEST_FLAGS = $(VALGRIND_FLAGS) --errors-for-leak-kinds=definite,possible --error-exitcode=99
 
-.PHONY: all build-tests build-tests-all build-all-tests-tsan run-tests test build-tests-tsan run-tests-tsan test-tsan run-tests-valgrind test-valgrind benchmarks benchmarks_base run-benchmarks run-benchmarks-base perf-report plot-all monitor valgrind-monitor clean
+.PHONY: all build-tests build-tests-all build-all-tests-tsan run-tests test build-tests-tsan run-tests-tsan test-tsan run-tests-valgrind test-valgrind benchmarks benchmarks_base run-benchmarks run-benchmarks-base perf-report plot-all monitor valgrind-monitor demo clean
 
 all: test benchmarks
 
@@ -87,6 +87,8 @@ BENCH_STABLE = $(TARGET_F)benchmark_stability
 BENCH_SRCS = $(BENCH_F)work.c
 BENCH_QUEUE = $(TARGET_F)benchmark_queue_ops
 BENCH_AGING = $(TARGET_F)benchmark_aging
+DEMO_HTTP = $(TARGET_F)http_server
+DEMO_SRCS = demo/http_server.c demo/mandelbrot.c
 
 # Conda python for plotting
 CONDA_ENV = bench_env
@@ -113,6 +115,9 @@ $(BENCH_QUEUE): $(BENCH_F)benchmark_queue_ops.c $(CORE_SRCS) | $(TARGET_F)
 $(BENCH_AGING): $(BENCH_F)benchmark_aging.c $(BENCH_SRCS) $(CORE_SRCS) | $(TARGET_F)
 	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) $^ -o $@ $(NCURSES_FLAGS)
 
+$(DEMO_HTTP): $(DEMO_SRCS) $(CORE_SRCS) | $(TARGET_F)
+	$(CC) $(OPFLAGS) $(BENCH_FLAG) -Idemo $^ -o $@ $(NCURSES_FLAGS)
+
 # Baseline benchmark targets
 BASE_F = benchmark/base/
 BENCH_BASE_CPU     = $(TARGET_F)benchmark_base_cpu
@@ -135,6 +140,8 @@ $(BENCH_BASE_SCALING): $(BASE_F)benchmark_base_scaling.c $(BENCH_SRCS) $(BASELIN
 benchmarks-base: $(BENCH_BASE_CPU) $(BENCH_BASE_IO) $(BENCH_BASE_QUEUE) $(BENCH_BASE_SCALING)
 
 benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_QUEUE) $(BENCH_AGING)
+
+demo: $(DEMO_HTTP)
 
 perf-report: benchmarks benchmarks-base
 	bash perf_run.sh
@@ -249,5 +256,6 @@ clean-photo:
 clean:
 	rm -f $(ALL_TEST_BINS) $(ALL_TSAN_BINS) $(MONITOR_BIN) $(BASELINE_TEST_BIN) $(BASELINE_TEST_BIN)_tsan $(SMOKE_TEST_BIN) $(SMOKE_TEST_BIN)_tsan \
 	      $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE) $(BENCH_QUEUE) $(BENCH_AGING) \
-	      $(BENCH_BASE_CPU) $(BENCH_BASE_IO) $(BENCH_BASE_QUEUE) $(BENCH_BASE_SCALING) \
+	      $(DEMO_HTTP) \
+	      $(BENCH_BASE_CPU) $(BENCH_BASE_IO) $(BENCH_BASE_QUEUE) $(BENCH_BASE_SCALING)
 	rm -rf $(LOG_F)

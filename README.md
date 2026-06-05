@@ -117,6 +117,51 @@ int main() {
 }
 ```
 
+## Demo: HTTP Server (Docker)
+
+The `demo/` directory contains a Mandelbrot-rendering HTTP server that uses the
+thread pool to handle concurrent requests. It can be packaged and shipped as a
+container image. A `Dockerfile` and `.dockerignore` are provided at the project
+root. (Commands work with `docker` or `podman` — substitute as needed.)
+
+### 1. Build the Image
+
+```bash
+docker build -t thread-pool-demo:latest .
+```
+
+The build is multi-stage: a Debian builder compiles `bin/http_server`, and the
+final runtime image carries only the binary, the static assets in `demo/www/`,
+and `libncursesw6`. The resulting image is ~80 MB and runs as a non-root user.
+
+### 2. Run the Container
+
+```bash
+docker run -d --name tpd -p 8080:8080 thread-pool-demo:latest
+```
+
+Then open <http://localhost:8080/>. The server binds `0.0.0.0` inside the
+container and runs headless (the ncurses dashboard is TTY-only). To pin the pool
+size, append the full command with `--workers N`:
+
+```bash
+docker run -d --name tpd -p 8080:8080 thread-pool-demo:latest \
+    /app/http_server --host 0.0.0.0 --port 8080 --docroot /app/www --no-monitor --workers 32
+```
+
+> **Note:** The image sets `STOPSIGNAL SIGINT` so `docker stop` triggers the
+> server's graceful shutdown instead of waiting 10s for a `SIGKILL`.
+
+### 3. Ship to a Remote Server (no registry required)
+
+```bash
+# Export, copy, and load
+docker save thread-pool-demo:latest | gzip > tpd.tar.gz
+scp tpd.tar.gz user@server:/tmp/
+ssh user@server 'gunzip -c /tmp/tpd.tar.gz | docker load && \
+    docker run -d --name tpd --restart=unless-stopped -p 80:8080 thread-pool-demo:latest'
+```
+
 ## Testing and Validation
 
 Tests are compiled into independent binaries and execution logs are stored in the `log/` directory. The test runner provides a summary of pass/fail/timeout status for each module.
@@ -131,7 +176,7 @@ Tests are compiled into independent binaries and execution logs are stored in th
 
 [x] **Benchmarks:** Add performance evaluation metrics for throughput and latency.
 
-[ ] **Application Layer:** Develop a sample application (e.g., an image processor or web server) utilizing the pool.
+[x] **Application Layer:** Develop a sample application (e.g., an image processor or web server) utilizing the pool.
 
 ## License
 
