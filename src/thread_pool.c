@@ -296,6 +296,19 @@ uint16_t thread_pool_num_working(thread_pool_t *ori_pool) {
         return worker_capacity_busy(ori_pool->workers, ori_pool->num_workers);
 }
 
+uint64_t thread_pool_queue_depth(thread_pool_t *pool)
+{
+        if (!pool)
+                return 0;
+
+        int total = atomic_load_explicit(&pool->total_task_in_system, memory_order_relaxed);
+        uint16_t busy = worker_capacity_busy(pool->workers, pool->num_workers);
+
+        if (total <= (int)busy)
+                return 0;
+        return (uint64_t)(total - (int)busy);
+}
+
 void thread_pool_monitor_start(thread_pool_t *pool)
 {
         monitor_start(pool);

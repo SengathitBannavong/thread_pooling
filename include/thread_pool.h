@@ -4,6 +4,7 @@
 #include <stdatomic.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "priority_queue.h"
 #include "worker.h"
 
@@ -65,6 +66,14 @@ void thread_pool_resume(thread_pool_t *ori_pool);
  * get capacity of workers are busy
  */
 uint16_t thread_pool_num_working(thread_pool_t *ori_pool);
+
+/**
+ * get an approximate count of queued, not-yet-running tasks.
+ *
+ * This is a read-only monitoring getter. It does not lock or walk the priority
+ * queue, so the value may be slightly skewed under concurrent submit/pop.
+ */
+uint64_t thread_pool_queue_depth(thread_pool_t *pool);
 
 /**
  * Start the ncurses real-time thread pool monitor in a background thread.
