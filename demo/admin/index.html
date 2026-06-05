@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Thread Pool Admin</title>
+        <link rel="stylesheet" href="./style.css" />
+    </head>
+    <body>
+        <main class="app">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">Admin listener</p>
+                    <h1>Thread Pool Control Panel</h1>
+                </div>
+                <div class="status-strip" aria-live="polite">
+                    <span id="healthDot" class="dot dot-waiting"></span>
+                    <span id="healthText">Connecting</span>
+                    <span id="lastSeen">Never updated</span>
+                </div>
+            </header>
+
+            <section class="toolbar" aria-label="Connection settings">
+                <label>
+                    <span>Admin base</span>
+                    <input id="adminBase" type="url" spellcheck="false" />
+                </label>
+                <label class="compact">
+                    <span>Poll</span>
+                    <select id="pollRate">
+                        <option value="500">0.5s</option>
+                        <option value="1000" selected>1s</option>
+                        <option value="2000">2s</option>
+                        <option value="5000">5s</option>
+                    </select>
+                </label>
+                <button id="saveSettings" type="button">Apply</button>
+            </section>
+
+            <section class="metrics" aria-label="Pool metrics">
+                <article class="metric">
+                    <span>Workers</span>
+                    <strong id="workers">--</strong>
+                    <small id="modeLabel">mode unknown</small>
+                </article>
+                <article class="metric">
+                    <span>Busy</span>
+                    <strong id="busy">--</strong>
+                    <small id="busyDetail">waiting for stats</small>
+                </article>
+                <article class="metric">
+                    <span>Queue</span>
+                    <strong id="queueDepth">--</strong>
+                    <small>queued render tasks</small>
+                </article>
+                <article class="metric">
+                    <span>Connections</span>
+                    <strong id="activeConnections">--</strong>
+                    <small>render port in flight</small>
+                </article>
+                <article class="metric">
+                    <span>Served</span>
+                    <strong id="totalServed">--</strong>
+                    <small>successful renders</small>
+                </article>
+            </section>
+
+            <section class="workbench">
+                <article class="load-panel">
+                    <div class="section-head">
+                        <div>
+                            <h2>Pool Pressure</h2>
+                            <p id="pressureSummary">
+                                Waiting for first sample.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-row">
+                            <span>Worker use</span>
+                            <div class="bar"><i id="busyBar"></i></div>
+                            <b id="busyPercent">0%</b>
+                        </div>
+                        <div class="bar-row">
+                            <span>Queue depth</span>
+                            <div class="bar"><i id="queueBar"></i></div>
+                            <b id="queuePercent">0</b>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="logs-panel">
+                    <div class="section-head">
+                        <div>
+                            <h2>Request Logs</h2>
+                            <p id="logMeta">
+                                Last 256 lines from the admin ring buffer.
+                            </p>
+                        </div>
+                        <div class="log-actions">
+                            <button
+                                id="pauseLogs"
+                                class="secondary"
+                                type="button"
+                            >
+                                Pause
+                            </button>
+                            <button
+                                id="clearLogs"
+                                class="secondary"
+                                type="button"
+                            >
+                                Clear view
+                            </button>
+                        </div>
+                    </div>
+                    <pre id="logs" class="logs" aria-live="polite">
+Waiting for logs...</pre
+                    >
+                </article>
+            </section>
+        </main>
+        <script src="./app.js"></script>
+    </body>
+</html>

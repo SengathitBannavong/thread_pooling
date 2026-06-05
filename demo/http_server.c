@@ -12,11 +12,11 @@
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #include <termios.h>
 #include <time.h>
@@ -25,14 +25,16 @@
 #define REQ_MAX 4096
 #define SMALL_BODY 256
 #define DEFAULT_PORT 8080
+#define DEFAULT_ADMIN_PORT 9090
 #define DEFAULT_HOST "127.0.0.1"
-#define DEFAULT_DOCROOT "demo/www"
 #define DEFAULT_RENDER_W 640
 #define DEFAULT_RENDER_H 420
 #define DEFAULT_RENDER_ITER 800
 #define MAX_RENDER_W 2048
 #define MAX_RENDER_H 2048
 #define MAX_RENDER_ITER 5000
+#define LOG_RING_SIZE 256
+#define LOG_LINE_MAX 256
 
 typedef enum {
         MODE_POOL,
@@ -41,13 +43,14 @@ typedef enum {
 
 typedef struct {
         int port;
+        int admin_port;
         int workers;
         server_mode_t mode;
         bool monitor;
         char host[64];
-        char docroot[PATH_MAX];
-        char docroot_real[PATH_MAX];
         thread_pool_t *pool;
+        atomic_uint active_connections;
+        atomic_uint_fast64_t total_served;
 } server_ctx_t;
 
 typedef struct {
@@ -61,10 +64,41 @@ typedef struct {
         long bytes;
 } resp_t;
 
+typedef struct {
+        pthread_mutex_t mutex;
+        char lines[LOG_RING_SIZE][LOG_LINE_MAX];
+        size_t start;
+        size_t count;
+} log_ring_t;
+
 static volatile sig_atomic_t running = 1;
 static volatile sig_atomic_t listen_fd = -1;
+static volatile sig_atomic_t admin_fd = -1;
 static pthread_t main_tid;
 static pthread_mutex_t log_mtx = PTHREAD_MUTEX_INITIALIZER;
+static log_ring_t request_log;
+
+/*
+ * SSE (Server-Sent Events) push. The dashboard opens GET /admin/events and keeps
+ * it open; the broadcaster thread writes a `data: {…}` frame to every subscriber
+ * the instant a gauge changes — so transitions are never lost in a polling gap.
+ * The thread pool is NOT modified: every gauge change is observable from
+ * demo-side points (notify_event() at accept / submit / task start / task end).
+ */
+#define MAX_SSE_CLIENTS 64
+#define STATS_JSON_MAX 256
+
+static struct {
+        pthread_mutex_t mutex;
+        int fds[MAX_SSE_CLIENTS];
+        int count;
+} sse_clients = { .mutex = PTHREAD_MUTEX_INITIALIZER, .count = 0 };
+
+static pthread_mutex_t bcast_mtx = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  bcast_cond = PTHREAD_COND_INITIALIZER;
+static uint64_t bcast_gen = 0;   /* bumped on each state change; guarded by bcast_mtx */
+
+static void notify_event(void);   /* defined below; used by handle_connection above it */
 
 static struct termios orig_termios;
 static bool termios_saved = false;
@@ -99,6 +133,52 @@ static void on_sigint(int signo)
         running = 0;
         if (listen_fd >= 0)
                 close((int)listen_fd);
+        if (admin_fd >= 0)
+                close((int)admin_fd);
+}
+
+static int log_ring_init(log_ring_t *ring)
+{
+        memset(ring, 0, sizeof(*ring));
+        return pthread_mutex_init(&ring->mutex, NULL);
+}
+
+static void log_ring_append(log_ring_t *ring, const char *line)
+{
+        pthread_mutex_lock(&ring->mutex);
+        size_t pos = (ring->start + ring->count) % LOG_RING_SIZE;
+
+        if (ring->count == LOG_RING_SIZE) {
+                pos = ring->start;
+                ring->start = (ring->start + 1) % LOG_RING_SIZE;
+        } else {
+                ring->count++;
+        }
+
+        snprintf(ring->lines[pos], sizeof(ring->lines[pos]), "%s", line);
+        pthread_mutex_unlock(&ring->mutex);
+}
+
+static size_t log_ring_copy(log_ring_t *ring, char *buf, size_t len)
+{
+        size_t used = 0;
+
+        pthread_mutex_lock(&ring->mutex);
+        for (size_t i = 0; i < ring->count && used < len; i++) {
+                size_t pos = (ring->start + i) % LOG_RING_SIZE;
+                int n = snprintf(buf + used, len - used, "%s", ring->lines[pos]);
+                if (n < 0)
+                        break;
+                if ((size_t)n >= len - used) {
+                        used = len - 1;
+                        break;
+                }
+                used += (size_t)n;
+        }
+        pthread_mutex_unlock(&ring->mutex);
+
+        buf[used] = '\0';
+        return used;
 }
 
 static int write_all(int fd, const void *buf, size_t len)
@@ -135,75 +215,21 @@ static size_t send_status(int fd, int code, const char *reason, const char *body
         return body_len;
 }
 
-static const char *content_type(const char *path)
+static size_t send_typed(int fd, int code, const char *reason, const char *type,
+                         const char *body)
 {
-        const char *ext = strrchr(path, '.');
-        if (!ext)
-                return "application/octet-stream";
-        if (strcmp(ext, ".html") == 0)
-                return "text/html; charset=utf-8";
-        if (strcmp(ext, ".css") == 0)
-                return "text/css; charset=utf-8";
-        if (strcmp(ext, ".js") == 0)
-                return "application/javascript; charset=utf-8";
-        return "application/octet-stream";
-}
-
-static int has_docroot_prefix(const char *root, const char *path)
-{
-        size_t n = strlen(root);
-        return strncmp(root, path, n) == 0 && (path[n] == '\0' || path[n] == '/');
-}
-
-static resp_t serve_file(int fd, server_ctx_t *ctx, const char *target)
-{
-        char rel[PATH_MAX];
-        char joined[PATH_MAX];
-        char resolved[PATH_MAX];
-
-        if (target[0] != '/' || strstr(target, "..") || strncmp(target, "//", 2) == 0)
-                return (resp_t){ 403, (long)send_status(fd, 403, "Forbidden", "forbidden\n") };
-
-        if (strcmp(target, "/") == 0)
-                snprintf(rel, sizeof(rel), "index.html");
-        else
-                snprintf(rel, sizeof(rel), "%s", target + 1);
-
-        if (rel[0] == '/' || strstr(rel, ".."))
-                return (resp_t){ 403, (long)send_status(fd, 403, "Forbidden", "forbidden\n") };
-
-        int n = snprintf(joined, sizeof(joined), "%s/%s", ctx->docroot_real, rel);
-        if (n < 0 || (size_t)n >= sizeof(joined))
-                return (resp_t){ 414, (long)send_status(fd, 414, "URI Too Long", "uri too long\n") };
-
-        if (!realpath(joined, resolved) || !has_docroot_prefix(ctx->docroot_real, resolved))
-                return (resp_t){ 404, (long)send_status(fd, 404, "Not Found", "not found\n") };
-
-        struct stat st;
-        if (stat(resolved, &st) != 0 || !S_ISREG(st.st_mode))
-                return (resp_t){ 404, (long)send_status(fd, 404, "Not Found", "not found\n") };
-
-        FILE *fp = fopen(resolved, "rb");
-        if (!fp)
-                return (resp_t){ 404, (long)send_status(fd, 404, "Not Found", "not found\n") };
-
         char header[512];
-        n = snprintf(header, sizeof(header),
-                     "HTTP/1.0 200 OK\r\n"
-                     "Content-Type: %s\r\n"
-                     "Content-Length: %ld\r\n"
-                     "Connection: close\r\n\r\n",
-                     content_type(resolved), (long)st.st_size);
+        size_t body_len = strlen(body);
+        int n = snprintf(header, sizeof(header),
+                         "HTTP/1.0 %d %s\r\n"
+                         "Content-Type: %s\r\n"
+                         "Content-Length: %zu\r\n"
+                         "Connection: close\r\n\r\n",
+                         code, reason, type, body_len);
         if (n > 0)
                 write_all(fd, header, (size_t)n);
-
-        char buf[8192];
-        size_t rd;
-        while ((rd = fread(buf, 1, sizeof(buf), fp)) > 0)
-                if (write_all(fd, buf, rd) != 0)
-                        break;
-        fclose(fp);
-        return (resp_t){ 200, (long)st.st_size };
+        write_all(fd, body, body_len);
+        return body_len;
 }
 
 static int query_int(const char *query, const char *key, int def, int min, int max)
@@ -264,20 +290,30 @@ static resp_t serve_render(int fd, const char *query)
 static void log_request(server_ctx_t *ctx, const char *peer, const char *method,
                         const char *path, const char *query, resp_t r, double ms)
 {
+        char ts[16];
+        char line[LOG_LINE_MAX];
+        time_t now = time(NULL);
+        struct tm tmv;
+
+        localtime_r(&now, &tmv);
+        strftime(ts, sizeof(ts), "%H:%M:%S", &tmv);
+        if (query && *query)
+                snprintf(line, sizeof(line),
+                         "[%s] %-21s %s %s?%s -> %d %.3fMB %.1fms\n",
+                         ts, peer, method, path, query, r.status,
+                         (double)r.bytes / (1024.0 * 1024.0), ms);
+        else
+                snprintf(line, sizeof(line),
+                         "[%s] %-21s %s %s -> %d %.3fMB %.1fms\n",
+                         ts, peer, method, path, r.status,
+                         (double)r.bytes / (1024.0 * 1024.0), ms);
+
+        log_ring_append(&request_log, line);
+
         pthread_mutex_lock(&log_mtx);
         bool attached = ctx->pool && thread_pool_monitor_attached(ctx->pool);
         if (!attached) {
-                char ts[16];
-                time_t now = time(NULL);
-                struct tm tmv;
-                localtime_r(&now, &tmv);
-                strftime(ts, sizeof(ts), "%H:%M:%S", &tmv);
-                if (query && *query)
-                        printf("[%s] %-21s %s %s?%s -> %d %.3fMB %.1fms\n",
-                               ts, peer, method, path, query, r.status, (double)r.bytes / (1024.0 * 1024.0), ms);
-                else
-                        printf("[%s] %-21s %s %s -> %d %.3fMB %.1fms\n",
-                               ts, peer, method, path, r.status, (double)r.bytes / (1024.0 * 1024.0), ms);
+                fputs(line, stdout);
                 fflush(stdout);
         }
         pthread_mutex_unlock(&log_mtx);
@@ -292,6 +328,8 @@ static void handle_connection(void *arg)
         snprintf(peer, sizeof(peer), "%s", conn->peer);
         free(conn);
 
+        notify_event();   /* task started on a worker (busy up, queue down) */
+
         struct timespec t0;
         clock_gettime(CLOCK_MONOTONIC, &t0);
 
@@ -299,11 +337,14 @@ static void handle_connection(void *arg)
         char path[PATH_MAX] = "-";
         const char *query = "";
         resp_t r = { 0, 0 };
+        bool rendered = false;
 
         char req[REQ_MAX];
         ssize_t nread = recv(fd, req, sizeof(req) - 1, 0);
         if (nread <= 0) {
                 close(fd);
+                atomic_fetch_sub_explicit(&ctx->active_connections, 1, memory_order_relaxed);
+                notify_event();
                 return;   /* client hung up before sending anything; nothing to log */
         }
         req[nread] = '\0';
@@ -322,13 +363,19 @@ static void handle_connection(void *arg)
                         q = "";
                 query = q;
                 snprintf(path, sizeof(path), "%s", target);
-                if (strcmp(target, "/render") == 0)
+                if (strcmp(target, "/render") == 0) {
                         r = serve_render(fd, query);
-                else
-                        r = serve_file(fd, ctx, target);
+                        rendered = true;
+                } else {
+                        r = (resp_t){ 404, (long)send_status(fd, 404, "Not Found", "not found\n") };
+                }
         }
 
         close(fd);
+        atomic_fetch_sub_explicit(&ctx->active_connections, 1, memory_order_relaxed);
+        if (rendered)
+                atomic_fetch_add_explicit(&ctx->total_served, 1, memory_order_relaxed);
+        notify_event();   /* task done (busy down, total up, active down) */
 
         struct timespec t1;
         clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -340,6 +387,215 @@ static void handle_connection(void *arg)
 static void *naive_thread(void *arg)
 {
         handle_connection(arg);
+        return NULL;
+}
+
+/* Build the stats JSON snapshot — shared by GET /admin/stats and the SSE push. */
+static void format_stats_json(server_ctx_t *ctx, char *buf, size_t len)
+{
+        uint16_t busy = thread_pool_num_working(ctx->pool);
+        uint64_t queue_depth = thread_pool_queue_depth(ctx->pool);
+        unsigned active = atomic_load_explicit(&ctx->active_connections, memory_order_relaxed);
+        uint64_t total = atomic_load_explicit(&ctx->total_served, memory_order_relaxed);
+
+        snprintf(buf, len,
+                 "{\"workers\":%d,\"busy\":%u,\"queue_depth\":%llu,"
+                 "\"active_connections\":%u,\"total_served\":%llu}",
+                 ctx->pool ? ctx->workers : 0, (unsigned)busy,
+                 (unsigned long long)queue_depth, active,
+                 (unsigned long long)total);
+}
+
+/*
+ * Wake the SSE broadcaster: a gauge just changed. Cheap, lock-guarded signal,
+ * called from the accept thread and from worker threads (handle_connection).
+ * Touches no thread-pool state.
+ */
+static void notify_event(void)
+{
+        pthread_mutex_lock(&bcast_mtx);
+        bcast_gen++;
+        pthread_cond_signal(&bcast_cond);
+        pthread_mutex_unlock(&bcast_mtx);
+}
+
+/* Write a frame to every SSE subscriber; drop+close any that error (client gone). */
+static void sse_send_all(const char *frame, size_t flen)
+{
+        pthread_mutex_lock(&sse_clients.mutex);
+        int n = 0;
+        for (int i = 0; i < sse_clients.count; i++) {
+                int cfd = sse_clients.fds[i];
+                if (write_all(cfd, frame, flen) == 0)
+                        sse_clients.fds[n++] = cfd;   /* keep the live ones */
+                else
+                        close(cfd);                   /* drop the dead ones */
+        }
+        sse_clients.count = n;
+        pthread_mutex_unlock(&sse_clients.mutex);
+}
+
+/* Register an SSE subscriber fd; 0 on success, -1 if the table is full. */
+static int sse_register(int fd)
+{
+        int rc = -1;
+        pthread_mutex_lock(&sse_clients.mutex);
+        if (sse_clients.count < MAX_SSE_CLIENTS) {
+                sse_clients.fds[sse_clients.count++] = fd;
+                rc = 0;
+        }
+        pthread_mutex_unlock(&sse_clients.mutex);
+        return rc;
+}
+
+static void sse_close_all(void)
+{
+        pthread_mutex_lock(&sse_clients.mutex);
+        for (int i = 0; i < sse_clients.count; i++)
+                close(sse_clients.fds[i]);
+        sse_clients.count = 0;
+        pthread_mutex_unlock(&sse_clients.mutex);
+}
+
+/*
+ * Broadcaster thread: waits for a state-change signal (or a 15 s keepalive
+ * timeout), then pushes the current stats snapshot to all SSE subscribers — but
+ * only when it actually changed (dedup). On timeout with no change it sends an
+ * SSE comment to keep idle connections (and any proxy) alive.
+ */
+static void *sse_broadcaster(void *arg)
+{
+        server_ctx_t *ctx = arg;
+        char last[STATS_JSON_MAX] = "";
+        uint64_t seen = 0;
+
+        while (running) {
+                pthread_mutex_lock(&bcast_mtx);
+                struct timespec ts;
+                clock_gettime(CLOCK_REALTIME, &ts);
+                ts.tv_sec += 15;
+                while (running && bcast_gen == seen &&
+                       pthread_cond_timedwait(&bcast_cond, &bcast_mtx, &ts) != ETIMEDOUT)
+                        ;
+                bool timed_out = (bcast_gen == seen);
+                seen = bcast_gen;
+                pthread_mutex_unlock(&bcast_mtx);
+                if (!running)
+                        break;
+
+                char payload[STATS_JSON_MAX];
+                format_stats_json(ctx, payload, sizeof(payload));
+
+                if (strcmp(payload, last) != 0) {
+                        char frame[STATS_JSON_MAX + 16];
+                        int fn = snprintf(frame, sizeof(frame), "data: %s\n\n", payload);
+                        if (fn > 0)
+                                sse_send_all(frame, (size_t)fn);
+                        memcpy(last, payload, sizeof(last));
+                } else if (timed_out) {
+                        sse_send_all(": ping\n\n", 8);   /* keepalive comment */
+                }
+        }
+        return NULL;
+}
+
+static void handle_admin_connection(int fd, server_ctx_t *ctx)
+{
+        char req[REQ_MAX];
+        char method[16];
+        char target[PATH_MAX];
+        char path[PATH_MAX];
+        ssize_t nread = recv(fd, req, sizeof(req) - 1, 0);
+
+        if (nread <= 0) {
+                close(fd);
+                return;
+        }
+        req[nread] = '\0';
+
+        if (sscanf(req, "%15s %1023s", method, target) != 2) {
+                send_status(fd, 400, "Bad Request", "bad request\n");
+                close(fd);
+                return;
+        }
+
+        char *q = strchr(target, '?');
+        if (q)
+                *q = '\0';
+        snprintf(path, sizeof(path), "%s", target);
+
+        if (strcmp(method, "GET") != 0) {
+                send_status(fd, 405, "Method Not Allowed", "method not allowed\n");
+        } else if (strcmp(path, "/admin/stats") == 0) {
+                char body[STATS_JSON_MAX];
+                format_stats_json(ctx, body, sizeof(body));
+                send_typed(fd, 200, "OK", "application/json", body);
+        } else if (strcmp(path, "/admin/events") == 0) {
+                /* Long-lived SSE stream. Send headers + an immediate snapshot,
+                 * THEN register with the broadcaster (so it can't interleave a
+                 * write before our snapshot), and return WITHOUT closing — the
+                 * broadcaster now owns this fd. */
+                static const char hdr[] =
+                    "HTTP/1.1 200 OK\r\n"
+                    "Content-Type: text/event-stream\r\n"
+                    "Cache-Control: no-cache\r\n"
+                    "Connection: keep-alive\r\n"
+                    "X-Accel-Buffering: no\r\n"
+                    "\r\n";
+                char body[STATS_JSON_MAX];
+                char frame[STATS_JSON_MAX + 16];
+                format_stats_json(ctx, body, sizeof(body));
+                int fn = snprintf(frame, sizeof(frame), "data: %s\n\n", body);
+                if (write_all(fd, hdr, sizeof(hdr) - 1) != 0 ||
+                    (fn > 0 && write_all(fd, frame, (size_t)fn) != 0) ||
+                    sse_register(fd) != 0) {
+                        close(fd);
+                        return;
+                }
+                return;   /* keep open: do NOT close */
+        } else if (strcmp(path, "/admin/logs") == 0) {
+                char body[LOG_RING_SIZE * LOG_LINE_MAX + 1];
+                log_ring_copy(&request_log, body, sizeof(body));
+                send_typed(fd, 200, "OK", "text/plain", body);
+        } else {
+                send_status(fd, 404, "Not Found", "not found\n");
+        }
+
+        close(fd);
+}
+
+static void *admin_listener(void *arg)
+{
+        server_ctx_t *ctx = arg;
+        int fd = (int)admin_fd;
+
+        while (running) {
+                /* Poll with a timeout instead of blocking in accept(): on
+                 * shutdown, on_sigint() closes admin_fd from another thread,
+                 * which does NOT wake a blocked accept() on Linux. The 200 ms
+                 * tick lets this loop notice running==0 on its own so
+                 * pthread_join(admin_tid) can complete. Mirrors key_listener. */
+                struct pollfd pfd = { .fd = fd, .events = POLLIN };
+                int pr = poll(&pfd, 1, 200);
+                if (pr <= 0)
+                        continue;                 /* timeout/EINTR -> re-check running */
+                if (!(pfd.revents & POLLIN))
+                        continue;                 /* POLLERR/POLLHUP/POLLNVAL on a closed fd */
+
+                struct sockaddr_in cli;
+                socklen_t clen = sizeof(cli);
+                int client = accept(fd, (struct sockaddr *)&cli, &clen);
+                if (client < 0) {
+                        if (errno == EINTR)
+                                continue;
+                        if (!running || errno == EBADF)
+                                break;
+                        continue;
+                }
+
+                handle_admin_connection(client, ctx);
+        }
+
         return NULL;
 }
 
@@ -409,8 +665,8 @@ static void *key_listener(void *arg)
 static int usage(const char *prog)
 {
         fprintf(stderr,
-                "Usage: %s [--port 8080] [--workers N] [--mode pool|naive] "
-                "[--docroot demo/www] [--host 127.0.0.1] [--no-monitor]\n",
+                "Usage: %s [--port 8080] [--admin-port 9090] [--workers N] "
+                "[--mode pool|naive] [--host 127.0.0.1] [--no-monitor]\n",
                 prog);
         return 2;
 }
@@ -430,8 +686,8 @@ static int parse_args(int argc, char **argv, server_ctx_t *ctx)
                                 ctx->mode = MODE_NAIVE;
                         else
                                 return usage(argv[0]);
-                } else if (strcmp(argv[i], "--docroot") == 0 && i + 1 < argc) {
-                        snprintf(ctx->docroot, sizeof(ctx->docroot), "%s", argv[++i]);
+                } else if (strcmp(argv[i], "--admin-port") == 0 && i + 1 < argc) {
+                        ctx->admin_port = atoi(argv[++i]);
                 } else if (strcmp(argv[i], "--host") == 0 && i + 1 < argc) {
                         snprintf(ctx->host, sizeof(ctx->host), "%s", argv[++i]);
                 } else if (strcmp(argv[i], "--no-monitor") == 0) {
@@ -441,13 +697,10 @@ static int parse_args(int argc, char **argv, server_ctx_t *ctx)
                 }
         }
 
-        if (ctx->port <= 0 || ctx->port > 65535 || ctx->workers <= 0)
+        if (ctx->port <= 0 || ctx->port > 65535 ||
+            ctx->admin_port <= 0 || ctx->admin_port > 65535 ||
+            ctx->workers <= 0 || ctx->port == ctx->admin_port)
                 return usage(argv[0]);
-
-        if (!realpath(ctx->docroot, ctx->docroot_real)) {
-                perror("realpath docroot");
-                return 1;
-        }
 
         return 0;
 }
@@ -484,13 +737,15 @@ static void server_defaults(server_ctx_t *ctx)
 {
         memset(ctx, 0, sizeof(*ctx));
         ctx->port = DEFAULT_PORT;
+        ctx->admin_port = DEFAULT_ADMIN_PORT;
         ctx->workers = get_num_core();
         if (ctx->workers <= 0)
                 ctx->workers = 4;
         ctx->mode = MODE_POOL;
         ctx->monitor = true;
         snprintf(ctx->host, sizeof(ctx->host), "%s", DEFAULT_HOST);
-        snprintf(ctx->docroot, sizeof(ctx->docroot), "%s", DEFAULT_DOCROOT);
+        atomic_store_explicit(&ctx->active_connections, 0, memory_order_relaxed);
+        atomic_store_explicit(&ctx->total_served, 0, memory_order_relaxed);
 }
 
 int main(int argc, char **argv)
@@ -498,18 +753,39 @@ int main(int argc, char **argv)
         server_ctx_t ctx;
         server_defaults(&ctx);
 
-        int parsed = parse_args(argc, argv, &ctx);
-        if (parsed != 0)
-                return parsed;
+        if (log_ring_init(&request_log) != 0) {
+                perror("log_ring_init");
+                return 1;
+        }
 
-        printf("sever run on: http://%s:%d/\n", ctx.host, ctx.port);
+        int parsed = parse_args(argc, argv, &ctx);
+        if (parsed != 0) {
+                pthread_mutex_destroy(&request_log.mutex);
+                return parsed;
+        }
+
+        printf("render backend: http://%s:%d/render\n", ctx.host, ctx.port);
+        printf("admin data:     http://%s:%d/admin/stats\n", ctx.host, ctx.admin_port);
+        fflush(stdout);   /* stdout is block-buffered when not a TTY (e.g. under
+                           * `podman logs`); flush so the banner shows immediately */
 
         int fd = create_listener(ctx.host, ctx.port);
         if (fd < 0) {
                 perror("listen");
+                pthread_mutex_destroy(&request_log.mutex);
                 return 1;
         }
         listen_fd = fd;
+
+        int afd = create_listener(ctx.host, ctx.admin_port);
+        if (afd < 0) {
+                perror("admin listen");
+                close(fd);
+                listen_fd = -1;
+                pthread_mutex_destroy(&request_log.mutex);
+                return 1;
+        }
+        admin_fd = afd;
 
         /* Install the SIGINT handler and record the main thread BEFORE spawning
          * the key listener, which signals this thread to quit. */
@@ -519,16 +795,26 @@ int main(int argc, char **argv)
         sa.sa_handler = on_sigint;
         sigemptyset(&sa.sa_mask);
         sigaction(SIGINT, &sa, NULL);
+        signal(SIGPIPE, SIG_IGN);   /* writing to a closed SSE client must not kill us */
 
         pthread_t key_tid;
         bool key_valid = false;
+        pthread_t admin_tid;
+        bool admin_valid = false;
+        pthread_t bcast_tid;
+        bool bcast_valid = false;
 
         if (ctx.mode == MODE_POOL) {
                 printf("[INFO] thread pool initialized with %d workers\n", ctx.workers);
+                fflush(stdout);
                 ctx.pool = thread_pool_init(ctx.workers);
                 if (!ctx.pool) {
                         perror("thread_pool_init");
                         close(fd);
+                        close(afd);
+                        listen_fd = -1;
+                        admin_fd = -1;
+                        pthread_mutex_destroy(&request_log.mutex);
                         return 1;
                 }
                 /* The interactive dashboard + key listener need a real terminal. */
@@ -540,6 +826,20 @@ int main(int argc, char **argv)
                                 key_valid = true;
                 }
         }
+
+        if (pthread_create(&admin_tid, NULL, admin_listener, &ctx) == 0) {
+                admin_valid = true;
+        } else {
+                perror("pthread_create admin");
+                running = 0;
+                close(fd);
+                close(afd);
+        }
+
+        if (pthread_create(&bcast_tid, NULL, sse_broadcaster, &ctx) == 0)
+                bcast_valid = true;
+        else
+                perror("pthread_create sse_broadcaster");
 
         while (running) {
                 struct sockaddr_in cli;
@@ -567,11 +867,13 @@ int main(int argc, char **argv)
                 else
                         snprintf(conn->peer, sizeof(conn->peer), "?");
 
+                atomic_fetch_add_explicit(&ctx.active_connections, 1, memory_order_relaxed);
                 if (ctx.mode == MODE_POOL) {
                         if (thread_pool_submit(ctx.pool, handle_connection, conn,
                                                PRIORITY_MEDIUM) < 0) {
                                 close(client);
                                 free(conn);
+                                atomic_fetch_sub_explicit(&ctx.active_connections, 1, memory_order_relaxed);
                         }
                 } else {
                         pthread_t tid;
@@ -580,16 +882,31 @@ int main(int argc, char **argv)
                         } else {
                                 close(client);
                                 free(conn);
+                                atomic_fetch_sub_explicit(&ctx.active_connections, 1, memory_order_relaxed);
                         }
                 }
+
+                notify_event();   /* connection accepted / work queued */
         }
 
         if (listen_fd >= 0)
                 close((int)listen_fd);
         listen_fd = -1;
+        if (admin_fd >= 0)
+                close((int)admin_fd);
+        admin_fd = -1;
+
+        if (admin_valid)
+                pthread_join(admin_tid, NULL);
 
         if (key_valid)
                 pthread_join(key_tid, NULL);  /* exits within ~200ms of running=0 */
+
+        if (bcast_valid) {
+                notify_event();               /* wake the broadcaster so it sees running==0 */
+                pthread_join(bcast_tid, NULL);
+        }
+        sse_close_all();                      /* close any still-open SSE client fds */
 
         if (ctx.pool) {
                 if (thread_pool_monitor_attached(ctx.pool))
@@ -598,5 +915,6 @@ int main(int argc, char **argv)
         }
 
         restore_termios();
+        pthread_mutex_destroy(&request_log.mutex);
         return 0;
 }

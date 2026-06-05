@@ -44,7 +44,7 @@ async function renderOne(slot) {
     const started = performance.now();
     try {
         const response = await fetch(
-            `/threadpool/render?w=${p.w}&h=${p.h}&iter=${p.iter}`,
+            `http://127.0.0.1:8080/threadpool/render?w=${p.w}&h=${p.h}&iter=${p.iter}`,
             {
                 cache: "no-store",
             },

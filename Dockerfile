@@ -35,20 +35,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 COPY --from=build /src/bin/http_server /app/http_server
-COPY --from=build /src/demo/www        /app/www
+# Note: no www/ here — the server is backend-only and serves no static files.
+# The control panel in demo/www/ is served by the reverse proxy (see run_demo.sh).
 
 USER appuser
-EXPOSE 8080
+EXPOSE 8080 9090
 
 # The server only installs a SIGINT handler for graceful shutdown; `docker stop`
 # / `podman stop` send SIGTERM by default and would wait 10s then SIGKILL it
 # mid-request. Make stop send SIGINT so it drains and exits cleanly.
 STOPSIGNAL SIGINT
 
-# --host 0.0.0.0  : default is 127.0.0.1, which is unreachable from outside the
-#                   container; bind all interfaces instead.
-# --docroot /app/www : default docroot is the relative path "demo/www".
-# --no-monitor    : explicit; the ncurses dashboard only starts on a TTY anyway.
-# Add "--workers N" to the end if you want to pin the pool size.
+# --host 0.0.0.0     : default is 127.0.0.1, unreachable from outside the container;
+#                      bind all interfaces instead.
+# --port 8080        : render listener (Mandelbrot /render).
+# --admin-port 9090  : admin listener (/admin/stats, /admin/logs, /admin/events SSE).
+# --no-monitor       : explicit; the ncurses dashboard only starts on a TTY anyway.
+# Add "--workers N" if you want to pin the pool size.
+# (run_demo.sh overrides this CMD but binds 127.0.0.1 — fine in a shared pod netns.)
 CMD ["/app/http_server", "--host", "0.0.0.0", "--port", "8080", \
-     "--docroot", "/app/www", "--no-monitor"]
+     "--admin-port", "9090", "--no-monitor"]

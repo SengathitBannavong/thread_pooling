@@ -159,7 +159,7 @@ docker run -d --name tpd -p 8080:8080 thread-pool-demo:latest \
 docker save thread-pool-demo:latest | gzip > tpd.tar.gz
 scp tpd.tar.gz user@server:/tmp/
 ssh user@server 'gunzip -c /tmp/tpd.tar.gz | docker load && \
-    docker run -d --name tpd --restart=unless-stopped -p 80:8080 thread-pool-demo:latest'
+    docker run -d --name tpd --restart=unless-stopped -p 8080:8080 9090:9090 thread-pool-demo:latest'
 ```
 
 ## Testing and Validation

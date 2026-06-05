@@ -1,16 +1,18 @@
-# Thread-Pool HTTP Server — Demo
+# Thread-Pool Render Backend — Demo
 
-An application-layer demo of the thread pool: a tiny from-scratch HTTP/1.0 server
-(raw POSIX sockets, zero dependencies beyond what the pool already uses) that
-serves two kinds of work through one pool:
+An application-layer demo of the thread pool: a tiny HTTP/1.0 render backend
+(raw POSIX sockets, zero dependencies beyond what the pool already uses).
 
-- **`/` + static assets** — IO route. Serves a control-panel web page from a docroot.
-- **`/render?w=&h=&iter=`** — CPU route. Computes a Mandelbrot set and returns it
-  as a BMP image (browsers render BMP).
+The C server is now backend-only:
 
-The page is also the **load generator**: a "heaviness" slider plus *Fire 1* / *Fire N*
-buttons issue concurrent `/render` requests so you can saturate the pool on demand
-and watch the live ncurses monitor.
+- **render listener**: `GET /render?w=&h=&iter=` computes a Mandelbrot set and
+  returns it as a BMP image.
+- **admin listener**: `GET /admin/stats` and `GET /admin/logs` return data only
+  and are served inline on a separate pthread, bypassing the pool.
+
+The browser control panel is a separately deployed static frontend. The files in
+`demo/www/` remain in the repo for that frontend, but this C server no longer
+serves them.
 
 ## Build
 
@@ -18,209 +20,183 @@ and watch the live ncurses monitor.
 make demo            # produces bin/http_server
 ```
 
-> Run the server **from the repository root** — the default docroot is the
-> relative path `demo/www`. (Or pass an absolute `--docroot`.)
-
 ## Quick start
 
 ```bash
 make demo
-./bin/http_server                       # pool mode, monitor ON, http://127.0.0.1:8080
+./bin/http_server
 ```
 
-Then open <http://127.0.0.1:8080> in a browser, drag the **Heaviness** slider up,
-and click **Fire N**. Watch the ncurses monitor (in the terminal running the
-server) light up workers and grow the queue while the worker count stays fixed.
+Defaults:
 
-Press **Ctrl-C** to shut down: the monitor detaches (terminal restored), in-flight
-requests drain, then the process exits cleanly.
+- render backend: <http://127.0.0.1:8080/render>
+- admin stats: <http://127.0.0.1:9090/admin/stats>
+- admin logs: <http://127.0.0.1:9090/admin/logs>
 
-## Flags
+Press **Ctrl-C** to shut down: listeners close, the admin thread exits, auxiliary
+threads are joined, in-flight pool work drains, and the process exits cleanly.
+
+## Browser demo (`run_demo.sh`)
+
+For the full interactive demo — control panel + a **real-time** monitor dashboard in a
+browser — use the Podman pod, which puts a reverse proxy in front of the backend:
+
+```bash
+./run_demo.sh            # build + start the pod (Caddy + nginx + http_server + www/)
+WORKERS=4 ./run_demo.sh  # 4 workers < the browser's ~6 conns -> the queue gauge fills
+./run_demo.sh down       # tear it down
+```
+
+Then open <http://localhost:8088/threadpool/>, pick a **Heavy/Max** preset, and **Send
+burst** — the Busy/Queue gauges update live.
+
+How it's wired (see `demo/doc-apis.md` for the configs):
+
+- **Two origins** so the browser's ~6-connection-per-origin limit can't let render traffic
+  starve admin polling: the page + `/render` on `:8088`, the admin endpoints on `:9099`.
+- **SSE push** (`GET /admin/events`): stats stream in real time, so short bursts aren't lost
+  between polls. Logs are still polled.
+
+## Usage
+
+```text
+Usage: ./bin/http_server [--port 8080] [--admin-port 9090] [--workers N] [--mode pool|naive] [--host 127.0.0.1] [--no-monitor]
+```
 
 All flags are optional; defaults shown in brackets.
 
 | Flag | Default | Meaning |
 |------|---------|---------|
-| `--port N` | `8080` | TCP port to listen on (1–65535). |
+| `--port N` | `8080` | Render TCP port to listen on (1-65535). |
+| `--admin-port N` | `9090` | Separate admin TCP port to listen on (1-65535). |
 | `--workers N` | number of CPU cores | Worker threads in the pool (pool mode only). |
-| `--mode pool\|naive` | `pool` | `pool` = use the thread pool. `naive` = spawn one detached pthread **per connection** (the contrast case). |
-| `--docroot PATH` | `demo/www` | Directory served for static files. Must exist (resolved at startup). |
-| `--host ADDR` | `127.0.0.1` | Interface to bind. Use `0.0.0.0` to reach it from another machine. |
+| `--mode pool\|naive` | `pool` | `pool` = use the thread pool. `naive` = spawn one detached pthread per render connection. |
+| `--host ADDR` | `127.0.0.1` | Interface to bind. Keep this private; put a reverse proxy in front for public access. |
 | `--no-monitor` | monitor ON | Disable the ncurses monitor. Required for headless / scripted / piped runs. |
 
 Notes:
-- The ncurses **monitor only attaches in `pool` mode**. In `naive` mode there is no
+
+- The ncurses monitor only attaches in `pool` mode. In `naive` mode there is no
   pool to monitor.
-- While the monitor is attached the server writes nothing to stdout (so it can't
-  corrupt the TUI). Run with `--no-monitor` when you want plain logging or to drive
-  it from scripts.
+- While the monitor is attached the server writes no request log lines to stdout.
+  Run with `--no-monitor` when you want plain logging or scripted output.
+- The C server intentionally does not implement TLS, CORS, `OPTIONS`, auth, or
+  rate limiting. A reverse proxy owns those concerns.
 
 ## Recipes
 
-**Default live demo (pool + monitor):**
-```bash
-./bin/http_server
-# browser: http://127.0.0.1:8080  -> slider + Fire N
-```
+**Render one image:**
 
-**More workers, custom port:**
 ```bash
-./bin/http_server --workers 8 --port 9000
-```
-
-**Headless (for curl / ab / wrk / CI — no TUI):**
-```bash
-./bin/http_server --no-monitor --port 8137 &
+./bin/http_server --no-monitor --port 8137 --admin-port 9137 &
 curl -s -o out.bmp "http://127.0.0.1:8137/render?w=512&h=512&iter=1000"
-curl -s            "http://127.0.0.1:8137/"
+curl -s "http://127.0.0.1:9137/admin/stats"
 ```
 
-**Bounded-concurrency contrast (the money shot):**
+**More workers, custom ports:**
+
+```bash
+./bin/http_server --workers 8 --port 9000 --admin-port 9001
+```
+
+**Bounded-concurrency contrast:**
 
 Terminal 1 — pool mode, watch threads stay fixed:
+
 ```bash
-./bin/http_server --no-monitor --port 8137 &
-ps -T -p $!        # or: htop -p $!   -> worker count stays at N under load
+./bin/http_server --mode pool --no-monitor --port 8137 --admin-port 9137 &
+ps -T -p $!
 ```
-Terminal 2 — hammer it:
+
+Terminal 2 — hammer it and poll admin stats:
+
 ```bash
 for i in $(seq 1 200); do
   curl -s -o /dev/null "http://127.0.0.1:8137/render?w=512&h=512&iter=1500" &
-done; wait
+done
+curl -s "http://127.0.0.1:9137/admin/stats"
+wait
 ```
-Now repeat with `--mode naive` and watch the thread count **explode** under the
-same load (one thread per in-flight connection) instead of staying bounded.
 
-**Expose to the LAN (e.g. demo from a phone):**
-```bash
-./bin/http_server --host 0.0.0.0 --port 8080
-# then browse to http://<this-machine-ip>:8080
-```
-> The HTTP parser is intentionally minimal; only expose it on a trusted network.
+Repeat with `--mode naive` and compare the OS thread count.
 
 ## Live monitor: detach / reattach + request log
 
 In pool mode with the monitor on, you can toggle the ncurses dashboard at runtime.
-**When the monitor is detached, the terminal is restored and the server streams a
-one-line log per client request; when it is reattached, the dashboard returns and
-logging is suppressed** (so it can never corrupt the TUI).
+When the monitor is detached, the terminal is restored and the server streams a
+one-line log per render request; when it is reattached, dashboard drawing resumes
+and stdout logging is suppressed. The same formatted log lines are also kept in a
+bounded in-memory ring for `GET /admin/logs`.
 
 Keys:
 
 | State | Key | Effect |
 |-------|-----|--------|
-| Dashboard (attached) | `q` / `Q` | Detach the monitor → request log starts streaming. |
-| Dashboard (attached) | `p` / `r` | Pause / resume the pool (built-in monitor keys). |
-| Log view (detached)  | `m` / `M` | Reattach the dashboard → logging stops. |
-| Log view (detached)  | `q` / `Q` | Quit the server (graceful shutdown). |
-| Anywhere | `Ctrl-C` | Quit the server (graceful shutdown). |
+| Dashboard (attached) | `q` / `Q` | Detach the monitor; request log starts streaming. |
+| Dashboard (attached) | `p` / `r` | Pause / resume the pool. |
+| Log view (detached) | `m` / `M` | Reattach the dashboard; stdout logging stops. |
+| Log view (detached) | `q` / `Q` | Quit the server. |
+| Anywhere | `Ctrl-C` | Quit the server. |
 
-So `q` "steps back": from the dashboard it drops you to the live log; from the log
-it quits. `m` brings the dashboard back. This drives the pool's
-`thread_pool_monitor_detach()` / `thread_pool_monitor_reattach()` API — reattach
-reuses the existing monitor context (history is preserved).
+Request log line format:
 
-> The interactive keys require a real terminal. With `--no-monitor`, a piped
-> stdin, or `naive` mode there is no dashboard and the request log streams
-> continuously; use `Ctrl-C` to quit.
-
-Request log line format (printed only while detached):
-
+```text
+[HH:MM:SS] <client-ip:port>   <METHOD> <path>[?query] -> <status> <MB>MB <ms>ms
 ```
-[HH:MM:SS] <client-ip:port>   <METHOD> <path>[?query] -> <status> <bytes>B <ms>ms
-```
-
-Example:
-
-```
-[13:19:45] 127.0.0.1:49116    GET /render?w=80&h=80&iter=90 -> 200 19254B 0.6ms
-[13:19:45] 127.0.0.1:49122    GET / -> 200 1032B 0.2ms
-```
-
-> With `--no-monitor` (or in `naive` mode) there is no dashboard to attach, so the
-> request log streams continuously — handy for headless runs.
 
 ## Render parameters
 
-`/render` accepts query params, all **hard-clamped** server-side:
+`/render` accepts query params, all hard-clamped server-side:
 
 | Param | Default | Range |
 |-------|---------|-------|
-| `w` | 640 | 16 … 2048 |
-| `h` | 420 | 16 … 2048 |
-| `iter` | 800 | 1 … 5000 |
+| `w` | 640 | 16 ... 2048 |
+| `h` | 420 | 16 ... 2048 |
+| `iter` | 800 | 1 ... 5000 |
 
-Bigger `w`/`h`/`iter` = heavier render = faster pool saturation. The web UI maps
-its single "Heaviness" slider onto these.
+Bigger `w`/`h`/`iter` means heavier render work and faster pool saturation.
 
 ## Routes & responses
 
+Render listener:
+
 | Request | Response |
 |---------|----------|
-| `GET /` | `index.html` from docroot |
-| `GET /style.css`, `/app.js`, … | matching static file (404 if missing/outside docroot) |
 | `GET /render?...` | `image/bmp` Mandelbrot |
+| Other `GET` path | `404 Not Found` |
 | Non-`GET` method | `405 Method Not Allowed` |
-| Path containing `..` / outside docroot | `403 Forbidden` / `404 Not Found` |
+
+Admin listener:
+
+| Request | Response |
+|---------|----------|
+| `GET /admin/stats` | `application/json`: `{"workers":N,"busy":N,"queue_depth":N,"active_connections":N,"total_served":N}` |
+| `GET /admin/logs` | `text/plain`: recent request log lines from the bounded ring |
+| `GET /admin/events` | `text/event-stream`: real-time SSE push of the stats snapshot on every state change (used by the dashboard) |
+| Other `GET` path | `404 Not Found` |
+| Non-`GET` method | `405 Method Not Allowed` |
 
 ## Performance comparison (`demo/bench.sh`)
 
-`demo/bench.sh` is a **load-tester only — it does not start or stop any server.**
-You run the server yourself in whichever mode you want; the script fires N
-concurrent requests at a target URL and reports throughput + latency
-percentiles. Run it once against a pool server and once against a naive server
-and compare.
-
-**Workflow:**
+`demo/bench.sh` is a load-tester only; it does not start or stop any server. Run
+the server yourself in whichever mode you want, then point the script at
+`/render`.
 
 ```bash
-# terminal 1 — run a POOL server
-./bin/http_server --mode pool --no-monitor --port 8080
+# terminal 1
+./bin/http_server --mode pool --no-monitor --port 8080 --admin-port 9090
 
-# terminal 2 — load it (optionally sample its threads with --pid)
+# terminal 2
 demo/bench.sh --url '/render?w=480&h=480&iter=1200' -c 200 \
               --pid "$(pgrep -f 'http_server --mode pool')"
 ```
 
-Then stop the pool server, start a **naive** one on the same port, and run the
-exact same `bench.sh` command again — compare the two outputs.
-
-Options (all optional):
-
-| Flag | Default | Meaning |
-|------|---------|---------|
-| `--url URL` | `http://127.0.0.1:8080/render?w=480&h=480&iter=1200` | full URL, or a bare `/path` joined onto `--host`/`--port` |
-| `--host HOST` | `127.0.0.1` | host (used when `--url` is a bare path) |
-| `--port PORT` | `8080` | port (used when `--url` is a bare path) |
-| `--requests N` / `-n` | `2000` | total requests |
-| `--concurrency C` / `-c` | `200` | concurrent in-flight requests |
-| `--pid PID` | — | server PID to sample peak OS thread count (optional) |
-
-Example output (one run):
-
-```
-════════════════════════════════════════════════════════════════
- Target : http://127.0.0.1:8080/render?w=480&h=480&iter=1200
- Load   : 2000 requests, concurrency 200
- Sample : threads of pid 84552
-════════════════════════════════════════════════════════════════
-[bench] running…
-
-  wall time     : 1.987 s
-  throughput    : 1006.5 req/s
-  requests      : 2000 ok, 0 failed (of 2000)
-  latency (ms)  : avg 40.71 | p50 38.01 | p90 58.05 | p99 76.96 | min 5.17 | max 87.68
-  peak threads  : 17 (server pid 84552)
-```
-
-Compare the two runs: the pool holds its `peak threads` at ~workers+1 with a
-tight tail, while the naive server's thread count climbs with concurrency and
-its p99/max latency blows out. (Requires `curl`; otherwise only `awk`/`sort`/
-`xargs` — no `ab`/`wrk`.)
+Then stop the pool server, start a naive one on the same render port, and run the
+same `bench.sh` command again.
 
 ## Shutdown
 
-`Ctrl-C` (SIGINT) sets a stop flag and closes the listen socket to break `accept()`.
-The main loop then detaches the monitor (restoring the terminal **before** any
-drain output) and calls `thread_pool_destroy`, which waits for in-flight requests
-to finish. Exit code is 0.
+`Ctrl-C` sets a stop flag and closes both listen sockets to break `accept()`.
+Teardown order is: close render/admin listeners, join the admin thread, join the
+SSE broadcaster (closing any open event streams) and auxiliary threads, destroy the
+thread pool, then destroy the log ring mutex.
