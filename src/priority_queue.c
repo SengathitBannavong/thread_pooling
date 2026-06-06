@@ -181,6 +181,12 @@ int pq_is_empty(struct priority_queue_t *pq)
 }
 
 static inline bool has_passed_ms(struct timespec *start, struct timespec *end, long target_ms) {
+
+        // check time zero
+        // it is mean this task is task before aging was started
+        if (start->tv_sec == 0 && start->tv_nsec == 0)
+                return false;
+
         long sec_diff = end->tv_sec - start->tv_sec;
         long nsec_diff = end->tv_nsec - start->tv_nsec;
 
