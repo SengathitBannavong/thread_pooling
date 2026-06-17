@@ -5,6 +5,7 @@
 #include "threadpool.h"
 #include "unity_internals.h"
 #include <stdatomic.h>
+#include <errno.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -394,6 +395,42 @@ void test_aging_enable_disable_runtime(void)
         thread_pool_destroy(&p);
 }
 
+void test_submit_rejected_when_queue_full(void)
+{
+        thread_pool_t *p = thread_pool_init(2);
+        TEST_ASSERT_NOT_NULL(p);
+        thread_pool_set_max_tasks(p, 4);
+
+        int hold = 500; /* ms — keep both workers busy while we fill the queue */
+
+        /* occupy both workers so they stop draining the queue */
+        thread_pool_submit(p, sleep_ms, &hold, PRIORITY_MEDIUM);
+        thread_pool_submit(p, sleep_ms, &hold, PRIORITY_MEDIUM);
+
+        /* let the workers pick up the two sleepers (queue drains to empty) */
+        struct timespec ts = { 0, 100 * 1000000L };
+        nanosleep(&ts, NULL);
+
+        /* fill the queue to capacity (4 pending) */
+        for (int i = 0; i < 4; i++) {
+                int64_t id = thread_pool_submit(p, sleep_ms, &hold, PRIORITY_LOW);
+                TEST_ASSERT_TRUE(id >= 0);
+        }
+
+        /* the next submit must be rejected with errno=EAGAIN */
+        errno = 0;
+        int64_t rej = thread_pool_submit(p, increment_counter, NULL, PRIORITY_LOW);
+        TEST_ASSERT_EQUAL_INT64(-1, rej);
+        TEST_ASSERT_EQUAL_INT(EAGAIN, errno);
+
+        /* after draining, the queue accepts work again */
+        thread_pool_wait(p);
+        int64_t ok = thread_pool_submit(p, increment_counter, NULL, PRIORITY_LOW);
+        TEST_ASSERT_TRUE(ok >= 0);
+
+        thread_pool_destroy(&p);
+}
+
 
 int main(void)
 {
@@ -431,6 +468,7 @@ int main(void)
         RUN_TEST(test_submit_after_destroy_returns_error);
         RUN_TEST(test_destroy_waits_for_running_tasks);
         RUN_TEST(test_aging_enable_disable_runtime);
+        RUN_TEST(test_submit_rejected_when_queue_full);
 
         return UNITY_END();
 }

@@ -217,22 +217,32 @@ err_free_pool:      free(pool);
 int64_t thread_pool_submit(thread_pool_t *pool, void (*task_fun_t)(void *arg),
                 void *arg, enum task_priority priority)
 {
-        if (!pool || !task_fun_t)
+        if (!pool || !task_fun_t) {
+                errno = EINVAL;
                 return -1;
+        }
 
         atomic_fetch_add_explicit(&pool->in_flight_submits, 1, memory_order_seq_cst);
 
         // fast return if shutdown
         if (atomic_load_explicit(&pool->shutdown, memory_order_seq_cst)) {
                 atomic_fetch_add_explicit(&pool->in_flight_submits, -1, memory_order_release);
+                errno = ESHUTDOWN;
                 return -1;
         }
 
+        // fast reject if the queue is already full (avoids a wasted allocation)
+        if (pq_is_full_approx(&pool->pq)) {
+                atomic_fetch_add_explicit(&pool->in_flight_submits, -1, memory_order_release);
+                errno = EAGAIN;
+                return -1;
+        }
 
         struct task_t *task = task_create(task_fun_t, arg, priority);
 
         if (!task) {
                 atomic_fetch_add_explicit(&pool->in_flight_submits, -1, memory_order_release);
+                errno = ENOMEM;
                 return -1;
         }
 
@@ -242,9 +252,26 @@ int64_t thread_pool_submit(thread_pool_t *pool, void (*task_fun_t)(void *arg),
         if (atomic_load_explicit(&pool->aging_enable, memory_order_acquire))
                 clock_gettime(CLOCK_MONOTONIC, &task->submit_time);
 
-        pq_push(&pool->pq, task);
+        /* authoritative capacity check: the queue may have filled between the
+         * approximate pre-check above and here. */
+        if (!pq_try_push(&pool->pq, task)) {
+                atomic_fetch_add_explicit(&pool->total_task_in_system, -1, memory_order_relaxed);
+                task_destroy(task);
+                atomic_fetch_add_explicit(&pool->in_flight_submits, -1, memory_order_release);
+                errno = EAGAIN;
+                return -1;
+        }
+
         atomic_fetch_add_explicit(&pool->in_flight_submits, -1, memory_order_release);
         return id;
+}
+
+void thread_pool_set_max_tasks(thread_pool_t *pool, uint64_t max_tasks)
+{
+        if (!pool)
+                return;
+
+        pq_set_max_tasks(&pool->pq, max_tasks);
 }
 
 void thread_pool_pause(thread_pool_t *ori_pool)

@@ -58,19 +58,17 @@ void pq_destroy(struct priority_queue_t *pq)
         }
 
         pq->ready_mask = pq->size = 0;
+        atomic_store_explicit(&pq->depth, 0, memory_order_relaxed);
         pthread_mutex_unlock(&pq->mutex);
         pthread_cond_destroy(&pq->not_empty);
         pthread_mutex_destroy(&pq->mutex);
         return;
 }
 
-void pq_push(struct priority_queue_t *pq, struct task_t *task)
+/* insert task into its priority lane; caller must hold pq->mutex */
+static void _pq_insert_locked(struct priority_queue_t *pq, struct task_t *task)
 {
-        if (!pq || !task)
-                return;
-
         int p = (int)task->priority;
-        pthread_mutex_lock(&pq->mutex);
         task->next = NULL;
 
         if (!pq->tails[p])
@@ -81,9 +79,59 @@ void pq_push(struct priority_queue_t *pq, struct task_t *task)
         // mask ready task at p priority level
         pq->ready_mask |= (1UL << p);
         pq->size++;
+        atomic_fetch_add_explicit(&pq->depth, 1, memory_order_relaxed);
+}
+
+void pq_push(struct priority_queue_t *pq, struct task_t *task)
+{
+        if (!pq || !task)
+                return;
+
+        pthread_mutex_lock(&pq->mutex);
+        _pq_insert_locked(pq, task);
         // wake up worker
         pthread_mutex_unlock(&pq->mutex);
         pthread_cond_signal(&pq->not_empty);
+}
+
+bool pq_try_push(struct priority_queue_t *pq, struct task_t *task)
+{
+        if (!pq || !task)
+                return false;
+
+        pthread_mutex_lock(&pq->mutex);
+
+        /* authoritative capacity check under the lock (no TOCTOU) */
+        uint64_t max = atomic_load_explicit(&pq->max_tasks, memory_order_relaxed);
+        if (max != 0 && pq->size >= max) {
+                pthread_mutex_unlock(&pq->mutex);
+                return false;
+        }
+
+        _pq_insert_locked(pq, task);
+        pthread_mutex_unlock(&pq->mutex);
+        pthread_cond_signal(&pq->not_empty);
+        return true;
+}
+
+void pq_set_max_tasks(struct priority_queue_t *pq, uint64_t max_tasks)
+{
+        if (!pq)
+                return;
+
+        atomic_store_explicit(&pq->max_tasks, max_tasks, memory_order_relaxed);
+}
+
+bool pq_is_full_approx(struct priority_queue_t *pq)
+{
+        if (!pq)
+                return false;
+
+        uint64_t max = atomic_load_explicit(&pq->max_tasks, memory_order_relaxed);
+        if (max == 0)
+                return false;
+
+        return atomic_load_explicit(&pq->depth, memory_order_relaxed) >= max;
 }
 
 static struct task_t *_pq_pop_locked(struct priority_queue_t *pq, int p)
@@ -98,6 +146,7 @@ static struct task_t *_pq_pop_locked(struct priority_queue_t *pq, int p)
 
         task->next = NULL;
         pq->size--;
+        atomic_fetch_sub_explicit(&pq->depth, 1, memory_order_relaxed);
         return task;
 }
 

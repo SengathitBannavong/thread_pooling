@@ -45,6 +45,7 @@ typedef struct {
         int port;
         int admin_port;
         int workers;
+        uint64_t max_tasks;   /* 0 = unbounded queue */
         server_mode_t mode;
         bool monitor;
         char host[64];
@@ -666,6 +667,7 @@ static int usage(const char *prog)
 {
         fprintf(stderr,
                 "Usage: %s [--port 8080] [--admin-port 9090] [--workers N] "
+                "[--max-tasks N] "
                 "[--mode pool|naive] [--host 127.0.0.1] [--no-monitor]\n",
                 prog);
         return 2;
@@ -678,6 +680,8 @@ static int parse_args(int argc, char **argv, server_ctx_t *ctx)
                         ctx->port = atoi(argv[++i]);
                 } else if (strcmp(argv[i], "--workers") == 0 && i + 1 < argc) {
                         ctx->workers = atoi(argv[++i]);
+                } else if (strcmp(argv[i], "--max-tasks") == 0 && i + 1 < argc) {
+                        ctx->max_tasks = (uint64_t)strtoull(argv[++i], NULL, 10);
                 } else if (strcmp(argv[i], "--mode") == 0 && i + 1 < argc) {
                         const char *mode = argv[++i];
                         if (strcmp(mode, "pool") == 0)
@@ -808,6 +812,12 @@ int main(int argc, char **argv)
                 printf("[INFO] thread pool initialized with %d workers\n", ctx.workers);
                 fflush(stdout);
                 ctx.pool = thread_pool_init(ctx.workers);
+                if (ctx.pool && ctx.max_tasks > 0) {
+                        thread_pool_set_max_tasks(ctx.pool, ctx.max_tasks);
+                        printf("[INFO] queue capped at %llu pending tasks\n",
+                               (unsigned long long)ctx.max_tasks);
+                        fflush(stdout);
+                }
                 if (!ctx.pool) {
                         perror("thread_pool_init");
                         close(fd);

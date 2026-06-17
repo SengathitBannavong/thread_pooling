@@ -18,10 +18,22 @@ thread_pool_t *thread_pool_init(int num_workers);
 
 /**
  * create a task and push it onto the priority queue
- * @return task_id (>= 0) on success, -1 if pool is shutdown
- * or on allocation failure.
+ * @return task_id (>= 0) on success, -1 on failure. On failure errno is set:
+ *   EINVAL    - pool or task function is NULL
+ *   ESHUTDOWN - pool is shutting down
+ *   EAGAIN    - queue is full (see thread_pool_set_max_tasks); retryable
+ *   ENOMEM    - task allocation failed
  */
 int64_t thread_pool_submit(thread_pool_t *pool, void (*task_fun_t)(void *arg), void *arg, enum task_priority priority);
+
+/**
+ * set the maximum number of queued (pending, not-yet-running) tasks.
+ * 0 = unbounded (the default). When the queue is full, thread_pool_submit()
+ * rejects immediately, returning -1 with errno=EAGAIN; queued work is never
+ * dropped. Thread-safe and callable at any time; lowering the cap below the
+ * current depth only stops new submits until the queue drains.
+ */
+void thread_pool_set_max_tasks(thread_pool_t *pool, uint64_t max_tasks);
 
 /**
  * graceful shutdown
