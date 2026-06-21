@@ -27,7 +27,7 @@ struct task_t *task_create(void (*func)(void *arg), void *arg,
                 return NULL;
         }
 
-        uint64_t new_id = atomic_fetch_add(&g_task_id_count, 1);
+        uint64_t new_id = atomic_fetch_add_explicit(&g_task_id_count, 1, memory_order_relaxed);
 
         new_task->task_id     = new_id;
         new_task->arg         = arg;
