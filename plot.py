@@ -99,7 +99,12 @@ def plot_benchmark(csv_path, output_dir):
     # ── 3. Average throughput bar (non-scaling, non-stability) ─
     if not is_stability and not is_scaling:
         plt.figure(figsize=(10, 6))
-        df.groupby('method')['throughput'].mean().plot(kind='bar')
+        g = df.groupby('method')['throughput'].mean()
+        # worker-sweep methods ('N_workers') must sort numerically, not lexically
+        # (otherwise pandas orders them 1,16,2,32,4,64,8 as strings).
+        if df['method'].str.match(r'^\d+_workers$').all():
+            g = g.reindex(sorted(g.index, key=lambda m: int(m.split('_')[0])))
+        g.plot(kind='bar')
         plt.title(f'Average Throughput - {base_name}')
         plt.ylabel('Throughput (Tasks/sec)')
         plt.xticks(rotation=45)
