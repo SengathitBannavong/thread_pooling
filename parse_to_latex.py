@@ -104,6 +104,30 @@ def extract_values(data, target_method, metric_col, verbose=False, filepath=""):
     return values
 
 
+def extract_metric_max(data, target_method, metric_col):
+    """Max of metric_col over rows matching target_method (e.g. RSS drift)."""
+    vals = []
+    for row in data:
+        if row.get("method") == target_method:
+            try:
+                vals.append(float(row.get(metric_col, 0.0)))
+            except ValueError:
+                continue
+    return max(vals) if vals else 0.0
+
+
+def read_latency_summary(path):
+    """Read a latency_summary_*.csv produced by demo/latency_stats.py."""
+    p = Path(path)
+    if not p.exists():
+        return []
+    rows = []
+    with open(p, "r", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            rows.append(row)
+    return rows
+
+
 def fmt_num(val):
     return f"{val:,.1f}".replace(",", "\\,")
 
@@ -165,6 +189,12 @@ def main():
         type=str,
         default="benchmark/res/tables.tex",
         help="Output path for LaTeX tables",
+    )
+    parser.add_argument(
+        "--latency-dir",
+        type=str,
+        default="demo/bench_results",
+        help="Directory containing latency_summary_*.csv (from demo/latency_stats.py)",
     )
     parser.add_argument(
         "--verbose", action="store_true", help="Print individual trial values"
@@ -327,6 +357,101 @@ def main():
                 )
         print()
 
+    # 4. Heterogeneous (mixed CPU+IO+priority) — same per-worker shape as scaling
+    f_hetero_mine = input_dir / "result_heterogeneous.txt"
+    f_hetero_base = input_dir / "result_base_heterogeneous.txt"
+    hetero_mine_data = read_csv(f_hetero_mine)
+    hetero_base_data = read_csv(f_hetero_base)
+
+    hetero_rows = []
+    hetero_variance_rows = []
+    if hetero_mine_data and hetero_base_data:
+        print("[Heterogeneous]")
+        for w in workers:
+            method_name = f"{w}_workers"
+            m_vals = extract_values(
+                hetero_mine_data, method_name, "throughput", args.verbose, f_hetero_mine
+            )
+            b_vals = extract_values(
+                hetero_base_data, method_name, "throughput", args.verbose, f_hetero_base
+            )
+            m_vals, b_vals = align_trials(m_vals, b_vals, f"Hetero {w}w")
+            st_m = compute_stats(m_vals)
+            st_b = compute_stats(b_vals)
+            ratios = analyze_comparison(st_m, st_b, f"hetero {w}w", verdicts)
+            if ratios:
+                hetero_rows.append(
+                    f"{w} & {fmt_num(st_m['mean'])} $\\pm$ {fmt_std(st_m['stdev'])} & "
+                    f"{fmt_num(st_b['mean'])} $\\pm$ {fmt_std(st_b['stdev'])} & {ratios[0]:.3f}x \\\\"
+                )
+                hetero_variance_rows.append((f"Hetero {w}w", st_m, st_b, ratios[1]))
+                print(
+                    f"  {w:2d}w -> Mine: {st_m['mean']:8.1f} | Base: {st_b['mean']:8.1f} | Ratio: {ratios[0]:.3f}x"
+                )
+        print()
+
+    # 5. Stability (sustained load) — mean throughput, CV, max RSS drift per pool
+    f_stab_mine = input_dir / "result_stability.txt"
+    f_stab_base = input_dir / "result_base_stability.txt"
+    stab_mine_data = read_csv(f_stab_mine)
+    stab_base_data = read_csv(f_stab_base)
+
+    stability_rows = []
+    if stab_mine_data and stab_base_data:
+        print("[Stability]")
+        for label, data, method, fpath in [
+            ("Mine", stab_mine_data, "threadpool", f_stab_mine),
+            ("Baseline", stab_base_data, "baseline", f_stab_base),
+        ]:
+            tput = extract_values(data, method, "throughput", args.verbose, fpath)
+            st = compute_stats(tput)
+            drift = extract_metric_max(data, method, "mem_run_cost_kb")
+            stability_rows.append(
+                f"{label} & {fmt_num(st['mean'])} $\\pm$ {fmt_std(st['stdev'])} & "
+                f"{fmt_cv(st['cv'])} & {drift:.0f} \\\\"
+            )
+            print(
+                f"  {label}: {st['mean']:.1f} t/s (CV={st['cv']:.2f}%) drift_max={drift:.0f} KB"
+            )
+        print()
+
+    # 6. Aging (priority aging ablation: disabled vs enabled) — within-mine, n=5.
+    #    No baseline counterpart: a FIFO pool has no aging to toggle. Metrics:
+    #    starvation window (low_last_done_us) and total_time_us are microseconds.
+    f_aging = input_dir / "result_aging.txt"
+    aging_data = read_csv(f_aging)
+
+    aging_rows = []
+    if aging_data:
+        print("[Aging (priority aging ablation)]")
+        for label, method in [
+            ("Aging disabled", "aging_disabled"),
+            ("Aging enabled", "aging_enabled"),
+        ]:
+            starv = extract_values(
+                aging_data, method, "low_last_done_us", args.verbose, f_aging
+            )
+            total = extract_values(
+                aging_data, method, "total_time_us", args.verbose, f_aging
+            )
+            tput = extract_values(
+                aging_data, method, "throughput", args.verbose, f_aging
+            )
+            st_s = compute_stats(starv)
+            st_t = compute_stats(total)
+            st_p = compute_stats(tput)
+            # us -> ms for the two time columns; throughput stays t/s.
+            aging_rows.append(
+                f"{label} & {fmt_num(st_s['mean'] / 1000.0)} $\\pm$ {fmt_std(st_s['stdev'] / 1000.0)} & "
+                f"{fmt_num(st_t['mean'] / 1000.0)} $\\pm$ {fmt_std(st_t['stdev'] / 1000.0)} & "
+                f"{fmt_num(st_p['mean'])} $\\pm$ {fmt_std(st_p['stdev'])} \\\\"
+            )
+            print(
+                f"  {label}: starvation={st_s['mean'] / 1000.0:.1f} ms | "
+                f"total={st_t['mean'] / 1000.0:.1f} ms | tput={st_p['mean']:.1f} t/s"
+            )
+        print()
+
     # Build Variance Table rows
     var_rows = []
     if cpu_ratios:
@@ -342,6 +467,10 @@ def main():
             f"{name} & {fmt_cv(m['cv'])} & {fmt_cv(b['cv'])} & {r:.2f}x \\\\"
         )
     for name, m, b, r in queue_variance_rows:
+        var_rows.append(
+            f"{name} & {fmt_cv(m['cv'])} & {fmt_cv(b['cv'])} & {r:.2f}x \\\\"
+        )
+    for name, m, b, r in hetero_variance_rows:
         var_rows.append(
             f"{name} & {fmt_cv(m['cv'])} & {fmt_cv(b['cv'])} & {r:.2f}x \\\\"
         )
@@ -383,7 +512,68 @@ def main():
     latex_out += "\\label{tab:variance}\n\\begin{tabular}{lrrr}\n\\toprule\n"
     latex_out += "Benchmark & Mine CV (\\%) & Base CV (\\%) & Stability advantage \\\\\n\\midrule\n"
     latex_out += "\n".join(var_rows) + "\n"
-    latex_out += "\\bottomrule\n\\end{tabular}\n\\end{table}\n"
+    latex_out += "\\bottomrule\n\\end{tabular}\n\\end{table}\n\n"
+
+    # Table 5: Heterogeneous
+    if hetero_rows:
+        latex_out += "\\begin{table}[htbp]\n\\centering\n"
+        latex_out += "\\caption{Heterogeneous (mixed CPU+IO+priority) throughput by worker count (mean $\\pm$ sample stddev, $n=3$ trials)}\n"
+        latex_out += "\\label{tab:hetero}\n\\begin{tabular}{rrrr}\n\\toprule\n"
+        latex_out += "Workers & Mine (t/s) & Baseline (t/s) & Ratio \\\\\n\\midrule\n"
+        latex_out += "\n".join(hetero_rows) + "\n"
+        latex_out += "\\bottomrule\n\\end{tabular}\n\\end{table}\n\n"
+
+    # Table 6: Stability
+    if stability_rows:
+        latex_out += "\\begin{table}[htbp]\n\\centering\n"
+        latex_out += "\\caption{Stability under sustained load (50 iterations): throughput, CV, and max RSS drift}\n"
+        latex_out += "\\label{tab:stability}\n\\begin{tabular}{lrrr}\n\\toprule\n"
+        latex_out += "Pool & Throughput (t/s) & CV & Max RSS drift (KB) \\\\\n\\midrule\n"
+        latex_out += "\n".join(stability_rows) + "\n"
+        latex_out += "\\bottomrule\n\\end{tabular}\n\\end{table}\n\n"
+
+    # Table 7: Aging (priority aging ablation) — mode-vs-mode, within-mine
+    if aging_rows:
+        latex_out += "\\begin{table}[htbp]\n\\centering\n"
+        latex_out += "\\caption{Priority aging ablation: starvation window and total time (5K LOW + 10K HIGH tasks, $n=5$ trials)}\n"
+        latex_out += "\\label{tab:aging}\n\\begin{tabular}{lrrr}\n\\toprule\n"
+        latex_out += "Mode & Starvation window (ms) & Total time (ms) & Throughput (t/s) \\\\\n\\midrule\n"
+        latex_out += "\n".join(aging_rows) + "\n"
+        latex_out += "\\bottomrule\n\\end{tabular}\n\\end{table}\n\n"
+
+    # Tables 8+: Tail latency (one per latency_summary_*.csv)
+    latency_dir = Path(args.latency_dir)
+    for summ in sorted(latency_dir.glob("latency_summary_*.csv")):
+        label = summ.stem.replace("latency_summary_", "")
+        disp = label.replace("_", "\\_")  # safe in LaTeX caption text
+        rows = read_latency_summary(summ)
+        if not rows:
+            continue
+        print(f"[Tail latency: {label}]")
+        body = ""
+        for r in rows:
+            body += (
+                f"{r['concurrency']} & {float(r['throughput_rps']):.1f} & "
+                f"{float(r['p50_ms']):.0f} & {float(r['p90_ms']):.0f} & "
+                f"{float(r['p95_ms']):.0f} & {float(r['p99_ms']):.0f} \\\\\n"
+            )
+            print(
+                f"  c={r['concurrency']:>3}  rps={float(r['throughput_rps']):6.1f}  "
+                f"p50={float(r['p50_ms']):7.1f}  p95={float(r['p95_ms']):7.1f}  p99={float(r['p99_ms']):7.1f}"
+            )
+        print()
+        latex_out += "\\begin{table}[htbp]\n\\centering\n"
+        latex_out += (
+            f"\\caption{{Tail latency by concurrency --- {disp} "
+            "(per-request, demo render server). Latency in ms.}\n"
+        )
+        latex_out += (
+            f"\\label{{tab:tail_latency_{label}}}\n"
+            "\\begin{tabular}{rrrrrr}\n\\toprule\n"
+        )
+        latex_out += "Concurrency & Throughput (req/s) & p50 & p90 & p95 & p99 \\\\\n\\midrule\n"
+        latex_out += body
+        latex_out += "\\bottomrule\n\\end{tabular}\n\\end{table}\n\n"
 
     # Save to file
     out_path = Path(args.output)

@@ -1,42 +1,42 @@
-# Benchmark Summary
+# Benchmark Summary (fresh run, commit 814fb2c)
 
-Fresh dataset generated in Phase 3; tables regenerated in Phase 5 with mean plus sample
-standard deviation (`n - 1`) and CV%.
+Dataset regenerated on 2026-06-24. Tables in `tables.tex` report mean plus sample
+standard deviation (`n - 1`) and CV%. Machine: AMD Ryzen 7 6800HS (8c/16t), 14 GiB,
+Fedora kernel 7.0.12, gcc 15.2.1. See `MANIFEST.txt` for the full environment and the
+exact commands.
 
-## Multi-axis Verdict
+## Correctness
 
-- CPU throughput: confirmed competitive, corrected from the expected `~1.01x` to `0.993x`.
-  The fresh table reports mine at `6,096.4 t/s` and baseline at `6,141.6 t/s`.
+- Unit tests: 8 binaries, 69/69 assertions pass, 0 failures.
+- TSAN: clean on 8/9 suites. The intentional `test_submit_vs_destroy_race` reports one
+  race (`in_flight_submits` increment vs `free(pool)`) — the documented concurrent-destroy
+  contract boundary; the `seq_cst` guard still prevents any task being enqueued after
+  shutdown.
+- Valgrind: 8/8 pass, 0 errors, 0 bytes definitely lost (ncurses suppressed via
+  `ncurses.supp`).
 
-- IO throughput: confirmed competitive, corrected from the expected `~0.99x` to `1.014x`.
-  The fresh table reports mine at `23,733.2 t/s` and baseline at `23,400.5 t/s`.
+## Performance (ratio = mine / baseline)
 
-- Worker scaling: confirmed advantage, corrected from the expected `~1.05x` at high
-  worker counts to `1.031x` at 16 workers, `1.028x` at 32 workers, and `1.032x` at
-  64 workers.
+- CPU-bound (fib30, 100K): mine 6,307.1 t/s vs base 6,271.4 t/s → 1.006x (tie).
+- IO-bound (64KB read, 100K): mine 38,408.4 t/s vs base 37,069.6 t/s → 1.036x;
+  mine CV 2.21% vs base 12.76% (5.78x more predictable).
+- Worker scaling: mine 1.02–1.04x at every worker count. Speedup S_p ≈ 7.21x at 8
+  physical cores (90% efficiency), then Amdahl plateau ≈ 7.5x through 16–64 workers.
+- Queue ops (bare FIFO microbench): baseline 1.1–1.4x faster (mine 0.697x at 1 worker,
+  0.918x at 8) — the cost of priority/aging/monitor machinery.
+- Heterogeneous (mixed CPU+IO+priority sweep): mine leads at high worker counts
+  (32w 1.182x, 64w 1.109x); 8w/16w are noisy due to real disk reads and excluded from
+  conclusions.
+- Stability (50 sustained iterations): mine 90,974.6 t/s CV 1.35%, RSS drift max 4 KB;
+  base 98,845.1 t/s CV 0.52%, drift 68 KB. Both leak-free; mine has the flattest memory
+  footprint.
+- Aging/fairness: last LOW task completes at 2,435.8 ms without aging vs 897.0 ms with
+  aging → 2.72x smaller starvation window, at equal total runtime (2,435.8 vs 2,437.3 ms).
 
-- Predictability: the expected IO-bound variance advantage is not supported by the
-  generated table because CPU/IO CV is reported as `0.00% / 0.00%`. Queue predictability
-  does show an advantage at several worker counts: queue 4w has `2.21x` stability
-  advantage and queue 8w has `4.24x`.
+## Verdict
 
-- Queue operation feature cost: confirmed, with corrected values. Low-contention queue
-  throughput is `0.699x` at 1 worker, not `~0.67x`; at 16 workers it improves to
-  `0.962x`, not `~0.99x`. The priority/monitor/aging capable pool carries measurable
-  overhead for pure queue operations, especially at low worker counts.
-
-- Aging/fairness: supported. Without aging, the last low-priority task completes at
-  `2493.2 ms` on average. With aging enabled, the last low-priority task completes at
-  `922.5 ms` on average, reducing the starvation window by about `2.70x`. Total runtime
-  stays similar: `2493.2 ms` without aging vs `2516.1 ms` with aging.
-
-## Corrected Expected-shape Notes
-
-- CPU: expected `~1.01x`, fresh data says `0.993x`.
-- IO: expected `~0.99x`, fresh data says `1.014x`.
-- Scaling 16/32/64 workers: expected `~1.05x`, fresh data says `1.031x`, `1.028x`,
-  and `1.032x`.
-- Queue 1 worker: expected `~0.67x`, fresh data says `0.699x`.
-- Queue 16 workers: expected `~0.99x`, fresh data says `0.962x`.
-- IO variance advantage: expected markedly lower CV, fresh table reports `0.00% / 0.00%`,
-  so no IO CV advantage is claimed from the generated table.
+The priority pool is competitive on real workloads, scales near-linearly to the physical
+core count, and wins where its scheduler matters (mixed high-load throughput, fairness,
+I/O-bound predictability, memory stability). It pays a measurable overhead on bare-FIFO
+and homogeneous sustained throughput — the expected trade-off for richer scheduling
+semantics.

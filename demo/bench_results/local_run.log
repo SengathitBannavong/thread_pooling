@@ -1,0 +1,20 @@
+════════════════════════════════════════════════════════════════
+ Target : http://127.0.0.1:8080/render?w=320&h=320&iter=600
+ Sweep  : concurrency [1 2 4 8 16 32 64], 1000 requests each
+ Out    : demo/bench_results (label=local_pool)
+════════════════════════════════════════════════════════════════
+[bench] concurrency=1 → demo/bench_results/raw_local_pool_c1.txt
+         done: 1000/1000 ok in 29.521s
+[bench] concurrency=2 → demo/bench_results/raw_local_pool_c2.txt
+         done: 1000/1000 ok in 14.799s
+[bench] concurrency=4 → demo/bench_results/raw_local_pool_c4.txt
+         done: 1000/1000 ok in 7.514s
+[bench] concurrency=8 → demo/bench_results/raw_local_pool_c8.txt
+         done: 1000/1000 ok in 3.813s
+[bench] concurrency=16 → demo/bench_results/raw_local_pool_c16.txt
+         done: 1000/1000 ok in 2.247s
+[bench] concurrency=32 → demo/bench_results/raw_local_pool_c32.txt
+         done: 1000/1000 ok in 2.139s
+[bench] concurrency=64 → demo/bench_results/raw_local_pool_c64.txt
+         done: 1000/1000 ok in 2.102s
+[bench] raw data in demo/bench_results

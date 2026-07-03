@@ -41,8 +41,12 @@ def plot_benchmark(csv_path, output_dir):
             if v >= 1e3: return f"{v/1e3:.1f}K"
             return f"{v:.0f}"
 
-        ws   = df[x_col].astype(str).tolist()
-        tps  = df['throughput'].tolist()
+        # Average the n trials per worker count so each worker count is a
+        # single bar (the raw CSV has one row per trial → 3x bars otherwise,
+        # which collides the x-axis labels).
+        agg  = df.groupby('workers')['throughput'].mean().sort_index()
+        ws   = agg.index.astype(str).tolist()
+        tps  = agg.tolist()
         x    = range(len(ws))
 
         fig, ax = plt.subplots(figsize=(11, 6))
@@ -75,7 +79,10 @@ def plot_benchmark(csv_path, output_dir):
     # ── 2. Latency ─────────────────────────────────────────────
     plt.figure(figsize=(10, 6))
     if is_scaling:
-        plt.plot(df[x_col], df['avg_latency_us'], marker='o', color='orange')
+        lat = df.groupby('workers')['avg_latency_us'].mean().sort_index()
+        plt.plot(lat.index, lat.values, marker='o', color='orange')
+        plt.xscale('log', base=2)
+        plt.xticks(lat.index, [str(w) for w in lat.index])
         plt.xlabel('Number of Workers')
     else:
         for method in df['method'].unique():
@@ -108,7 +115,44 @@ def plot_benchmark(csv_path, output_dir):
     if mem_col:
         _plot_memory(df, base_name, output_dir, is_scaling, x_col, mem_col)
 
+    # ── 5. Speedup S_p = t1 / tp (scaling only) ────────────────
+    if is_scaling and 'total_time_us' in df.columns:
+        _plot_speedup(df, base_name, output_dir)
+
     print(f"Plots generated for {base_name} in {output_dir}")
+
+
+def _plot_speedup(df, base_name, output_dir):
+    """Speedup vs worker count: S_p = t1 / tp, averaged across runs.
+
+    t1 is the mean single-worker wall time; tp the mean wall time at p workers.
+    Overlays the ideal-linear reference (S_p = p) so the Amdahl plateau is
+    visible as the gap between the measured curve and the diagonal.
+    """
+    avg = df.groupby('workers')['total_time_us'].mean().sort_index()
+    if 1 not in avg.index:
+        print(f"  [speedup] no 1-worker row in {base_name}; skipping")
+        return
+    t1 = avg.loc[1]
+    ws = avg.index.tolist()
+    sp = (t1 / avg).tolist()
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(ws, sp, marker='o', color='seagreen', label='Measured $S_p = t_1/t_p$')
+    plt.plot(ws, ws, linestyle='--', color='gray', label='Ideal linear ($S_p = p$)')
+    for w, s in zip(ws, sp):
+        plt.annotate(f"{s:.2f}", (w, s), textcoords="offset points",
+                     xytext=(0, 8), ha='center', fontsize=9)
+    plt.xscale('log', base=2)
+    plt.xticks(ws, [str(w) for w in ws])
+    plt.xlabel('Number of Workers')
+    plt.ylabel('Speedup $S_p$')
+    plt.title(f'Speedup vs Worker Count - {base_name}')
+    plt.grid(True, which='both')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, f'speedup_{base_name}.png'))
+    plt.close()
 
 
 def _plot_memory(df, base_name, output_dir, is_scaling, x_col, mem_col='mem_run_cost_kb'):
@@ -128,7 +172,8 @@ def _plot_memory(df, base_name, output_dir, is_scaling, x_col, mem_col='mem_run_
     plt.figure(figsize=(10, 5))
 
     if is_scaling:
-        plt.bar(df[x_col].astype(str), df[mem_col], color='steelblue')
+        agg = df.groupby('workers')[mem_col].mean().sort_index()
+        plt.bar(agg.index.astype(str), agg.values, color='steelblue')
         plt.xlabel('Number of Workers')
     else:
         avg = df.groupby('method')[mem_col].mean()

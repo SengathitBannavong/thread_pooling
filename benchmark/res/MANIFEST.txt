@@ -1,0 +1,58 @@
+================================================================
+ RAW EVALUATION BUNDLE — SOURCE OF TRUTH
+ Thread Pool (priority-aware) vs Baseline (FIFO) pool
+================================================================
+
+----------------------------------------------------------------
+TEST MACHINE
+----------------------------------------------------------------
+CPU        : AMD Ryzen 7 6800HS with Radeon Graphics (8 cores / 16 threads)
+Logical CPU: 16
+RAM        : 14 GiB
+OS / kernel: Fedora, Linux 7.0.12-101.fc43.x86_64 (x86_64)
+Compiler   : gcc (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)
+Build flags: -std=c11 -O3 -march=native -ffast-math -pthread  (OPFLAGS)
+
+----------------------------------------------------------------
+METHODOLOGY
+----------------------------------------------------------------
+- Each benchmark data point runs in a forked child (bench_fork) so the
+  glibc heap is fresh per run; RSS sampled from /proc/self/status (VmRSS).
+- Timing: clock_gettime(CLOCK_MONOTONIC).
+- n = 3 trials for cpu/io/scaling/queue/heterogeneous; aging n = 5;
+  stability = 50 sustained iterations (single long-lived pool).
+- Comparative tables: mean +/- sample stddev (n-1) and CV%, via
+  parse_to_latex.py. It now auto-generates ALL benchmark tables into
+  tables.tex: cpu/io/scaling/queue, heterogeneous, stability, and the
+  tail-latency tables (read from demo/bench_results/latency_summary_*.csv).
+
+----------------------------------------------------------------
+COMMANDS (exact)
+----------------------------------------------------------------
+make run-benchmarks            # mine: cpu io scaling queue aging hetero stability
+make run-benchmarks-base       # baseline: cpu io scaling queue hetero stability
+bash run_plot.sh               # PNGs -> benchmark/plot/<bucket>/
+python parse_to_latex.py       # -> benchmark/res/tables.tex
+make test                      # Unity unit tests
+
+----------------------------------------------------------------
+COMMANDS (tail latency)
+----------------------------------------------------------------
+demo/bench_latency.sh                 # sweep -> demo/bench_results/raw_*.txt
+python demo/latency_stats.py          # -> latency_summary_vps_pool.csv
+python demo/plot_latency.py           # -> benchmark/plot/latency/*.png
+
+----------------------------------------------------------------
+CONTENTS
+----------------------------------------------------------------
+res/            raw CSV results (result_*.txt), tables.tex, summary.md,
+                run_log.txt, this MANIFEST.txt
+plot/           regenerated PNG figures, bucketed by benchmark
+                (mine: cpu io scaling queue_ops aging hetero stability;
+                 baseline/ mirror for cpu io scaling queue_ops hetero stability;
+                 latency/ demo VPS tail-latency figures)
+log/            unit (*.log), TSAN (*_tsan.log), Valgrind (*.valgrind.log)
+                test output, plus valgrind_run.txt
+latency/        demo VPS tail-latency raw per-request data (raw_*.txt),
+                summary CSV, run meta, and the run log
+================================================================

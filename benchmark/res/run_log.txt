@@ -1,12 +1,106 @@
-phase=1 environment record
-date_time=2026-05-21T09:53:52+07:00
-git_head=893a6b709dbe2f6d9f3ef44592268462f52cc34b
-nproc=16
-uptime= 09:53:52 up  2:44,  2 users,  load average: 0.35, 0.54, 0.54
-cpu_governor_files=/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor /sys/devices/system/cpu/cpu10/cpufreq/scaling_governor /sys/devices/system/cpu/cpu11/cpufreq/scaling_governor /sys/devices/system/cpu/cpu12/cpufreq/scaling_governor /sys/devices/system/cpu/cpu13/cpufreq/scaling_governor /sys/devices/system/cpu/cpu14/cpufreq/scaling_governor /sys/devices/system/cpu/cpu15/cpufreq/scaling_governor /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor /sys/devices/system/cpu/cpu5/cpufreq/scaling_governor /sys/devices/system/cpu/cpu6/cpufreq/scaling_governor /sys/devices/system/cpu/cpu7/cpufreq/scaling_governor /sys/devices/system/cpu/cpu8/cpufreq/scaling_governor /sys/devices/system/cpu/cpu9/cpufreq/scaling_governor 
-cpu_governors=performance 
-cpu_governor_counts:
-     16 performance
-ac_power_status:
-/sys/class/power_supply/ADP0/online=1
-/sys/class/power_supply/ucsi-source-psy-USBC000:001/online=0
+=== RUN 2026-06-24T12:06:24Z ===
+### MINE ###
+mkdir -p benchmark/res
+./bin/benchmark_cpu 100000 3
+[INFO] device has 16 CPU cores
+[INFO] spin #1
+[INFO] start sequential
+[INFO] start on_demand
+[INFO] start thread_pool
+[INFO] spin #2
+[INFO] start on_demand
+[INFO] start thread_pool
+[INFO] spin #3
+[INFO] start on_demand
+[INFO] start thread_pool
+./bin/benchmark_io 100000 3
+[INFO] spin #1
+[INFO] start sequential
+[INFO] start on_demand
+[INFO] start thread_pool
+[INFO] spin #2
+[INFO] start on_demand
+[INFO] start thread_pool
+[INFO] spin #3
+[INFO] start on_demand
+[INFO] start thread_pool
+./bin/benchmark_scaling 3
+--- Worker Scaling Test (10,000 tasks) run 1/3 ---
+Workers  | Time (ms)  | Throughput (tasks/s)   | total cost KB 
+--------------------------------------------------------------
+      1  |    781.75 |               12791.75 |         +1080
+      2  |    400.35 |               24978.19 |         +1088
+      4  |    207.33 |               48233.29 |         +1100
+      8  |    108.55 |               92124.95 |         +1136
+     16  |    105.77 |               94549.01 |         +1200
+     32  |    103.55 |               96567.18 |         +1332
+     64  |    104.85 |               95372.37 |         +1596
+--- Worker Scaling Test (10,000 tasks) run 2/3 ---
+Workers  | Time (ms)  | Throughput (tasks/s)   | total cost KB 
+--------------------------------------------------------------
+      1  |    781.76 |               12791.63 |         +1080
+      2  |    395.12 |               25309.01 |         +1088
+      4  |    206.66 |               48388.78 |         +1104
+      8  |    107.58 |               92956.62 |         +1132
+     16  |    104.24 |               95928.33 |         +1196
+     32  |    105.08 |               95166.01 |         +1332
+     64  |    104.63 |               95571.98 |         +1592
+--- Worker Scaling Test (10,000 tasks) run 3/3 ---
+Workers  | Time (ms)  | Throughput (tasks/s)   | total cost KB 
+--------------------------------------------------------------
+      1  |    790.52 |               12649.92 |         +1080
+      2  |    398.66 |               25083.98 |         +1088
+... (181 lines truncated)
+### BASELINE ###
+mkdir -p benchmark/res
+./bin/benchmark_base_cpu 100000 3
+[INFO] device has 16 CPU cores
+[INFO] spin #1
+[INFO] start sequential
+[INFO] start on_demand
+[INFO] start baseline
+[INFO] spin #2
+[INFO] start on_demand
+[INFO] start baseline
+[INFO] spin #3
+[INFO] start on_demand
+[INFO] start baseline
+./bin/benchmark_base_io 100000 3
+[INFO] spin #1
+[INFO] start sequential
+[INFO] start on_demand
+[INFO] start baseline
+[INFO] spin #2
+[INFO] start on_demand
+[INFO] start baseline
+[INFO] spin #3
+[INFO] start on_demand
+[INFO] start baseline
+./bin/benchmark_base_scaling 3
+--- Baseline Worker Scaling Test (10,000 tasks) run 1/3 ---
+Workers  | Time (ms)  | Throughput (tasks/s)   | total cost KB 
+--------------------------------------------------------------
+      1  |    809.03 |               12360.51 |          +892
+      2  |    406.93 |               24574.27 |          +964
+      4  |    211.83 |               47206.82 |          +980
+      8  |    110.22 |               90726.16 |         +1012
+     16  |    107.24 |               93244.89 |         +1076
+     32  |    107.48 |               93038.37 |         +1208
+     64  |    107.74 |               92812.38 |         +1472
+--- Baseline Worker Scaling Test (10,000 tasks) run 2/3 ---
+Workers  | Time (ms)  | Throughput (tasks/s)   | total cost KB 
+--------------------------------------------------------------
+      1  |    805.65 |               12412.32 |          +952
+      2  |    406.10 |               24624.75 |          +960
+      4  |    212.66 |               47024.41 |          +976
+      8  |    118.26 |               84558.63 |         +1012
+     16  |    106.40 |               93980.86 |         +1076
+     32  |    107.61 |               92923.91 |         +1208
+     64  |    108.23 |               92394.26 |         +1472
+--- Baseline Worker Scaling Test (10,000 tasks) run 3/3 ---
+Workers  | Time (ms)  | Throughput (tasks/s)   | total cost KB 
+--------------------------------------------------------------
+      1  |    806.83 |               12394.21 |          +952
+      2  |    406.07 |               24626.60 |          +960
+... (154 lines truncated)
+=== DONE 2026-06-24T12:17:16Z ===

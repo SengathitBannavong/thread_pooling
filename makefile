@@ -124,6 +124,8 @@ BENCH_BASE_CPU     = $(TARGET_F)benchmark_base_cpu
 BENCH_BASE_IO      = $(TARGET_F)benchmark_base_io
 BENCH_BASE_QUEUE   = $(TARGET_F)benchmark_base_queue_ops
 BENCH_BASE_SCALING = $(TARGET_F)benchmark_base_scaling
+BENCH_BASE_HETERO  = $(TARGET_F)benchmark_base_heterogeneous
+BENCH_BASE_STABLE  = $(TARGET_F)benchmark_base_stability
 
 $(BENCH_BASE_CPU): $(BASE_F)benchmark_base_cpu.c $(BENCH_SRCS) $(BASELINE_POOL_SRC) | $(TARGET_F)
 	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) -Iinclude/baseline $^ -o $@
@@ -137,9 +139,15 @@ $(BENCH_BASE_QUEUE): $(BASE_F)benchmark_base_queue_ops.c $(BASELINE_POOL_SRC) | 
 $(BENCH_BASE_SCALING): $(BASE_F)benchmark_base_scaling.c $(BENCH_SRCS) $(BASELINE_POOL_SRC) | $(TARGET_F)
 	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) -Iinclude/baseline $^ -o $@
 
-benchmarks-base: $(BENCH_BASE_CPU) $(BENCH_BASE_IO) $(BENCH_BASE_QUEUE) $(BENCH_BASE_SCALING)
+$(BENCH_BASE_HETERO): $(BASE_F)benchmark_base_heterogeneous.c $(BENCH_SRCS) $(BASELINE_POOL_SRC) | $(TARGET_F)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) -Iinclude/baseline $^ -o $@
 
-benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_QUEUE) $(BENCH_AGING)
+$(BENCH_BASE_STABLE): $(BASE_F)benchmark_base_stability.c $(BENCH_SRCS) $(BASELINE_POOL_SRC) | $(TARGET_F)
+	$(CC) $(OPFLAGS) -I$(BENCH_F) $(BENCH_FLAG) -Iinclude/baseline $^ -o $@
+
+benchmarks-base: $(BENCH_BASE_CPU) $(BENCH_BASE_IO) $(BENCH_BASE_QUEUE) $(BENCH_BASE_SCALING) $(BENCH_BASE_HETERO) $(BENCH_BASE_STABLE)
+
+benchmarks: $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_QUEUE) $(BENCH_AGING) $(BENCH_HETERO) $(BENCH_STABLE)
 
 demo: $(DEMO_HTTP)
 
@@ -154,12 +162,14 @@ build-tests-tsan: $(TSAN_BINS) $(BASELINE_TEST_BIN)_tsan $(SMOKE_TEST_BIN)_tsan
 
 build-tests-all-tsan: $(ALL_TSAN_BINS)
 
-run-benchmarks-base: benchmarks_base
+run-benchmarks-base: benchmarks-base
 	mkdir -p benchmark/res
 	./$(BENCH_BASE_CPU) 100000 3
 	./$(BENCH_BASE_IO) 100000 3
 	./$(BENCH_BASE_SCALING) 3
 	./$(BENCH_BASE_QUEUE) 10000 3
+	./$(BENCH_BASE_HETERO) 3
+	./$(BENCH_BASE_STABLE)
 
 run-benchmarks: benchmarks
 	mkdir -p benchmark/res
@@ -168,6 +178,8 @@ run-benchmarks: benchmarks
 	./$(BENCH_SCALE) 3
 	./$(BENCH_QUEUE) 10000 3
 	./$(BENCH_AGING)
+	./$(BENCH_HETERO) 3
+	./$(BENCH_STABLE)
 
 plot-all: run-benchmarks
 	@for f in benchmark/res/*.txt; do \
@@ -257,5 +269,5 @@ clean:
 	rm -f $(ALL_TEST_BINS) $(ALL_TSAN_BINS) $(MONITOR_BIN) $(BASELINE_TEST_BIN) $(BASELINE_TEST_BIN)_tsan $(SMOKE_TEST_BIN) $(SMOKE_TEST_BIN)_tsan \
 	      $(BENCH_CPU) $(BENCH_IO) $(BENCH_SCALE) $(BENCH_HETERO) $(BENCH_STABLE) $(BENCH_QUEUE) $(BENCH_AGING) \
 	      $(DEMO_HTTP) \
-	      $(BENCH_BASE_CPU) $(BENCH_BASE_IO) $(BENCH_BASE_QUEUE) $(BENCH_BASE_SCALING)
+	      $(BENCH_BASE_CPU) $(BENCH_BASE_IO) $(BENCH_BASE_QUEUE) $(BENCH_BASE_SCALING) $(BENCH_BASE_HETERO) $(BENCH_BASE_STABLE)
 	rm -rf $(LOG_F)

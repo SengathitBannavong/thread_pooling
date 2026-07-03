@@ -1,0 +1,13 @@
+url=https://chadolfjerry.page/threadpool/render?w=320&h=320&iter=600
+requests_per_config=120
+concurrency_list=1 2 4 8 16 32 64
+started=2026-06-24T16:01:59Z
+client_host=fedora
+config c=1 wall=94.772 ok=120
+config c=2 wall=47.602 ok=120
+config c=4 wall=23.018 ok=120
+config c=8 wall=16.283 ok=120
+config c=16 wall=6.776 ok=120
+config c=32 wall=5.128 ok=120
+config c=64 wall=6.325 ok=120
+finished=2026-06-24T16:05:40Z

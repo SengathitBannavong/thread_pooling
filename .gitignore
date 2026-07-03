@@ -6,7 +6,10 @@ log/
 
 # file excute temp (r)
 r
-context/
+
+# ignore working notes in context/ but keep the raw evaluation bundle tracked
+context/*
+!context/raw_evaluation.zip
 
 # file save log of brenchmark test
 benchmark/save/

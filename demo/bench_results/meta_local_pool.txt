@@ -1,0 +1,13 @@
+url=http://127.0.0.1:8080/render?w=320&h=320&iter=600
+requests_per_config=1000
+concurrency_list=1 2 4 8 16 32 64
+started=2026-06-24T16:32:29Z
+client_host=fedora
+config c=1 wall=29.521 ok=1000
+config c=2 wall=14.799 ok=1000
+config c=4 wall=7.514 ok=1000
+config c=8 wall=3.813 ok=1000
+config c=16 wall=2.247 ok=1000
+config c=32 wall=2.139 ok=1000
+config c=64 wall=2.102 ok=1000
+finished=2026-06-24T16:33:52Z

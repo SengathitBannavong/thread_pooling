@@ -1,0 +1,20 @@
+════════════════════════════════════════════════════════════════
+ Target : https://chadolfjerry.page/threadpool/render?w=320&h=320&iter=600
+ Sweep  : concurrency [1 2 4 8 16 32 64], 120 requests each
+ Out    : demo/bench_results (label=vps_pool)
+════════════════════════════════════════════════════════════════
+[bench] concurrency=1 → demo/bench_results/raw_vps_pool_c1.txt
+         done: 120/120 ok in 94.772s
+[bench] concurrency=2 → demo/bench_results/raw_vps_pool_c2.txt
+         done: 120/120 ok in 47.602s
+[bench] concurrency=4 → demo/bench_results/raw_vps_pool_c4.txt
+         done: 120/120 ok in 23.018s
+[bench] concurrency=8 → demo/bench_results/raw_vps_pool_c8.txt
+         done: 120/120 ok in 16.283s
+[bench] concurrency=16 → demo/bench_results/raw_vps_pool_c16.txt
+         done: 120/120 ok in 6.776s
+[bench] concurrency=32 → demo/bench_results/raw_vps_pool_c32.txt
+         done: 120/120 ok in 5.128s
+[bench] concurrency=64 → demo/bench_results/raw_vps_pool_c64.txt
+         done: 120/120 ok in 6.325s
+[bench] raw data in demo/bench_results

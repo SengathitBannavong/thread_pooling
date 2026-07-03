@@ -6,8 +6,8 @@
 \toprule
 Benchmark & Mine (t/s) & Baseline (t/s) & Ratio & CV (mine / base) \\
 \midrule
-CPU-bound (fib30, 100K) & 6\,096.4 $\pm$ 0.0 & 6\,141.6 $\pm$ 0.0 & 0.993x & 0.00\% / 0.00\% \\
-IO-bound (64KB read, 100K) & 23\,733.2 $\pm$ 0.0 & 23\,400.5 $\pm$ 0.0 & 1.014x & 0.00\% / 0.00\% \\
+CPU-bound (fib30, 100K) & 6\,307.1 $\pm$ 50.4 & 6\,271.4 $\pm$ 50.6 & 1.006x & 0.80\% / 0.81\% \\
+IO-bound (64KB read, 100K) & 38\,408.4 $\pm$ 847.3 & 37\,069.6 $\pm$ 4\,729.9 & 1.036x & 2.21\% / 12.76\% \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -20,13 +20,13 @@ IO-bound (64KB read, 100K) & 23\,733.2 $\pm$ 0.0 & 23\,400.5 $\pm$ 0.0 & 1.014x 
 \toprule
 Workers & Mine (t/s) & Baseline (t/s) & Ratio \\
 \midrule
-1 & 12\,684.1 $\pm$ 34.3 & 12\,179.6 $\pm$ 54.4 & 1.041x \\
-2 & 25\,165.8 $\pm$ 36.1 & 24\,122.6 $\pm$ 27.8 & 1.043x \\
-4 & 47\,761.9 $\pm$ 217.1 & 46\,211.5 $\pm$ 315.5 & 1.034x \\
-8 & 87\,202.2 $\pm$ 2\,057.2 & 84\,599.2 $\pm$ 1\,733.6 & 1.031x \\
-16 & 92\,100.7 $\pm$ 1\,750.7 & 89\,294.1 $\pm$ 287.3 & 1.031x \\
-32 & 92\,022.8 $\pm$ 2\,975.9 & 89\,525.3 $\pm$ 606.3 & 1.028x \\
-64 & 91\,952.1 $\pm$ 1\,454.9 & 89\,095.2 $\pm$ 519.0 & 1.032x \\
+1 & 12\,744.4 $\pm$ 81.9 & 12\,389.0 $\pm$ 26.3 & 1.029x \\
+2 & 25\,123.7 $\pm$ 169.0 & 24\,608.5 $\pm$ 29.7 & 1.021x \\
+4 & 48\,266.4 $\pm$ 109.6 & 46\,983.7 $\pm$ 246.0 & 1.027x \\
+8 & 91\,922.4 $\pm$ 1\,148.9 & 88\,550.1 $\pm$ 3\,461.4 & 1.038x \\
+16 & 95\,842.0 $\pm$ 1\,252.0 & 93\,677.4 $\pm$ 384.6 & 1.023x \\
+32 & 96\,149.5 $\pm$ 854.9 & 93\,119.3 $\pm$ 246.1 & 1.033x \\
+64 & 95\,199.3 $\pm$ 483.1 & 92\,564.9 $\pm$ 219.4 & 1.028x \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -39,11 +39,11 @@ Workers & Mine (t/s) & Baseline (t/s) & Ratio \\
 \toprule
 Workers & Mine (ops/s) & Baseline (ops/s) & Ratio \\
 \midrule
-1 & 5\,920\,081.2 $\pm$ 76\,410.6 & 8\,469\,928.1 $\pm$ 190\,271.0 & 0.699x \\
-2 & 5\,182\,658.2 $\pm$ 42\,833.2 & 7\,000\,034.1 $\pm$ 71\,943.0 & 0.740x \\
-4 & 3\,733\,903.4 $\pm$ 14\,005.3 & 4\,992\,465.7 $\pm$ 41\,381.1 & 0.748x \\
-8 & 1\,585\,654.7 $\pm$ 51\,711.0 & 2\,358\,960.3 $\pm$ 326\,279.8 & 0.672x \\
-16 & 813\,579.9 $\pm$ 21\,630.2 & 845\,507.9 $\pm$ 2\,003.4 & 0.962x \\
+1 & 4\,928\,547.0 $\pm$ 631\,393.6 & 7\,070\,802.1 $\pm$ 894\,808.6 & 0.697x \\
+2 & 4\,327\,288.6 $\pm$ 169\,910.5 & 5\,110\,832.6 $\pm$ 441\,093.6 & 0.847x \\
+4 & 2\,187\,355.3 $\pm$ 141\,682.7 & 2\,641\,628.6 $\pm$ 404\,250.4 & 0.828x \\
+8 & 1\,003\,339.4 $\pm$ 63\,216.6 & 1\,093\,152.5 $\pm$ 57\,649.2 & 0.918x \\
+16 & 898\,454.5 $\pm$ 336.1 & 1\,036\,515.4 $\pm$ 27\,587.0 & 0.867x \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -56,20 +56,113 @@ Workers & Mine (ops/s) & Baseline (ops/s) & Ratio \\
 \toprule
 Benchmark & Mine CV (\%) & Base CV (\%) & Stability advantage \\
 \midrule
-CPU-bound & 0.00\% & 0.00\% & 0.00x \\
-IO-bound & 0.00\% & 0.00\% & 0.00x \\
-Scaling 1w & 0.27\% & 0.45\% & 1.65x \\
-Scaling 2w & 0.14\% & 0.12\% & 0.80x \\
-Scaling 4w & 0.45\% & 0.68\% & 1.50x \\
-Scaling 8w & 2.36\% & 2.05\% & 0.87x \\
-Scaling 16w & 1.90\% & 0.32\% & 0.17x \\
-Scaling 32w & 3.23\% & 0.68\% & 0.21x \\
-Scaling 64w & 1.58\% & 0.58\% & 0.37x \\
-Queue 1w & 1.29\% & 2.25\% & 1.74x \\
-Queue 2w & 0.83\% & 1.03\% & 1.24x \\
-Queue 4w & 0.38\% & 0.83\% & 2.21x \\
-Queue 8w & 3.26\% & 13.83\% & 4.24x \\
-Queue 16w & 2.66\% & 0.24\% & 0.09x \\
+CPU-bound & 0.80\% & 0.81\% & 1.01x \\
+IO-bound & 2.21\% & 12.76\% & 5.78x \\
+Scaling 1w & 0.64\% & 0.21\% & 0.33x \\
+Scaling 2w & 0.67\% & 0.12\% & 0.18x \\
+Scaling 4w & 0.23\% & 0.52\% & 2.31x \\
+Scaling 8w & 1.25\% & 3.91\% & 3.13x \\
+Scaling 16w & 1.31\% & 0.41\% & 0.31x \\
+Scaling 32w & 0.89\% & 0.26\% & 0.30x \\
+Scaling 64w & 0.51\% & 0.24\% & 0.47x \\
+Queue 1w & 12.81\% & 12.65\% & 0.99x \\
+Queue 2w & 3.93\% & 8.63\% & 2.20x \\
+Queue 4w & 6.48\% & 15.30\% & 2.36x \\
+Queue 8w & 6.30\% & 5.27\% & 0.84x \\
+Queue 16w & 0.04\% & 2.66\% & 71.15x \\
+Hetero 1w & 0.84\% & 0.92\% & 1.10x \\
+Hetero 2w & 0.77\% & 1.08\% & 1.39x \\
+Hetero 4w & 2.03\% & 0.97\% & 0.48x \\
+Hetero 8w & 65.53\% & 3.58\% & 0.05x \\
+Hetero 16w & 45.26\% & 0.26\% & 0.01x \\
+Hetero 32w & 1.89\% & 1.62\% & 0.86x \\
+Hetero 64w & 2.93\% & 5.37\% & 1.83x \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Heterogeneous (mixed CPU+IO+priority) throughput by worker count (mean $\pm$ sample stddev, $n=3$ trials)}
+\label{tab:hetero}
+\begin{tabular}{rrrr}
+\toprule
+Workers & Mine (t/s) & Baseline (t/s) & Ratio \\
+\midrule
+1 & 6\,546.8 $\pm$ 54.8 & 6\,535.2 $\pm$ 60.2 & 1.002x \\
+2 & 14\,667.4 $\pm$ 113.1 & 15\,157.5 $\pm$ 163.0 & 0.968x \\
+4 & 34\,767.3 $\pm$ 704.8 & 32\,257.6 $\pm$ 311.6 & 1.078x \\
+8 & 54\,171.1 $\pm$ 35\,500.9 & 67\,072.2 $\pm$ 2\,400.4 & 0.808x \\
+16 & 78\,685.8 $\pm$ 35\,614.2 & 98\,232.8 $\pm$ 254.7 & 0.801x \\
+32 & 121\,641.3 $\pm$ 2\,293.4 & 102\,899.2 $\pm$ 1\,667.6 & 1.182x \\
+64 & 134\,431.8 $\pm$ 3\,941.6 & 121\,166.3 $\pm$ 6\,510.7 & 1.109x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Stability under sustained load (50 iterations): throughput, CV, and max RSS drift}
+\label{tab:stability}
+\begin{tabular}{lrrr}
+\toprule
+Pool & Throughput (t/s) & CV & Max RSS drift (KB) \\
+\midrule
+Mine & 90\,974.6 $\pm$ 1\,228.2 & 1.35\% & 4 \\
+Baseline & 98\,845.1 $\pm$ 516.4 & 0.52\% & 68 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Priority aging ablation: starvation window and total time (5K LOW + 10K HIGH tasks, $n=5$ trials)}
+\label{tab:aging}
+\begin{tabular}{lrrr}
+\toprule
+Mode & Starvation window (ms) & Total time (ms) & Throughput (t/s) \\
+\midrule
+Aging disabled & 2\,435.8 $\pm$ 22.6 & 2\,435.8 $\pm$ 22.7 & 6\,158.6 $\pm$ 57.4 \\
+Aging enabled & 897.0 $\pm$ 6.8 & 2\,437.3 $\pm$ 14.5 & 6\,154.5 $\pm$ 36.6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Tail latency by concurrency --- local\_pool (per-request, demo render server). Latency in ms.}
+\label{tab:tail_latency_local_pool}
+\begin{tabular}{rrrrrr}
+\toprule
+Concurrency & Throughput (req/s) & p50 & p90 & p95 & p99 \\
+\midrule
+1 & 33.9 & 25 & 25 & 25 & 26 \\
+2 & 67.6 & 25 & 26 & 26 & 26 \\
+4 & 133.1 & 26 & 26 & 26 & 27 \\
+8 & 262.3 & 26 & 27 & 27 & 27 \\
+16 & 445.0 & 29 & 34 & 37 & 46 \\
+32 & 467.5 & 48 & 62 & 67 & 82 \\
+64 & 475.7 & 51 & 89 & 96 & 108 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Tail latency by concurrency --- vps\_pool (per-request, demo render server). Latency in ms.}
+\label{tab:tail_latency_vps_pool}
+\begin{tabular}{rrrrrr}
+\toprule
+Concurrency & Throughput (req/s) & p50 & p90 & p95 & p99 \\
+\midrule
+1 & 1.3 & 744 & 916 & 1010 & 1797 \\
+2 & 2.5 & 762 & 926 & 953 & 987 \\
+4 & 5.2 & 731 & 867 & 909 & 1007 \\
+8 & 7.4 & 928 & 1559 & 1787 & 2139 \\
+16 & 17.7 & 796 & 1034 & 1224 & 1624 \\
+32 & 23.4 & 1156 & 1387 & 1540 & 1811 \\
+64 & 19.0 & 2180 & 2825 & 3138 & 4627 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
