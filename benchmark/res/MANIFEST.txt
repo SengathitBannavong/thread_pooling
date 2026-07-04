@@ -25,6 +25,7 @@ METHODOLOGY
   parse_to_latex.py. It now auto-generates ALL benchmark tables into
   tables.tex: cpu/io/scaling/queue, heterogeneous, stability, and the
   tail-latency tables (read from demo/bench_results/latency_summary_*.csv).
+- A/B run benchmark_heterogeneous — branches A/B (mine/base), n = 10
 
 ----------------------------------------------------------------
 COMMANDS (exact)

@@ -182,6 +182,9 @@ def _plot_memory(df, base_name, output_dir, is_scaling, x_col, mem_col='mem_run_
         plt.xlabel('Number of Workers')
     else:
         avg = df.groupby('method')[mem_col].mean()
+        # worker-sweep methods ('N_workers') must sort numerically, not lexically
+        if df['method'].str.match(r'^\d+_workers$').all():
+            avg = avg.reindex(sorted(avg.index, key=lambda m: int(m.split('_')[0])))
         avg.plot(kind='bar', color='steelblue')
         plt.xticks(rotation=30, ha='right')
 

@@ -1,0 +1,111 @@
+A/B
+Run 1
+Mine:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,132922.88,75231.59,13.2923,1204
+16_workers,10000,1,89926.96,111201.35,8.9927,1712
+---------------------
+Base:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,163202.02,61273.75,16.3202,1052
+16_workers,10000,1,95915.32,104258.63,9.5915,1560
+---------------------
+Run 2
+Mine:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,138509.66,72197.13,13.8510,1204
+16_workers,10000,1,93051.13,107467.80,9.3051,1712
+---------------------
+Base:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,159973.03,62510.54,15.9973,1052
+16_workers,10000,1,100626.82,99377.09,10.0627,1560
+---------------------
+Run 3
+Mine:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,138599.87,72150.14,13.8600,1140
+16_workers,10000,1,94469.89,105853.84,9.4470,1644
+---------------------
+Base:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,157024.13,63684.48,15.7024,988
+16_workers,10000,1,107866.07,92707.56,10.7866,1496
+---------------------
+Run 4
+Mine:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,136717.91,73143.31,13.6718,1204
+16_workers,10000,1,97406.70,102662.34,9.7407,1712
+---------------------
+Base:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,162129.69,61679.02,16.2130,988
+16_workers,10000,1,102831.69,97246.29,10.2832,1496
+---------------------
+Run 5
+Mine:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,136855.30,73069.88,13.6855,1140
+16_workers,10000,1,94376.68,105958.38,9.4377,1648
+---------------------
+Base:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,161922.71,61757.86,16.1923,988
+16_workers,10000,1,107087.26,93381.79,10.7087,1496
+---------------------
+Run 6
+Mine:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,131299.38,76161.82,13.1299,1140
+16_workers,10000,1,95433.99,104784.47,9.5434,1648
+---------------------
+Base:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,163411.26,61195.29,16.3411,988
+16_workers,10000,1,107322.14,93177.42,10.7322,1500
+---------------------
+Run 7
+Mine:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,135553.32,73771.71,13.5553,1140
+16_workers,10000,1,100799.82,99206.52,10.0800,1648
+---------------------
+Base:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,160091.24,62464.38,16.0091,988
+16_workers,10000,1,108421.47,92232.66,10.8421,1496
+---------------------
+Run 8
+Mine:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,136393.51,73317.27,13.6394,1204
+16_workers,10000,1,92421.62,108199.79,9.2422,1712
+---------------------
+Base:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,157302.64,63571.73,15.7303,1052
+16_workers,10000,1,106182.81,94177.20,10.6183,1560
+---------------------
+Run 9
+Mine:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,141688.90,70577.16,14.1689,1140
+16_workers,10000,1,95005.35,105257.23,9.5005,1648
+---------------------
+Base:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,159099.52,62853.74,15.9100,1052
+16_workers,10000,1,105707.60,94600.57,10.5708,1560
+---------------------
+Run 10
+Mine:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,136880.12,73056.63,13.6880,1140
+16_workers,10000,1,103154.51,96941.96,10.3155,1648
+---------------------
+Base:
+method,n_tasks,run,total_time_us,throughput,avg_latency_us,mem_run_cost_kb
+8_workers,10000,1,157012.47,63689.21,15.7012,1052
+16_workers,10000,1,103781.30,96356.47,10.3781,1560
+---------------------
